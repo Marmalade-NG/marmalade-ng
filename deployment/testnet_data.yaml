@@ -1,0 +1,8 @@
+chain: 1
+network: testnet04
+admin-keyset: n_442d3e11cfe0d39859878e5b1520cd8b8c36e5db.admin
+gas-payer: k:a354ebe134adf311dc31b91b288d09fea7f1974e4dc4f4f7ebff2b5648aae25b
+
+namespace-key: e978916dab2810e062653f8a58b05e57d5a2a2d86aa9b2626b92baece256af7f
+admin-key: e2e1ff78fa6079a895ec90c38c0c2c934e1069f05f34fd3c10a773355d3d11ce
+gas-payer-key: a354ebe134adf311dc31b91b288d09fea7f1974e4dc4f4f7ebff2b5648aae25b
