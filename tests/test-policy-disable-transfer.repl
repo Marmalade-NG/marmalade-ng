@@ -1,0 +1,29 @@
+(env-data {"disable-marmalade":true})
+(load "kadena_repl_sandbox/kda-env/init.repl")
+(load "init/init-ledger.repl")
+(load "init/init-policy-disable-transfer.repl")
+
+(begin-tx "Transfer tests")
+(use marmalade-ng.ledger)
+(env-data {'create-ks:["create"],
+           'alice-ks:["alice-key"],
+           'bob-ks:["bob-key"]})
+
+(print (+ "Token ID: => " (create-token-id (read-keyset 'create-ks) "http://token-not-transferable" )))
+
+(env-sigs [{'key:"create", 'caps:[(ENFORCE-RESERVED)]},
+           {'key:"nobody", 'caps:[(MINT "t:m5PRDNMXHfzC2FKeEZW_okpIp7c30Pwrv4gEuSQQoiA" "alice" 1.0)]},
+           {'key:"alice-key", 'caps:[(TRANSFER "t:m5PRDNMXHfzC2FKeEZW_okpIp7c30Pwrv4gEuSQQoiA" "alice" "bob" 0.1)]}
+          ])
+
+
+(create-token "t:m5PRDNMXHfzC2FKeEZW_okpIp7c30Pwrv4gEuSQQoiA" 1 "http://token-not-transferable"
+              [marmalade-ng.policy-disable-transfer] (read-keyset 'create-ks))
+
+(mint "t:m5PRDNMXHfzC2FKeEZW_okpIp7c30Pwrv4gEuSQQoiA" "alice" (read-keyset 'alice-ks) 1.0)
+
+
+(expect-failure "Transfer disabled" "Transfer not allowed"
+                (transfer-create "t:m5PRDNMXHfzC2FKeEZW_okpIp7c30Pwrv4gEuSQQoiA" "alice" "bob" (read-keyset 'bob-ks) 0.1))
+
+(commit-tx)

@@ -1,0 +1,65 @@
+(env-data {"disable-marmalade":true})
+(load "kadena_repl_sandbox/kda-env/init.repl")
+(load "init/init-ledger.repl")
+(load "init/init-policy-non-fungible.repl")
+
+
+(begin-tx "Create / Mint token")
+(env-hash (hash "Create Mint Tx"))
+(use marmalade-ng.ledger)
+(env-data {'create-ks:["create"],
+           'alice-ks:["alice-key"],
+           'bob-ks:["bob-key"]})
+
+(print (+ "Token ID: => " (create-token-id (read-keyset 'create-ks) "http://token-not-fungible" )))
+
+(env-sigs [{'key:"create", 'caps:[(ENFORCE-RESERVED)]}])
+
+
+; try to create with a precision different from 0
+(expect-failure "Bad precision for a non fungible"
+                (create-token "t:vHKxwYAQoWIjGw3WP7piLyGtLhQnfvW5u-OLHuKIVdw" 3 "http://token-not-fungible"
+                              [marmalade-ng.policy-non-fungible] (read-keyset 'create-ks)))
+
+; A precision of 0 should work
+(create-token "t:vHKxwYAQoWIjGw3WP7piLyGtLhQnfvW5u-OLHuKIVdw" 0 "http://token-not-fungible"
+              [marmalade-ng.policy-non-fungible] (read-keyset 'create-ks))
+
+; try to mint an amount of 2.0
+(env-sigs [{'key:"nobody", 'caps:[(MINT "t:vHKxwYAQoWIjGw3WP7piLyGtLhQnfvW5u-OLHuKIVdw" "alice" 2.0)]}])
+(expect-failure "Try to mint 2.0 is not allowed" "amount can only be 1"
+                (mint "t:vHKxwYAQoWIjGw3WP7piLyGtLhQnfvW5u-OLHuKIVdw" "alice" (read-keyset 'alice-ks) 2.0))
+
+; Now it should be ok
+(env-sigs [{'key:"nobody", 'caps:[(MINT "t:vHKxwYAQoWIjGw3WP7piLyGtLhQnfvW5u-OLHuKIVdw" "alice" 1.0)]}])
+(mint "t:vHKxwYAQoWIjGw3WP7piLyGtLhQnfvW5u-OLHuKIVdw" "alice" (read-keyset 'alice-ks) 1.0)
+
+; try to mint a second time for bob
+(env-sigs [{'key:"nobody", 'caps:[(MINT "t:vHKxwYAQoWIjGw3WP7piLyGtLhQnfvW5u-OLHuKIVdw" "bob" 1.0)]}])
+(expect-failure "Try to mint again is not allowed" "Only one mint allowed"
+                (mint "t:vHKxwYAQoWIjGw3WP7piLyGtLhQnfvW5u-OLHuKIVdw" "bob" (read-keyset 'bob-ks) 1.0))
+
+(expect "Balance of alice should be 1.0" 1.0 (get-balance "t:vHKxwYAQoWIjGw3WP7piLyGtLhQnfvW5u-OLHuKIVdw" "alice"))
+(expect "Balance of bob should be 0.0" 0.0 (get-balance "t:vHKxwYAQoWIjGw3WP7piLyGtLhQnfvW5u-OLHuKIVdw" "bob"))
+
+(commit-tx)
+
+; Now we are trying some transfers
+(begin-tx "Transfer token")
+(env-hash (hash "Transfer token"))
+(use marmalade-ng.ledger)
+(env-data {'alice-ks:["alice-key"],
+           'bob-ks:["bob-key"]})
+
+(env-sigs [{'key:"alice-key", 'caps:[(TRANSFER "t:vHKxwYAQoWIjGw3WP7piLyGtLhQnfvW5u-OLHuKIVdw" "alice" "bob" 2.0)]}
+          ])
+(expect-failure "Try to transfer 2.0 is not allowed" "amount can only be 1"
+  (transfer-create "t:vHKxwYAQoWIjGw3WP7piLyGtLhQnfvW5u-OLHuKIVdw" "alice" "bob" (read-keyset 'bob-ks) 2.0))
+
+; Now let's transfer 1.0 and it should work
+(transfer-create "t:vHKxwYAQoWIjGw3WP7piLyGtLhQnfvW5u-OLHuKIVdw" "alice" "bob" (read-keyset 'bob-ks) 1.0)
+
+;Verify that the transfer worked as expected
+(expect "Balance of alice should be 0.0" 0.0 (get-balance "t:vHKxwYAQoWIjGw3WP7piLyGtLhQnfvW5u-OLHuKIVdw" "alice"))
+(expect "Balance of bob should be 1.0" 1.0 (get-balance "t:vHKxwYAQoWIjGw3WP7piLyGtLhQnfvW5u-OLHuKIVdw" "bob"))
+(commit-tx)

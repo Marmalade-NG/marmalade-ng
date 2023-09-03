@@ -1,0 +1,6 @@
+(begin-tx)
+(print "====> Deploy policy-marketplace")
+(namespace 'marmalade-ng)
+(load "../../pact/policies/policy-marketplace.pact")
+(create-table marketplace-sales)
+(commit-tx)

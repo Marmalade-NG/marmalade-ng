@@ -1,0 +1,220 @@
+(env-data {"disable-marmalade":true})
+(load "kadena_repl_sandbox/kda-env/init.repl")
+(load "init/init-ledger.repl")
+(load "init/init-policy-auction-sale.repl")
+
+(begin-tx "Create a token")
+(env-hash (hash "CreateTx"))
+(use marmalade-ng.ledger)
+(env-data {'create-ks:["create"],
+           'alice-ks:["alice-key"]})
+
+(print (+ "Token ID: => " (create-token-id (read-keyset 'create-ks) "http://token-1-auction" )))
+
+(env-sigs [{'key:"create", 'caps:[(ENFORCE-RESERVED)]}
+           {'key:"nobody", 'caps:[(MINT "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8" "alice" 0.6)]},
+          ])
+
+(create-token "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8" 1 "http://token-1-auction"
+              [marmalade-ng.policy-auction-sale] (read-keyset 'create-ks))
+
+(mint "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8" "alice" (read-keyset 'alice-ks) 0.6)
+
+(commit-tx)
+
+(begin-tx "Sales")
+(env-hash (hash "auction-sale-1"))
+(env-chain-data {"block-time": (time "2023-01-01T00:00:00Z")})
+(print (format "Sale ID 1: => {}" [(tx-hash)]))
+
+; Alice will sell 0.1
+(use marmalade-ng.ledger)
+(use marmalade-ng.policy-auction-sale)
+
+(env-sigs [ {'key:"alice-key", 'caps:[(OFFER "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8" "alice" 0.1)]}
+           ])
+
+(expect "Balance of was 0.6" 0.6 (get-balance "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8" "alice"))
+
+
+; try without env-data
+(expect-failure "No env-data provided" "No policy to handle the offer"
+  (sale "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8" "alice" 0.1 (time "2023-06-01T00:00:00Z")))
+
+
+; Try with a valid marmalade_sale but with a mssing auction msg
+(env-data {'marmalade_sale:{'sale_type:"auction", 'currency:coin }})
+(expect-failure "auction_quote not present in data" "auction not present in data"
+  (sale "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8" "alice" 0.1 (time "2023-06-01T00:00:00Z")))
+ 
+; Try with a missing recipient
+(env-data {'marmalade_sale: {'sale_type:"auction", 'currency:coin },
+           'marmalade_auction: {'recipient:"", 'start_price:10.0, 'increment_ratio:1.1 }})
+
+(expect-failure "bad recipient" "Account name does not conform"
+  (sale "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8" "alice" 0.1 (time "2023-06-01T00:00:00Z")))
+
+; Try with a bad starting price
+(env-data {'marmalade_sale: {'sale_type:"auction", 'currency:coin },
+           'marmalade_auction: {'recipient:"alice", 'start_price:-10.0, 'increment_ratio:1.1 }})
+
+(expect-failure "bad price" "price must be positive"
+  (sale "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8" "alice" 0.1 (time "2023-06-01T00:00:00Z")))
+
+; Try with an unknown account
+(env-data {'marmalade_sale: {'sale_type:"auction", 'currency:coin },
+           'marmalade_auction: {'recipient:"unknown", 'start_price:10.0, 'increment_ratio:1.1 }})
+
+(expect-failure "unknown KDA account" "does not exist"
+  (sale "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8" "alice" 0.1 (time "2023-06-01T00:00:00Z")))
+
+; Try with a bad increment ratio
+(env-data {'marmalade_sale: {'sale_type:"auction", 'currency:coin },
+           'marmalade_auction: {'recipient:"alice", 'start_price:10.0, 'increment_ratio:0.9 }})
+
+(expect-failure "bad increment ratio" "Increment must be > 1"
+  (sale "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8" "alice" 0.1 (time "2023-06-01T00:00:00Z")))
+
+; Try with a NO-TIMEOUT
+(env-data {'marmalade_sale: {'sale_type:"auction", 'currency:coin },
+           'marmalade_auction: {'recipient:"alice", 'start_price:10.0, 'increment_ratio:1.1 }})
+
+(expect-failure "bad timeout" "not supported"
+  (sale "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8" "alice" 0.1 NO-TIMEOUT))
+
+; Now try exrything good
+(env-data {'marmalade_sale: {'sale_type:"auction", 'currency:coin },
+           'marmalade_auction: {'recipient:"alice", 'start_price:10.0, 'increment_ratio:1.1 }})
+
+
+(sale "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8" "alice" 0.1 (time "2023-06-01T00:00:00Z"))
+
+
+
+(expect-that "It should exist 1 active sale" (compose (length) (= 1)) (get-all-active-sales))
+(expect-that "It should exist 1 active sale" (compose (length) (= 1)) (get-sales-for-token "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8"))
+
+(print (+ "Escrow account: => " (at 'escrow-account (get-sale (tx-hash)))))
+(commit-tx)
+
+(begin-tx "Bob wants to bid")
+(env-chain-data {"block-time": (time "2023-01-02T00:00:00Z")})
+(use marmalade-ng.policy-auction-sale)
+(env-data {'bob-ks:["bob-key"]})
+
+
+(env-sigs [ {'key:"bob-key", 'caps:[(coin.TRANSFER "bob" "c:09-juxzBu412pfsgBlM6Au7fOnwvSsX78Er66vnC6sI" 10.0)]}
+           ])
+
+; Try with an amount lower than the starting price
+(expect-failure "Below the starting price" "Price too low"
+               (place-bid "utRLLLbDcGyMnBcuPDjo-VaxR_65Wxv2v8EhoD9z4-E" "bob" (read-keyset 'bob-ks) 9.9))
+
+; Now with the ight price
+(place-bid "utRLLLbDcGyMnBcuPDjo-VaxR_65Wxv2v8EhoD9z4-E" "bob" (read-keyset 'bob-ks) 10.0)
+
+; Verify that bob KDA account has been debited
+(expect "Balance should be 990" 990.0 (coin.get-balance "bob"))
+
+; Verify that the buyer has been recorded
+(expect-that "Buyer has been recoreded" (compose (at 'current-buyer) (= "bob")) (get-sale "utRLLLbDcGyMnBcuPDjo-VaxR_65Wxv2v8EhoD9z4-E"))
+(commit-tx)
+
+
+(begin-tx "Carol wants to bid")
+(env-chain-data {"block-time": (time "2023-01-03T00:00:00Z")})
+(use marmalade-ng.policy-auction-sale)
+(env-data {'carol-ks:["carol-key"]})
+
+(env-sigs [ {'key:"carol-key", 'caps:[(coin.TRANSFER "carol" "c:09-juxzBu412pfsgBlM6Au7fOnwvSsX78Er66vnC6sI" 11.0)]}
+           ])
+
+; The minium amount to bid is 10.0 * 10% = 11.0
+
+; Try with an amount lower than the starting price
+(expect-failure "Below the starting price" "Price too low"
+               (place-bid "utRLLLbDcGyMnBcuPDjo-VaxR_65Wxv2v8EhoD9z4-E" "carol" (read-keyset 'carol-ks) 10.99))
+
+; Now with the ight price
+(place-bid "utRLLLbDcGyMnBcuPDjo-VaxR_65Wxv2v8EhoD9z4-E" "carol" (read-keyset 'carol-ks) 11.0)
+
+; Verify that carol KDA account has been debited
+(expect "Balance should be 989" 989.0 (coin.get-balance "carol"))
+
+; Verify that bob KDA account has been refunded
+(expect "Balance should be 1000" 1000.0 (coin.get-balance "bob"))
+
+; Verify that the buyer has been recorded
+(expect-that "Buyer has been recoreded" (compose (at 'current-buyer) (= "carol")) (get-sale "utRLLLbDcGyMnBcuPDjo-VaxR_65Wxv2v8EhoD9z4-E"))
+(commit-tx)
+
+
+;; Bob will bid again
+(begin-tx "Bob bids again")
+(env-chain-data {"block-time": (time "2023-01-04T00:00:00Z")})
+(use marmalade-ng.policy-auction-sale)
+(env-data {'bob-ks:["bob-key"]})
+
+(env-sigs [ {'key:"bob-key", 'caps:[(coin.TRANSFER "bob" "c:09-juxzBu412pfsgBlM6Au7fOnwvSsX78Er66vnC6sI" 20.0)]}
+           ])
+
+; The minium amount to bid is 11.0 * 10% = 12.1
+
+; Try with an amount lower than the starting price
+(expect-failure "Below the starting price" "Price too low"
+               (place-bid "utRLLLbDcGyMnBcuPDjo-VaxR_65Wxv2v8EhoD9z4-E" "bob" (read-keyset 'bob-ks) 12.09))
+
+; Now with the ight price
+(place-bid "utRLLLbDcGyMnBcuPDjo-VaxR_65Wxv2v8EhoD9z4-E" "bob" (read-keyset 'bob-ks) 13.0)
+
+; Verify that bob KDA account has been debited
+(expect "Balance should be 989" 987.0 (coin.get-balance "bob"))
+
+; Verify that carol KDA account has been refunded
+(expect "Balance should be 1000" 1000.0 (coin.get-balance "carol"))
+
+; Verify that the buyer has been recorded
+(expect-that "Buyer has been recoreded" (compose (at 'current-buyer) (= "bob")) (get-sale "utRLLLbDcGyMnBcuPDjo-VaxR_65Wxv2v8EhoD9z4-E"))
+(commit-tx)
+
+
+
+; Bob believes he has won and want to close the defpact, howver it's too early
+; The auction last 6 months
+(begin-tx "Bob wants to close the defpact")
+(env-chain-data {"block-time": (time "2023-01-05T00:00:00Z")})
+(use marmalade-ng.ledger)
+
+(env-data {'buyer:"bob", 'buyer-guard:{'pred:"keys-all", 'keys:["bob-key"]}})
+(expect-failure "To early to end the defpact" "Sale not ended"
+                (continue-pact 1 false (hash "auction-sale-1")))
+(commit-tx)
+
+
+
+;Now teh auction goes t o it's end; We close the defpact
+(begin-tx "Close the defpact")
+(env-chain-data {"block-time": (time "2023-06-06T00:00:00Z")})
+(use marmalade-ng.ledger)
+(use marmalade-ng.policy-auction-sale)
+
+; Try with the bad buyer
+(env-data {'buyer:"carol", 'buyer-guard:{'pred:"keys-all", 'keys:["carol-key"]}})
+(expect-failure "To early to end the defpact" "uyer does not match"
+                (continue-pact 1 false (hash "auction-sale-1")))
+
+
+(env-data {'buyer:"bob", 'buyer-guard:{'pred:"keys-all", 'keys:["bob-key"]}})
+(continue-pact 1 false (hash "auction-sale-1"))
+
+; Check that alice has been paid
+(expect "Balance should be 1013" 1013.0 (coin.get-balance "alice"))
+
+; Check that bob now owns the NFT
+(expect "Balance of bob is 0.1" 0.1 (get-balance "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8" "bob"))
+
+(expect-that "It should exist 0 active sale" (compose (length) (= 0)) (get-all-active-sales))
+(expect-that "It should exist 0 active sale" (compose (length) (= 0)) (get-sales-for-token "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8"))
+
+
+(commit-tx)

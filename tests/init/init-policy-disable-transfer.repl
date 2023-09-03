@@ -1,0 +1,5 @@
+(begin-tx)
+(print "====> Deploy policy-disable-transfer")
+(namespace 'marmalade-ng)
+(load "../../pact/policies/policy-disable-transfer.pact")
+(commit-tx)

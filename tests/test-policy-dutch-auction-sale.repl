@@ -1,0 +1,235 @@
+(env-data {"disable-marmalade":true})
+(load "kadena_repl_sandbox/kda-env/init.repl")
+(load "init/init-ledger.repl")
+(load "init/init-policy-dutch-auction-sale.repl")
+
+(begin-tx "Create a token")
+(env-hash (hash "CreateTx"))
+(use marmalade-ng.ledger)
+(env-data {'create-ks:["create"]})
+
+(print (+ "Token ID: => " (create-token-id (read-keyset 'create-ks) "http://token-to-sell" )))
+
+
+(env-sigs [{'key:"create", 'caps:[(ENFORCE-RESERVED)]}])
+(create-token "t:jH6cLnR-L_tehD874FGubaGQ0zx9BTxzlh8ENcXqWxc" 1 "http://token-to-sell"
+              [marmalade-ng.policy-dutch-auction-sale] (read-keyset 'create-ks))
+
+(env-sigs [ {'key:"nobody", 'caps:[(MINT "t:jH6cLnR-L_tehD874FGubaGQ0zx9BTxzlh8ENcXqWxc" "alice" 0.6)]}])
+(env-data {'alice-ks:["alice-key"]})
+
+(mint "t:jH6cLnR-L_tehD874FGubaGQ0zx9BTxzlh8ENcXqWxc" "alice" (read-keyset 'alice-ks) 0.6)
+
+(commit-tx)
+
+(begin-tx "Sales")
+(env-hash (hash "fixed-sale-1"))
+(print (format "Sale ID 1: => {}" [(tx-hash)]))
+
+; Alice will sell 0.1 to carol
+(use marmalade-ng.ledger)
+(use marmalade-ng.policy-dutch-auction-sale)
+
+(env-sigs [ {'key:"alice-key", 'caps:[(OFFER "t:jH6cLnR-L_tehD874FGubaGQ0zx9BTxzlh8ENcXqWxc" "alice" 0.1)]}
+           ])
+
+(env-chain-data {"block-time": (time "2023-01-01T00:00:00Z")})
+(expect "Balance of was 0.6" 0.6 (get-balance "t:jH6cLnR-L_tehD874FGubaGQ0zx9BTxzlh8ENcXqWxc" "alice"))
+
+
+; try without env-data
+(expect-failure "No env-data provided" "No policy to handle the offer"
+  (sale "t:jH6cLnR-L_tehD874FGubaGQ0zx9BTxzlh8ENcXqWxc" "alice" 0.1 (time "2023-06-01T00:00:00Z")))
+
+; Try with invalid fields
+(env-data {'marmalade_sale:{'sale_type:"poo", 'currency:coin }})
+
+(expect-failure "Bad sale type" "No policy to handle the offer"
+  (sale "t:jH6cLnR-L_tehD874FGubaGQ0zx9BTxzlh8ENcXqWxc" "alice" 0.1 (time "2023-06-01T00:00:00Z")))
+
+; Try with a valid marmalade_sale but with a mssing fixed quote msg
+(env-data {'marmalade_sale:{'sale_type:"dutch_auction", 'currency:coin }})
+(expect-failure "dutch_quote not present in data" "dutch_quote not present in data"
+  (sale "t:jH6cLnR-L_tehD874FGubaGQ0zx9BTxzlh8ENcXqWxc" "alice" 0.1 (time "2023-06-01T00:00:00Z")))
+
+; Try with a missing recipient
+(env-data {'marmalade_sale: {'sale_type:"dutch_auction", 'currency:coin },
+           'marmalade_dutch_quote: {'recipient:"", 'start_price:100.0, 'end_price:1.0, 'end_time:(time "2023-01-05T00:00:00Z")  }})
+
+(expect-failure "bad recipient" "Account name does not conform"
+  (sale "t:jH6cLnR-L_tehD874FGubaGQ0zx9BTxzlh8ENcXqWxc" "alice" 0.1 (time "2023-06-01T00:00:00Z")))
+
+; Try with a bad start-price
+(env-data {'marmalade_sale: {'sale_type:"dutch_auction", 'currency:coin },
+           'marmalade_dutch_quote: {'recipient:"", 'start_price:-100.0, 'end_price:1.0, 'end_time:(time "2023-01-05T00:00:00Z")  }})
+
+(expect-failure "bad price" "price must be positive"
+  (sale "t:jH6cLnR-L_tehD874FGubaGQ0zx9BTxzlh8ENcXqWxc" "alice" 0.1 (time "2023-06-01T00:00:00Z")))
+
+; Try with a bad end-price
+(env-data {'marmalade_sale: {'sale_type:"dutch_auction", 'currency:coin },
+           'marmalade_dutch_quote: {'recipient:"", 'start_price:100.0, 'end_price:-1.0, 'end_time:(time "2023-01-05T00:00:00Z")  }})
+
+(expect-failure "bad price" "price must be positive"
+  (sale "t:jH6cLnR-L_tehD874FGubaGQ0zx9BTxzlh8ENcXqWxc" "alice" 0.1 (time "2023-06-01T00:00:00Z")))
+
+; Try with an unknown account
+(env-data {'marmalade_sale: {'sale_type:"dutch_auction", 'currency:coin },
+           'marmalade_dutch_quote: {'recipient:"unknown", 'start_price:100.0, 'end_price:1.0, 'end_time:(time "2023-01-05T00:00:00Z")  }})
+
+(expect-failure "unknown KDA account" "does not exist"
+  (sale "t:jH6cLnR-L_tehD874FGubaGQ0zx9BTxzlh8ENcXqWxc" "alice" 0.1 (time "2023-06-01T00:00:00Z")))
+
+; Now try exrything good
+(env-data {'marmalade_sale: {'sale_type:"dutch_auction", 'currency:coin },
+           'marmalade_dutch_quote: {'recipient:"alice", 'start_price:100.0, 'end_price:1.0, 'end_time:(time "2023-01-05T00:00:00Z")  }})
+
+
+(sale "t:jH6cLnR-L_tehD874FGubaGQ0zx9BTxzlh8ENcXqWxc" "alice" 0.1 (time "2023-06-01T00:00:00Z"))
+
+
+
+(expect-that "It should exist 1 active sale" (compose (length) (= 1)) (get-all-active-sales))
+(expect-that "It should exist 1 active sale" (compose (length) (= 1)) (get-sales-for-token "t:jH6cLnR-L_tehD874FGubaGQ0zx9BTxzlh8ENcXqWxc"))
+
+(print (+ "Escrow account: => " (at 'escrow-account (get-sale (tx-hash)))))
+
+
+(commit-tx)
+
+
+;; We will try to withdraw
+(begin-tx "Sales withdraw")
+(env-hash (hash "fixed-sale-1-withdraw"))
+(use marmalade-ng.ledger)
+(use marmalade-ng.policy-dutch-auction-sale)
+
+; Try before the ending date
+(env-chain-data {"block-time": (time "2023-05-30T00:00:00Z")})
+(expect-failure "Before ending date" "Sale not ended"
+  (continue-pact 0 true (hash  "fixed-sale-1")))
+
+; After end date
+(env-chain-data {"block-time": (time "2023-06-02T00:00:00Z")})
+(continue-pact 0 true (hash "fixed-sale-1"))
+
+(expect-that "It should exist 0 active sale" (compose (length) (= 0)) (get-all-active-sales))
+
+; Check that the balance of Alice has recovered
+(expect "Balance of alice is now back 0.6" 0.6 (get-balance "t:jH6cLnR-L_tehD874FGubaGQ0zx9BTxzlh8ENcXqWxc" "alice"))
+
+
+; Rollback
+(rollback-tx)
+
+; Bob will try to buy
+(begin-tx "Sales buy")
+(env-hash (hash "fixed-sale-1-buy"))
+(use marmalade-ng.ledger)
+(use free.util-math)
+(use marmalade-ng.policy-dutch-auction-sale)
+
+; First confirm the balances of their respective KDA accounts
+(expect "Initial balance should be 1000" 1000.0 (coin.get-balance "alice"))
+(expect "Initial balance should be 1000" 1000.0 (coin.get-balance "bob"))
+
+(env-data {'buyer:"bob", 'buyer-guard:{'pred:"keys-all", 'keys:["bob-key"]}})
+
+; After end date
+(env-chain-data {"block-time": (time "2023-06-02T00:00:00Z")})
+(expect-failure "Before ending date" "Sale ended"
+  (continue-pact 1 false (hash  "fixed-sale-1")))
+
+; Now it shoudl work
+(env-sigs [{'key:"bob-key", 'caps:[(coin.TRANSFER "bob" "c:uZK0n0opPMtEMAOctKX2S-nNa3KCotC9TBQCnXPOYeY" 100.0)]}])
+
+; We are going to do price checks by changing the date
+; The price should go from 100.0 to -> 1.0 in 4 days
+;    -> After 1 day should be  SQRT( 100.0 * 10.0) = 31.622
+;    -> After 2 days should be SQRT(100.0) = 10.0
+;    -> After 3 days should be SQRT(10.0) = 3.162
+(env-chain-data {"block-time": (time "2023-01-02T00:00:00Z")})
+(expect-that "Price after 1 day" (between 31.622 31.623) (compute-price (hash  "fixed-sale-1")))
+
+(env-chain-data {"block-time": (time "2023-01-03T00:00:00Z")})
+(expect-that "Price after 2 days" (between 9.99 10.01) (compute-price (hash  "fixed-sale-1")))
+
+(env-chain-data {"block-time": (time "2023-01-04T00:00:00Z")})
+(expect-that "Price after 3 days" (between 3.162 3.163) (compute-price (hash  "fixed-sale-1")))
+
+(env-chain-data {"block-time": (time "2023-01-05T00:00:00Z")})
+(expect-that "Price after 4 days" (between 1.0 1.01) (compute-price (hash  "fixed-sale-1")))
+
+(env-chain-data {"block-time": (time "2023-01-06T00:00:00Z")})
+(expect "Price after 5 days" 1.0 (compute-price (hash  "fixed-sale-1")))
+
+
+; Let's but after 10 days => 10.0 KDA
+(env-chain-data {"block-time": (time "2023-01-03T00:00:00Z")})
+(continue-pact 1 false (hash  "fixed-sale-1"))
+
+
+; Check the KDA balances
+(expect-that "Final balance should be 1005" (between 1009.99 1010.01) (coin.get-balance "alice"))
+(expect-that "Final balance should be 995" (between 989.99 990.01) (coin.get-balance "bob"))
+
+; Checl the token balances
+(expect "Balance of alice is now  0.5" 0.5 (get-balance "t:jH6cLnR-L_tehD874FGubaGQ0zx9BTxzlh8ENcXqWxc" "alice"))
+(expect "Balance of alice is now  0.1" 0.1 (get-balance "t:jH6cLnR-L_tehD874FGubaGQ0zx9BTxzlh8ENcXqWxc" "bob"))
+
+(expect-that "It should exist 0 active sale" (compose (length) (= 0)) (get-all-active-sales))
+(expect-that "It should exist 0 active sale" (compose (length) (= 0)) (get-sales-for-token "t:jH6cLnR-L_tehD874FGubaGQ0zx9BTxzlh8ENcXqWxc"))
+(commit-tx)
+
+
+;------------------------ Try with an infinite Timeout ----------------------
+(begin-tx "Sales 2")
+(env-hash (hash "fixed-sale-2"))
+(print (format "Sale ID 2: => {}" [(tx-hash)]))
+; Alice will sell 0.2 to carol
+(use marmalade-ng.ledger)
+(use marmalade-ng.policy-dutch-auction-sale)
+
+(env-sigs [ {'key:"alice-key", 'caps:[(OFFER "t:jH6cLnR-L_tehD874FGubaGQ0zx9BTxzlh8ENcXqWxc" "alice" 0.2)]}
+           ])
+
+(env-chain-data {"block-time": (time "2023-01-01T00:00:00Z")})
+
+(env-data {'marmalade_sale: {'sale_type:"dutch_auction", 'currency:coin },
+           'marmalade_dutch_quote: {'recipient:"alice", 'start_price:100.0, 'end_price:1.0, 'end_time:(time "2023-01-05T00:00:00Z")  }})
+
+(sale "t:jH6cLnR-L_tehD874FGubaGQ0zx9BTxzlh8ENcXqWxc" "alice" 0.2 NO-TIMEOUT)
+
+(print (+ "Escrow account: => " (at 'escrow-account (get-sale (tx-hash)))))
+
+(expect "Balance of alice is 0.3" 0.3 (get-balance "t:jH6cLnR-L_tehD874FGubaGQ0zx9BTxzlh8ENcXqWxc" "alice"))
+(commit-tx)
+
+(begin-tx "Force withdraw Sale 2")
+(use marmalade-ng.ledger)
+(use marmalade-ng.policy-dutch-auction-sale)
+; try to withdraw only 1 hour later
+(env-chain-data {"block-time": (time "2023-01-01T01:00:00Z")})
+; try without proper signature
+(expect-failure "Not signed" "Seller must sign forced-withdrawal"
+  (continue-pact 0 true (hash "fixed-sale-2")))
+
+(env-sigs [{'key:"alice-key", 'caps:[(FORCE-WITHDRAW (hash "fixed-sale-2"))]}
+          ])
+(continue-pact 0 true (hash "fixed-sale-2"))
+(expect "Balance of alice is now back 0.5" 0.5 (get-balance "t:jH6cLnR-L_tehD874FGubaGQ0zx9BTxzlh8ENcXqWxc" "alice"))
+(rollback-tx)
+
+
+(begin-tx "Try to buy 2 years later")
+(use marmalade-ng.ledger)
+(use marmalade-ng.policy-dutch-auction-sale)
+
+(env-chain-data {"block-time": (time "2025-01-01T00:00:00Z")})
+(env-data {'buyer:"bob", 'buyer-guard:{'pred:"keys-all", 'keys:["bob-key"]}})
+
+(env-sigs [{'key:"bob-key", 'caps:[(coin.TRANSFER "bob" "c:RofYomFLW13xvivg2XjN3MykJG_1hNRfDvV4W2DjdNU" 5.0)]}])
+(continue-pact 1 false (hash  "fixed-sale-2"))
+(expect "Balance of alice is 0.3" 0.3 (get-balance "t:jH6cLnR-L_tehD874FGubaGQ0zx9BTxzlh8ENcXqWxc" "alice"))
+(expect "Balance of bob is 0.3" 0.3 (get-balance "t:jH6cLnR-L_tehD874FGubaGQ0zx9BTxzlh8ENcXqWxc" "bob"))
+(commit-tx)

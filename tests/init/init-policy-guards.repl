@@ -1,0 +1,6 @@
+(begin-tx)
+(print "====> Deploy policy-guards")
+(namespace 'marmalade-ng)
+(load "../../pact/policies/policy-guards.pact")
+(create-table guards)
+(commit-tx)

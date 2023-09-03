@@ -1,0 +1,133 @@
+(env-data {"disable-marmalade":true})
+(load "kadena_repl_sandbox/kda-env/init.repl")
+(load "init/init-ledger.repl")
+(load "init/init-policy-collection.repl")
+
+;; Create collections
+; try 2 create 2 collection Dogs and Cats
+(begin-tx "Create collections")
+(use marmalade-ng.policy-collection)
+
+(env-data {'dogs-ks:["dogs-owner-key"],
+           'cats-ks:["cats-owner-key"] })
+
+(print (+ "Collection ID: => "
+          (create-collection-id "Dogs" (read-keyset 'dogs-ks))))
+
+(print (+ "Collection ID: => "
+          (create-collection-id "Cats" (read-keyset 'cats-ks))))
+
+; try to create without signature
+(expect-failure "No keys" "Keyset failure"
+                (create-collection "c_Dogs_8BRJPRYtqM-2w8ASMYq6Toq4PIvhws-kHh0nbYfT1iY" "Dogs" 3 (read-keyset 'dogs-ks)))
+
+; Try with a bad id
+(env-sigs [{'key:"dogs-owner-key", 'caps:[]}])
+(expect-failure "No keys" "does not match"
+                (create-collection "c_Dogs_bad_id" "Dogs" 3 (read-keyset 'dogs-ks)))
+
+
+; Now evrything good
+(create-collection "c_Dogs_8BRJPRYtqM-2w8ASMYq6Toq4PIvhws-kHh0nbYfT1iY" "Dogs" 2 (read-keyset 'dogs-ks))
+(env-sigs [{'key:"cats-owner-key", 'caps:[]}])
+(create-collection "c_Cats_ZMLLJuSq0JoHSR4f_ZgUa2H_p7Rr71CN8CjQ7ZL_hU0" "Cats" 0 (read-keyset 'cats-ks))
+
+
+(commit-tx)
+
+(begin-tx "Create tokens")
+(use marmalade-ng.policy-collection)
+(use marmalade-ng.ledger)
+
+
+
+(env-data {'create-ks:["create"]})
+
+; We try to create 6 tokens: 3 for the Dogs and 3 for the cats
+
+(print (+ "Token ID Dog 1: => " (create-token-id (read-keyset 'create-ks) "http://dog1" )))
+(print (+ "Token ID Dog 2: => " (create-token-id (read-keyset 'create-ks) "http://dog2" )))
+(print (+ "Token ID Dog 3: => " (create-token-id (read-keyset 'create-ks) "http://dog3" )))
+(print (+ "Token ID Cat 1: => " (create-token-id (read-keyset 'create-ks) "http://cat1" )))
+(print (+ "Token ID Cat 2: => " (create-token-id (read-keyset 'create-ks) "http://cat2" )))
+(print (+ "Token ID Cat 3: => " (create-token-id (read-keyset 'create-ks) "http://cat3" )))
+
+; Try to create withouu the collection name in data
+(env-sigs [{'key:"create", 'caps:[(ENFORCE-RESERVED)]}])
+
+(expect-failure "Not defined collection" "collection not present in data"
+                (create-token "t:C6KzoW9DSYdSbrZuUOazHzlpdA_vtZyiwFo9WTIUhP8" 1 "http://dog1"
+                              [marmalade-ng.policy-collection] (read-keyset 'create-ks)))
+
+; Try to create withouu the collection signature
+(env-data {'create-ks:["create"],
+           'marmalade_collection:{'id:"c_Dogs_8BRJPRYtqM-2w8ASMYq6Toq4PIvhws-kHh0nbYfT1iY"}})
+
+(expect-failure "Not defined collection" "Keyset failure"
+                (create-token "t:C6KzoW9DSYdSbrZuUOazHzlpdA_vtZyiwFo9WTIUhP8" 1 "http://dog1"
+                              [marmalade-ng.policy-collection] (read-keyset 'create-ks)))
+
+; Now with evrything good
+(env-data {'create-ks:["create"],
+           'marmalade_collection:{'id:"c_Dogs_8BRJPRYtqM-2w8ASMYq6Toq4PIvhws-kHh0nbYfT1iY"}})
+
+(env-sigs [{'key:"dogs-owner-key", 'caps:[]}
+           {'key:"create", 'caps:[(ENFORCE-RESERVED)]}
+           ])
+
+
+(create-token "t:C6KzoW9DSYdSbrZuUOazHzlpdA_vtZyiwFo9WTIUhP8" 0 "http://dog1"
+              [marmalade-ng.policy-collection] (read-keyset 'create-ks))
+
+(create-token "t:MkygmZK2iaGHuTTmKnzJMke3HcALz8SgTyxnD5A-VkA" 0 "http://dog2"
+              [marmalade-ng.policy-collection] (read-keyset 'create-ks))
+
+; Dogs collection only allow 2 tokens
+(expect-failure "Too much tokens" "Exceeds collection size"
+                (create-token "t:Axc6q-aWpN9g1u3NveIXaNMOqJ5n_Wsudw4GDnFiZNM" 0 "http://dog3"
+                              [marmalade-ng.policy-collection] (read-keyset 'create-ks)))
+
+; Now create 3 cats
+
+
+(env-data {'create-ks:["create"],
+           'marmalade_collection:{'id:"c_Cats_ZMLLJuSq0JoHSR4f_ZgUa2H_p7Rr71CN8CjQ7ZL_hU0"}})
+
+(env-sigs [{'key:"cats-owner-key", 'caps:[]}
+           {'key:"create", 'caps:[(ENFORCE-RESERVED)]}
+           ])
+
+
+(create-token "t:8UUtZdQJTomKPposMzgKLIyr-kXzwVRbUiRnk6ll1GQ" 0 "http://cat1"
+              [marmalade-ng.policy-collection] (read-keyset 'create-ks))
+
+(create-token "t:FiEymgltFYwVdXtWJsVlYp_7h7eg6t6fzwqLjZv1_lM" 0 "http://cat2"
+              [marmalade-ng.policy-collection] (read-keyset 'create-ks))
+
+(create-token "t:MkWmoRRFNCDhqPRn7XQ1U0CVuJ01Sb8XAXfrS7H47OI" 0 "http://cat3"
+              [marmalade-ng.policy-collection] (read-keyset 'create-ks))
+
+(commit-tx)
+
+
+; Test view functions
+
+(begin-tx)
+(use marmalade-ng.policy-collection)
+
+(print (get-all-collections))
+
+(expect "Get all collections" ["c_Cats_ZMLLJuSq0JoHSR4f_ZgUa2H_p7Rr71CN8CjQ7ZL_hU0",
+                               "c_Dogs_8BRJPRYtqM-2w8ASMYq6Toq4PIvhws-kHh0nbYfT1iY"]
+        (get-all-collections))
+
+(expect-that "Get cat collection" (compose (at 'name) (= "Cats"))
+             (get-collection "c_Cats_ZMLLJuSq0JoHSR4f_ZgUa2H_p7Rr71CN8CjQ7ZL_hU0"))
+
+
+(expect-that "Get collection of Cat0" (compose (at 'id) (= "c_Cats_ZMLLJuSq0JoHSR4f_ZgUa2H_p7Rr71CN8CjQ7ZL_hU0"))
+                                      (get-token-collection "t:8UUtZdQJTomKPposMzgKLIyr-kXzwVRbUiRnk6ll1GQ"))
+
+(expect-that "Get list of Cats tokens" (and? (contains "t:FiEymgltFYwVdXtWJsVlYp_7h7eg6t6fzwqLjZv1_lM")
+                                        (compose (length) (= 3)))
+             (list-tokens-of-collection "c_Cats_ZMLLJuSq0JoHSR4f_ZgUa2H_p7Rr71CN8CjQ7ZL_hU0"))

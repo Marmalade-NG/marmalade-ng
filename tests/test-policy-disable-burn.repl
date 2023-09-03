@@ -1,0 +1,29 @@
+(env-data {"disable-marmalade":true})
+(load "kadena_repl_sandbox/kda-env/init.repl")
+(load "init/init-ledger.repl")
+(load "init/init-policy-disable-burn.repl")
+
+(begin-tx "Burn tests")
+(use marmalade-ng.ledger)
+(env-data {'create-ks:["create"],
+          'alice-ks:["alice-key"]})
+
+(print (+ "Token ID: => " (create-token-id (read-keyset 'create-ks) "http://token-not-burnable" )))
+
+(env-sigs [{'key:"create", 'caps:[(ENFORCE-RESERVED)]},
+           {'key:"nobody", 'caps:[(MINT "t:YAEqyzR87hi3kDqAS3pnA80kg2kBkgUnyKJEf9RFzP4" "alice" 1.0)]}
+          ])
+
+
+(create-token "t:YAEqyzR87hi3kDqAS3pnA80kg2kBkgUnyKJEf9RFzP4" 1 "http://token-not-burnable"
+              [marmalade-ng.policy-disable-burn] (read-keyset 'create-ks))
+
+(mint "t:YAEqyzR87hi3kDqAS3pnA80kg2kBkgUnyKJEf9RFzP4" "alice" (read-keyset 'alice-ks) 1.0)
+
+
+(env-sigs [{'key:"alice-key", 'caps:[(BURN "t:YAEqyzR87hi3kDqAS3pnA80kg2kBkgUnyKJEf9RFzP4" "alice" 0.1)]}])
+
+(expect-failure "Burn disabled" "Burn not allowed"
+                (burn "t:YAEqyzR87hi3kDqAS3pnA80kg2kBkgUnyKJEf9RFzP4" "alice" 0.1))
+
+(commit-tx)

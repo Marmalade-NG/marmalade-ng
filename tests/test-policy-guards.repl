@@ -1,0 +1,126 @@
+(env-data {"disable-marmalade":true})
+(load "kadena_repl_sandbox/kda-env/init.repl")
+(load "init/init-ledger.repl")
+(load "init/init-policy-guards.repl")
+
+(begin-tx)
+(namespace 'marmalade-ng)
+(load "stubs/policy-events-A.pact")
+(commit-tx)
+
+(begin-tx "Guards create tests")
+(use marmalade-ng.ledger)
+
+(env-data {'create-ks:["create"]})
+
+(print (+ "Token ID: => " (create-token-id (read-keyset 'create-ks) "http://token-guardable" )))
+
+(env-sigs [{'key:"create", 'caps:[(ENFORCE-RESERVED)]}])
+
+; Try to create without the proper data
+(expect-failure "Missing structure in data" "guards not present in data"
+              (create-token "t:0Ro8f7yTkJMBrAWlw0z6IFwCKVJwl4NUk03-YfB_w38" 1 "http://token-guardable"
+                             [marmalade-ng.policy-guards, marmalade-ng.policy-events-A] (read-keyset 'create-ks)))
+
+(env-data {'create-ks:["create"],
+           'marmalade_guards: {'mint:    {'pred:"keys-all", 'keys:["g-mint-key"]},
+                               'burn:    {'pred:"keys-all", 'keys:["g-burn-key"]},
+                               'transfer:{'pred:"keys-all", 'keys:["g-transfer-key"]},
+                               'sale:    {'pred:"keys-all", 'keys:["g-sale-key"]}}
+          })
+
+(create-token "t:0Ro8f7yTkJMBrAWlw0z6IFwCKVJwl4NUk03-YfB_w38" 1 "http://token-guardable"
+              [marmalade-ng.policy-guards, marmalade-ng.policy-events-A] (read-keyset 'create-ks))
+(commit-tx)
+
+(begin-tx "Guards mint tests")
+(use marmalade-ng.ledger)
+(env-data {'alice-ks:["alice-key"]})
+
+; Try to mint without the guard
+(env-sigs [{'key:"nobody", 'caps:[(MINT "t:0Ro8f7yTkJMBrAWlw0z6IFwCKVJwl4NUk03-YfB_w38" "alice" 1.0)]}
+          ])
+(expect-failure "Without the gaurd" "Keyset failure"
+                 (mint "t:0Ro8f7yTkJMBrAWlw0z6IFwCKVJwl4NUk03-YfB_w38" "alice" (read-keyset 'alice-ks) 1.0))
+
+;now with the guard
+(env-sigs [{'key:"nobody", 'caps:[(MINT "t:0Ro8f7yTkJMBrAWlw0z6IFwCKVJwl4NUk03-YfB_w38" "alice" 1.0)]},
+           {'key:"g-mint-key", 'caps:[(marmalade-ng.policy-guards.MINT "t:0Ro8f7yTkJMBrAWlw0z6IFwCKVJwl4NUk03-YfB_w38")]}
+          ])
+(mint "t:0Ro8f7yTkJMBrAWlw0z6IFwCKVJwl4NUk03-YfB_w38" "alice" (read-keyset 'alice-ks) 1.0)
+(commit-tx)
+
+(begin-tx "Guards burn tests")
+(use marmalade-ng.ledger)
+
+; Try to burn without the guard
+(env-sigs [{'key:"alice-key", 'caps:[(BURN "t:0Ro8f7yTkJMBrAWlw0z6IFwCKVJwl4NUk03-YfB_w38" "alice" 0.1)]}
+          ])
+(expect-failure "Without the gaurd" "Keyset failure"
+                 (burn "t:0Ro8f7yTkJMBrAWlw0z6IFwCKVJwl4NUk03-YfB_w38" "alice" 0.1))
+
+;now with the guard but bad key
+(env-sigs [{'key:"alice-key", 'caps:[(BURN "t:0Ro8f7yTkJMBrAWlw0z6IFwCKVJwl4NUk03-YfB_w38" "alice" 0.1)]},
+           {'key:"g-mint-key", 'caps:[(marmalade-ng.policy-guards.BURN "t:0Ro8f7yTkJMBrAWlw0z6IFwCKVJwl4NUk03-YfB_w38")]}
+          ])
+(expect-failure "Without the gaurd" "Keyset failure"
+                (burn "t:0Ro8f7yTkJMBrAWlw0z6IFwCKVJwl4NUk03-YfB_w38" "alice" 0.1))
+
+;with everything right
+(env-sigs [{'key:"alice-key", 'caps:[(BURN "t:0Ro8f7yTkJMBrAWlw0z6IFwCKVJwl4NUk03-YfB_w38" "alice" 0.1)]},
+           {'key:"g-burn-key", 'caps:[(marmalade-ng.policy-guards.BURN "t:0Ro8f7yTkJMBrAWlw0z6IFwCKVJwl4NUk03-YfB_w38")]}
+          ])
+
+(burn "t:0Ro8f7yTkJMBrAWlw0z6IFwCKVJwl4NUk03-YfB_w38" "alice" 0.1)
+(commit-tx)
+
+
+(begin-tx "Guards transfer tests")
+(use marmalade-ng.ledger)
+(env-data {'bob-ks:["bob-key"]})
+
+; Try to burn without the guard
+(env-sigs [{'key:"alice-key", 'caps:[(TRANSFER "t:0Ro8f7yTkJMBrAWlw0z6IFwCKVJwl4NUk03-YfB_w38" "alice" "bob" 0.1)]}
+          ])
+(expect-failure "Without the gaurd" "Keyset failure"
+                 (transfer-create "t:0Ro8f7yTkJMBrAWlw0z6IFwCKVJwl4NUk03-YfB_w38" "alice" "bob" (read-keyset 'bob-ks) 0.1))
+
+;now with the guard but bad key
+(env-sigs [{'key:"alice-key", 'caps:[(TRANSFER "t:0Ro8f7yTkJMBrAWlw0z6IFwCKVJwl4NUk03-YfB_w38" "alice" "bob" 0.1)]}
+           {'key:"g-mint-key", 'caps:[(marmalade-ng.policy-guards.TRANSFER "t:0Ro8f7yTkJMBrAWlw0z6IFwCKVJwl4NUk03-YfB_w38")]}
+          ])
+(expect-failure "Without the gaurd" "Keyset failure"
+                (transfer-create "t:0Ro8f7yTkJMBrAWlw0z6IFwCKVJwl4NUk03-YfB_w38" "alice" "bob" (read-keyset 'bob-ks) 0.1))
+
+;with everything right
+(env-sigs [{'key:"alice-key", 'caps:[(TRANSFER "t:0Ro8f7yTkJMBrAWlw0z6IFwCKVJwl4NUk03-YfB_w38" "alice" "bob" 0.1)]}
+           {'key:"g-transfer-key", 'caps:[(marmalade-ng.policy-guards.TRANSFER "t:0Ro8f7yTkJMBrAWlw0z6IFwCKVJwl4NUk03-YfB_w38")]}
+          ])
+
+(transfer-create "t:0Ro8f7yTkJMBrAWlw0z6IFwCKVJwl4NUk03-YfB_w38" "alice" "bob" (read-keyset 'bob-ks) 0.1)
+(commit-tx)
+
+
+(begin-tx "Guards sale tests")
+(use marmalade-ng.ledger)
+
+; Try to burn without the guard
+(env-sigs [{'key:"alice-key", 'caps:[(OFFER "t:0Ro8f7yTkJMBrAWlw0z6IFwCKVJwl4NUk03-YfB_w38" "alice" 0.1)]}
+          ])
+(expect-failure "Without the gaurd" "Keyset failure"
+                 (sale "t:0Ro8f7yTkJMBrAWlw0z6IFwCKVJwl4NUk03-YfB_w38" "alice" 0.1 (time "2023-06-01T00:00:00Z")))
+
+;now with the guard but bad key
+(env-sigs [{'key:"alice-key", 'caps:[(OFFER "t:0Ro8f7yTkJMBrAWlw0z6IFwCKVJwl4NUk03-YfB_w38" "alice" 0.1)]}
+           {'key:"g-mint-key", 'caps:[(marmalade-ng.policy-guards.SALE "t:0Ro8f7yTkJMBrAWlw0z6IFwCKVJwl4NUk03-YfB_w38")]}
+          ])
+(expect-failure "Without the gaurd" "Keyset failure"
+                (sale "t:0Ro8f7yTkJMBrAWlw0z6IFwCKVJwl4NUk03-YfB_w38" "alice" 0.1 (time "2023-06-01T00:00:00Z")))
+
+;with everything right
+(env-sigs [{'key:"alice-key", 'caps:[(OFFER "t:0Ro8f7yTkJMBrAWlw0z6IFwCKVJwl4NUk03-YfB_w38" "alice" 0.1)]}
+           {'key:"g-sale-key", 'caps:[(marmalade-ng.policy-guards.SALE "t:0Ro8f7yTkJMBrAWlw0z6IFwCKVJwl4NUk03-YfB_w38")]}
+          ])
+
+(sale "t:0Ro8f7yTkJMBrAWlw0z6IFwCKVJwl4NUk03-YfB_w38" "alice" 0.1 (time "2023-06-01T00:00:00Z"))
+(commit-tx)

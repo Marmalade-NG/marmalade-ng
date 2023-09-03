@@ -1,0 +1,6 @@
+(begin-tx)
+(print "====> Deploy policy-dutch-auction-sale")
+(namespace 'marmalade-ng)
+(load "../../pact/policies/policy-dutch-auction-sale.pact")
+(create-table quotes)
+(commit-tx)

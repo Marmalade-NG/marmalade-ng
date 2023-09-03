@@ -1,0 +1,323 @@
+(env-data {"disable-marmalade":true})
+(load "kadena_repl_sandbox/kda-env/init.repl")
+(load "init/init-ledger.repl")
+(load "init/init-policy-fixed-sale.repl")
+(load "init/init-policy-marketplace.repl")
+
+(begin-tx "Create 4 tokens")
+(env-hash (hash "CreateTx"))
+(use marmalade-ng.ledger)
+(use free.util-strings)
+(env-data {'create-ks:["create"]})
+
+(env-sigs [{'key:"create", 'caps:[(ENFORCE-RESERVED)]}])
+(print (+ "Tokens ID: -" (join "\n           -" (map (create-token-id (read-keyset 'create-ks)) ["http://token-1",
+                                                                                      "http://token-2",
+                                                                                      "http://token-3",
+                                                                                      "http://token-4"]))))
+
+(create-token "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" 0 "http://token-1"
+              [marmalade-ng.policy-fixed-sale, marmalade-ng.policy-marketplace] (read-keyset 'create-ks))
+
+(create-token "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I" 0 "http://token-2"
+              [marmalade-ng.policy-fixed-sale, marmalade-ng.policy-marketplace] (read-keyset 'create-ks))
+
+(create-token "t:L3JH94fXZQvUZ_IGNKMXAX5HwSZc_X0H7OwbnY_lsHA" 0 "http://token-3"
+              [marmalade-ng.policy-fixed-sale, marmalade-ng.policy-marketplace] (read-keyset 'create-ks))
+
+(create-token "t:9Dh2pSjMjXLPERZnbE-aDuXQuquuOkgxSOgS-hYYX7Q" 0 "http://token-4"
+              [marmalade-ng.policy-fixed-sale, marmalade-ng.policy-marketplace] (read-keyset 'create-ks))
+
+(env-sigs [ {'key:"nobody", 'caps:[(MINT "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice" 1.0),
+                                   (MINT "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I" "alice" 1.0),
+                                   (MINT "t:L3JH94fXZQvUZ_IGNKMXAX5HwSZc_X0H7OwbnY_lsHA" "alice" 1.0),
+                                   (MINT "t:9Dh2pSjMjXLPERZnbE-aDuXQuquuOkgxSOgS-hYYX7Q" "alice" 1.0)]}])
+(env-data {'alice-ks:["alice-key"]})
+
+(mint "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice" (read-keyset 'alice-ks) 1.0)
+(mint "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I" "alice" (read-keyset 'alice-ks) 1.0)
+(mint "t:L3JH94fXZQvUZ_IGNKMXAX5HwSZc_X0H7OwbnY_lsHA" "alice" (read-keyset 'alice-ks) 1.0)
+(mint "t:9Dh2pSjMjXLPERZnbE-aDuXQuquuOkgxSOgS-hYYX7Q" "alice" (read-keyset 'alice-ks) 1.0)
+
+(commit-tx)
+
+;-------------------------------------------
+; Preparation create a keyset for best-market
+;--------------------------------------------
+(begin-tx)
+(env-data {'ks:["best-market-key"]})
+(namespace 'user)
+(define-keyset "user.best-market" (read-keyset 'ks))
+(commit-tx)
+
+
+;-----------------------------------
+; Sale 1 No market-place
+;------------------------------------
+(begin-tx "Sale 1")
+(env-hash (hash "fixed-sale-1"))
+(print (format "Sale ID 1: => {}" [(tx-hash)]))
+
+(use marmalade-ng.ledger)
+(use marmalade-ng.policy-fixed-sale)
+(use marmalade-ng.policy-marketplace)
+
+(env-sigs [ {'key:"alice-key", 'caps:[(OFFER "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice" 1.0)]}
+           ])
+
+; Now try exrything good
+(env-data {'marmalade_sale: {'sale_type:"fixed", 'currency:coin },
+           'marmalade_fixed_quote: {'recipient:"alice", 'price:5.0 }})
+
+
+(sale "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice" 1.0 NO-TIMEOUT)
+(print (+ "Escrow account: => " (at 'escrow-account (get-sale (tx-hash)))))
+
+;
+(commit-tx)
+
+
+(begin-tx "Sale 1 buy")
+(env-hash (hash "fixed-sale-1-buy"))
+(use marmalade-ng.ledger)
+(use marmalade-ng.policy-fixed-sale)
+
+; First confirm the balances of their respective KDA accounts
+(expect "Initial balance should be 1000" 1000.0 (coin.get-balance "alice"))
+(expect "Initial balance should be 1000" 1000.0 (coin.get-balance "bob"))
+
+(env-data {'buyer:"bob", 'buyer-guard:{'pred:"keys-all", 'keys:["bob-key"]}})
+
+
+(env-sigs [{'key:"bob-key", 'caps:[(coin.TRANSFER "bob" "c:uZK0n0opPMtEMAOctKX2S-nNa3KCotC9TBQCnXPOYeY" 5.0)]}])
+(continue-pact 1 false (hash  "fixed-sale-1"))
+
+
+; Check the KDA balances
+(expect "Final balance should be 1005.0" 1005.0 (coin.get-balance "alice"))
+(expect "Final balance should be 995" 995.0 (coin.get-balance "bob"))
+(commit-tx)
+
+
+;---------------------------------------
+; Sale 2 Market place proportional price
+;---------------------------------------
+(begin-tx "Sale 2")
+(env-hash (hash "fixed-sale-2"))
+(print (format "Sale ID 2: => {}" [(tx-hash)]))
+
+(use marmalade-ng.ledger)
+(use marmalade-ng.policy-fixed-sale)
+(use marmalade-ng.policy-marketplace)
+
+(env-sigs [ {'key:"alice-key", 'caps:[(OFFER "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I" "alice" 1.0)]}
+           ])
+
+; Try with some irrelevant fees
+(env-data {'marmalade_sale: {'sale_type:"fixed", 'currency:coin },
+           'marmalade_fixed_quote: {'recipient:"alice", 'price:5.0 },
+           'marmalade_marketplace: {'marketplace-name: "BestMarket",
+                                    'marketplace-account:"r.user.best-market",
+                                    'currency:coin,
+                                    'min-fee:-8.0,
+                                    'fee-rate:0.1,
+                                    'max-fee:10000.0}
+          })
+(expect-failure "Negative min fee" "Illegal"
+  (sale "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I" "alice" 1.0 NO-TIMEOUT))
+
+(env-data {'marmalade_sale: {'sale_type:"fixed", 'currency:coin },
+           'marmalade_fixed_quote: {'recipient:"alice", 'price:5.0 },
+           'marmalade_marketplace: {'marketplace-name: "BestMarket",
+                                    'marketplace-account:"r.user.best-market",
+                                    'currency:coin,
+                                    'min-fee:8.0,
+                                    'fee-rate:0.1,
+                                    'max-fee:1.0}
+          })
+(expect-failure "Max fee < Min fee>" "Illegal"
+  (sale "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I" "alice" 1.0 NO-TIMEOUT))
+
+
+(env-data {'marmalade_sale: {'sale_type:"fixed", 'currency:coin },
+           'marmalade_fixed_quote: {'recipient:"alice", 'price:5.0 },
+           'marmalade_marketplace: {'marketplace-name: "BestMarket",
+                                    'marketplace-account:"r.user.best-market",
+                                    'currency:coin,
+                                    'min-fee:0.0,
+                                    'fee-rate:1.2,
+                                    'max-fee:10000.0}
+          })
+(expect-failure "Fee rate > 1.0" "Illegal"
+  (sale "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I" "alice" 1.0 NO-TIMEOUT))
+
+
+; Try with a non created account
+(env-data {'marmalade_sale: {'sale_type:"fixed", 'currency:coin },
+           'marmalade_fixed_quote: {'recipient:"alice", 'price:5.0 },
+           'marmalade_marketplace: {'marketplace-name: "BestMarket",
+                                    'marketplace-account:"r.user.best-market",
+                                    'currency:coin,
+                                    'min-fee:0.2,
+                                    'fee-rate:0.1,
+                                    'max-fee:10000.0}
+          })
+(expect-failure "Account does not exist" "does not exist"
+  (sale "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I" "alice" 1.0 NO-TIMEOUT))
+
+; Create the account and try again
+(coin.create-account "r.user.best-market" (keyset-ref-guard "user.best-market"))
+
+(sale "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I" "alice" 1.0 NO-TIMEOUT)
+
+(print (+ "Escrow account: => " (at 'escrow-account (get-sale (tx-hash)))))
+
+(commit-tx)
+
+;---------------------------------------
+; Sale 3 Market place floor price hit
+;---------------------------------------
+(begin-tx "Sale 3")
+(env-hash (hash "fixed-sale-3"))
+(print (format "Sale ID 3: => {}" [(tx-hash)]))
+(use marmalade-ng.ledger)
+(use marmalade-ng.policy-fixed-sale)
+(use marmalade-ng.policy-marketplace)
+(env-sigs [ {'key:"alice-key", 'caps:[(OFFER "t:L3JH94fXZQvUZ_IGNKMXAX5HwSZc_X0H7OwbnY_lsHA" "alice" 1.0)]}])
+(env-data {'marmalade_sale: {'sale_type:"fixed", 'currency:coin },
+           'marmalade_fixed_quote: {'recipient:"alice", 'price:5.0 },
+           'marmalade_marketplace: {'marketplace-name: "BestMarket",
+                                    'marketplace-account:"r.user.best-market",
+                                    'currency:coin,
+                                    'min-fee:1.0,
+                                    'fee-rate:0.1,
+                                    'max-fee:10000.0}
+          })
+(sale "t:L3JH94fXZQvUZ_IGNKMXAX5HwSZc_X0H7OwbnY_lsHA" "alice" 1.0 NO-TIMEOUT)
+
+(print (+ "Escrow account: => " (at 'escrow-account (get-sale (tx-hash)))))
+
+(commit-tx)
+
+
+;---------------------------------------
+; Sale 4 Market place ceil price hit
+;---------------------------------------
+(begin-tx "Sale 4")
+(env-hash (hash "fixed-sale-4"))
+(print (format "Sale ID 4: => {}" [(tx-hash)]))
+(use marmalade-ng.ledger)
+(use marmalade-ng.policy-fixed-sale)
+(use marmalade-ng.policy-marketplace)
+(env-sigs [ {'key:"alice-key", 'caps:[(OFFER "t:9Dh2pSjMjXLPERZnbE-aDuXQuquuOkgxSOgS-hYYX7Q" "alice" 1.0)]}])
+(env-data {'marmalade_sale: {'sale_type:"fixed", 'currency:coin },
+           'marmalade_fixed_quote: {'recipient:"alice", 'price:5.0 },
+           'marmalade_marketplace: {'marketplace-name: "BestMarket",
+                                    'marketplace-account:"r.user.best-market",
+                                    'currency:coin,
+                                    'min-fee:0.0,
+                                    'fee-rate:0.1,
+                                    'max-fee:0.2}
+          })
+
+(print (+ "Sale 4 MarketPlace Hash: => " (hash {'marketplace-name: "BestMarket",
+                                                'marketplace-account:"r.user.best-market",
+                                                'min-fee:0.0,
+                                                'currency:coin,
+                                                'fee-rate:0.1,
+                                                'max-fee:0.2})))
+
+(sale "t:9Dh2pSjMjXLPERZnbE-aDuXQuquuOkgxSOgS-hYYX7Q" "alice" 1.0 NO-TIMEOUT)
+
+(print (+ "Escrow account: => " (at 'escrow-account (get-sale (tx-hash)))))
+
+(commit-tx)
+
+;---------------------------------------
+; Do some basic checks
+;---------------------------------------
+(begin-tx "View checks")
+(use marmalade-ng.ledger)
+(use marmalade-ng.policy-fixed-sale)
+(use marmalade-ng.policy-marketplace)
+
+(expect-that "Check the sale 2" (compose (at 'token-id) (= "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I"))
+             (get-marketplace-fee "MdXO502ljyF-O6YJV-ODmTuhqFF2Zn6Wa0ONQZu1P8o"))
+
+(print (get-marketplace-fee "MdXO502ljyF-O6YJV-ODmTuhqFF2Zn6Wa0ONQZu1P8o"))
+
+(expect-that "3 NFTS are currently under sale with market-place policy"  (compose (length) (= 3))
+             (get-all-active-sales))
+
+
+(expect-that "3 NFTS are currently under sale with BestMarket"  (compose (length) (= 3))
+             (get-active-sales-by-name "BestMarket"))
+
+(print (get-active-sales-by-name "BestMarket"))
+
+(expect-that "1 NFTS is currently under sale with ceil price hash"  (compose (length) (= 1))
+             (get-active-sales-by-market-hash "zE-T8f_kTazOs7IuC-dNZ4Nf3KnkDymeozRb66QlrBk" ))
+(commit-tx)
+
+
+(begin-tx "Sale 2 buy")
+(env-hash (hash "fixed-sale-2-buy"))
+(use marmalade-ng.ledger)
+
+(env-data {'buyer:"bob", 'buyer-guard:{'pred:"keys-all", 'keys:["bob-key"]}})
+(env-sigs [{'key:"bob-key", 'caps:[(coin.TRANSFER "bob" "c:RofYomFLW13xvivg2XjN3MykJG_1hNRfDvV4W2DjdNU" 5.0)]}])
+(continue-pact 1 false (hash  "fixed-sale-2"))
+
+; The price was 5.0 - 10%  = 4.5 for Alice
+; Check the KDA balances
+(expect "Final balance should be 1005.0 + 4.5"  1009.5 (coin.get-balance "alice"))
+(expect "Final balance should be 995 - 5 " 990.0 (coin.get-balance "bob"))
+(commit-tx)
+
+
+(begin-tx "Sale 3 buy")
+(env-hash (hash "fixed-sale-3-buy"))
+(use marmalade-ng.ledger)
+
+(env-data {'buyer:"bob", 'buyer-guard:{'pred:"keys-all", 'keys:["bob-key"]}})
+(env-sigs [{'key:"bob-key", 'caps:[(coin.TRANSFER "bob" "c:hl7nOg4e09GP5zMyZ8KtWQTmIV7ftlKnQoPqvtu632g" 5.0)]}])
+(continue-pact 1 false (hash  "fixed-sale-3"))
+
+; The price was 5.0 - 10%  but with a fee of min 1.0 => 4.0 for Alice
+; Check the KDA balances
+(expect "Final balance should be 1005.0 + 4.5 + 4.0"  1013.5 (coin.get-balance "alice"))
+(expect "Final balance should be 995 - 5 -5" 985.0 (coin.get-balance "bob"))
+(commit-tx)
+
+(begin-tx "Sale 4 buy")
+(env-hash (hash "fixed-sale-4-buy"))
+(use marmalade-ng.ledger)
+
+(env-data {'buyer:"bob", 'buyer-guard:{'pred:"keys-all", 'keys:["bob-key"]}})
+(env-sigs [{'key:"bob-key", 'caps:[(coin.TRANSFER "bob" "c:4Nr40zQ_9goRs84H1HiDLwVcsgHyevLjgjQ4XUbANfU" 5.0)]}])
+(continue-pact 1 false (hash  "fixed-sale-4"))
+
+; The price was 5.0 - 10%  but with a fee of max 0.2 => 4.8 for Alice
+; Check the KDA balances
+(expect "Final balance should be 1005.0 + 4.5 + 4.0 + 4.8"  1018.3 (coin.get-balance "alice"))
+(expect "Final balance should be 995 - 5 -5 -5" 980.0 (coin.get-balance "bob"))
+(commit-tx)
+
+
+;---------------------------------------
+; Final check
+;---------------------------------------
+(begin-tx "Final checks")
+(use marmalade-ng.ledger)
+(use marmalade-ng.policy-fixed-sale)
+(use marmalade-ng.policy-marketplace)
+
+(expect-that "0 NFTS are currently under sale with market-place policy"  (compose (length) (= 0))
+             (get-all-active-sales))
+
+(expect-that "0 NFTS are currently under sale with BestMarket"  (compose (length) (= 0))
+             (get-active-sales-by-name "BestMarket"))
+
+(expect-that "0 NFTS is currently under sale with ceil price hash"  (compose (length) (= 0))
+             (get-active-sales-by-market-hash "zE-T8f_kTazOs7IuC-dNZ4Nf3KnkDymeozRb66QlrBk" ))
+(commit-tx)

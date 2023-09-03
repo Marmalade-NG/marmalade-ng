@@ -1,0 +1,5 @@
+(begin-tx)
+(print "====> Deploy policy-non-fungible")
+(namespace 'marmalade-ng)
+(load "../../pact/policies/policy-non-fungible.pact")
+(commit-tx)

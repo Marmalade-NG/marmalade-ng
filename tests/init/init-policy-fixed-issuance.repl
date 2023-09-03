@@ -1,0 +1,6 @@
+(begin-tx)
+(print "====> Deploy policy-fixed-issuance")
+(namespace 'marmalade-ng)
+(load "../../pact/policies/policy-fixed-issuance.pact")
+(create-table supplies)
+(commit-tx)

@@ -1,0 +1,219 @@
+(env-data {"disable-marmalade":true})
+(load "kadena_repl_sandbox/kda-env/init.repl")
+(load "init/init-ledger.repl")
+(load "init/init-policy-blacklist.repl")
+
+(begin-tx)
+(namespace 'marmalade-ng)
+(load "stubs/policy-events-A.pact")
+(commit-tx)
+
+
+(begin-tx "Blacklists tests")
+(use marmalade-ng.ledger)
+(env-data {'create-ks:["create"]})
+
+(print (+ "Token ID 1: => " (create-token-id (read-keyset 'create-ks) "http://token-blacklistable-1" )))
+(print (+ "Token ID 2: => " (create-token-id (read-keyset 'create-ks) "http://token-blacklistable-2" )))
+
+(env-data {'create-ks:["create"],
+           'alice-ks:["alice-key"],
+           "marmalade_blacklist_t:EgYRAWXSd4zZlch3B0cLHTSEt4sgYVg5cwKgvP1CoUs":{'guard:{'pred:"keys-all", 'keys:["black-1-key"]}},
+           "marmalade_blacklist_t:jQ84xa7TcJGa6kJqrMgF0l9wzpEnl8uD_-OpIAhfqko":{'guard:{'pred:"keys-all", 'keys:["black-2-key"]}}
+         })
+
+
+(env-sigs [{'key:"create", 'caps:[(ENFORCE-RESERVED)]},
+           {'key:"nobody", 'caps:[(MINT "t:EgYRAWXSd4zZlch3B0cLHTSEt4sgYVg5cwKgvP1CoUs" "alice" 1.0),
+                                  (MINT "t:jQ84xa7TcJGa6kJqrMgF0l9wzpEnl8uD_-OpIAhfqko" "alice" 1.0)]}
+
+          ])
+
+
+(create-token "t:EgYRAWXSd4zZlch3B0cLHTSEt4sgYVg5cwKgvP1CoUs" 1 "http://token-blacklistable-1"
+              [marmalade-ng.policy-blacklist, marmalade-ng.policy-events-A] (read-keyset 'create-ks))
+
+(mint "t:EgYRAWXSd4zZlch3B0cLHTSEt4sgYVg5cwKgvP1CoUs" "alice" (read-keyset 'alice-ks) 1.0)
+
+(create-token "t:jQ84xa7TcJGa6kJqrMgF0l9wzpEnl8uD_-OpIAhfqko" 1 "http://token-blacklistable-2"
+              [marmalade-ng.policy-blacklist, marmalade-ng.policy-events-A] (read-keyset 'create-ks))
+
+(mint "t:jQ84xa7TcJGa6kJqrMgF0l9wzpEnl8uD_-OpIAhfqko" "alice" (read-keyset 'alice-ks) 1.0)
+
+
+(env-sigs [{'key:"alice-key", 'caps:[(BURN "t:YAEqyzR87hi3kDqAS3pnA80kg2kBkgUnyKJEf9RFzP4" "alice" 0.1)]}])
+
+(commit-tx)
+
+
+; Now we go to blacklist
+; Token 1 => alice blacklisted
+; Token 2 => carol and dave blacklisted
+
+(begin-tx "Blacklisting")
+(use marmalade-ng.policy-blacklist)
+(env-data {})
+
+; Try to blacklist without signature
+(env-sigs [])
+(expect-failure "No signature to blacklist" "Keyset failure"
+                (add-account "t:EgYRAWXSd4zZlch3B0cLHTSEt4sgYVg5cwKgvP1CoUs" "alice"))
+
+; Try the bad sigature black-2-key instead of black-1-key
+(env-sigs [{'key:"black-2-key", 'caps:[(UPDATE-BLACKLIST "t:EgYRAWXSd4zZlch3B0cLHTSEt4sgYVg5cwKgvP1CoUs" "alice" true)]}])
+
+(expect-failure "No signature to blacklist" "Keyset failure"
+                (add-account "t:EgYRAWXSd4zZlch3B0cLHTSEt4sgYVg5cwKgvP1CoUs" "alice"))
+
+
+; Now with the good keys
+(env-sigs [{'key:"black-1-key", 'caps:[(UPDATE-BLACKLIST "t:EgYRAWXSd4zZlch3B0cLHTSEt4sgYVg5cwKgvP1CoUs" "alice" true)]}
+           {'key:"black-2-key", 'caps:[(UPDATE-BLACKLIST "t:jQ84xa7TcJGa6kJqrMgF0l9wzpEnl8uD_-OpIAhfqko" "carol" true),
+                                       (UPDATE-BLACKLIST "t:jQ84xa7TcJGa6kJqrMgF0l9wzpEnl8uD_-OpIAhfqko" "dave" true)]}
+          ])
+
+(add-account "t:EgYRAWXSd4zZlch3B0cLHTSEt4sgYVg5cwKgvP1CoUs" "alice")
+(add-account "t:jQ84xa7TcJGa6kJqrMgF0l9wzpEnl8uD_-OpIAhfqko" "carol")
+(add-account "t:jQ84xa7TcJGa6kJqrMgF0l9wzpEnl8uD_-OpIAhfqko" "dave")
+
+; Check that evrything is good now
+(expect "Alice is blacklisted" true (is-blacklisted "t:EgYRAWXSd4zZlch3B0cLHTSEt4sgYVg5cwKgvP1CoUs" "alice"))
+(expect "Carol is blacklisted" true (is-blacklisted "t:jQ84xa7TcJGa6kJqrMgF0l9wzpEnl8uD_-OpIAhfqko" "carol"))
+
+; Check the lists
+(expect-that "Alice should be in the lists of token 1" (contains "alice")              (list-blacklisted-accounts "t:EgYRAWXSd4zZlch3B0cLHTSEt4sgYVg5cwKgvP1CoUs"))
+(expect-that "Carol should be in the lists of token 2" (contains "carol")              (list-blacklisted-accounts "t:jQ84xa7TcJGa6kJqrMgF0l9wzpEnl8uD_-OpIAhfqko"))
+(expect-that "Dave should be in the lists of token 2" (contains "dave")                (list-blacklisted-accounts "t:jQ84xa7TcJGa6kJqrMgF0l9wzpEnl8uD_-OpIAhfqko"))
+(expect-that "Bob should be in the lists of token 2" (compose (contains "bob") (not))  (list-blacklisted-accounts "t:jQ84xa7TcJGa6kJqrMgF0l9wzpEnl8uD_-OpIAhfqko"))
+
+(expect-that "Alice should be in the lists of token 1" (contains "t:EgYRAWXSd4zZlch3B0cLHTSEt4sgYVg5cwKgvP1CoUs")  (list-blacklisted-tokens "alice"))
+(expect-that "Carol should not be in the lists of token 1" (compose (contains "t:EgYRAWXSd4zZlch3B0cLHTSEt4sgYVg5cwKgvP1CoUs") (not))  (list-blacklisted-tokens "carol"))
+(expect-that "Carol should  be in the lists of token 2" (contains "t:jQ84xa7TcJGa6kJqrMgF0l9wzpEnl8uD_-OpIAhfqko")  (list-blacklisted-tokens "carol"))
+(commit-tx)
+
+
+
+(begin-tx "Mint test")
+(use marmalade-ng.ledger)
+; Try to mint some tokens 1 to Alice
+(env-data {'alice-ks:["alice-key"],
+           'carol-ks:["carol-key"]})
+
+(env-sigs [{'key:"nobody", 'caps:[(MINT "t:EgYRAWXSd4zZlch3B0cLHTSEt4sgYVg5cwKgvP1CoUs" "alice" 1.0),
+                                  (MINT "t:EgYRAWXSd4zZlch3B0cLHTSEt4sgYVg5cwKgvP1CoUs" "carol" 1.0),
+                                  (MINT "t:jQ84xa7TcJGa6kJqrMgF0l9wzpEnl8uD_-OpIAhfqko" "alice" 1.0)]}
+          ])
+(expect-failure "Blacklisted" "Account in blacklist"
+          (mint "t:EgYRAWXSd4zZlch3B0cLHTSEt4sgYVg5cwKgvP1CoUs" "alice" (read-keyset 'alice-ks) 1.0))
+
+; But OK for token 2
+(mint "t:jQ84xa7TcJGa6kJqrMgF0l9wzpEnl8uD_-OpIAhfqko" "alice" (read-keyset 'alice-ks) 1.0)
+
+; Try to mint some tokens 1 to carol : should work
+(mint "t:EgYRAWXSd4zZlch3B0cLHTSEt4sgYVg5cwKgvP1CoUs" "carol" (read-keyset 'carol-ks) 1.0)
+(commit-tx)
+
+; Burn tests
+(begin-tx "Burn test")
+(use marmalade-ng.ledger)
+
+(env-sigs [{'key:"alice-key", 'caps:[(BURN "t:EgYRAWXSd4zZlch3B0cLHTSEt4sgYVg5cwKgvP1CoUs" "alice" 0.1),
+                                     (BURN "t:jQ84xa7TcJGa6kJqrMgF0l9wzpEnl8uD_-OpIAhfqko" "alice" 0.1)]}
+          ])
+
+(expect-failure "Blacklisted" "Account in blacklist"
+          (burn "t:EgYRAWXSd4zZlch3B0cLHTSEt4sgYVg5cwKgvP1CoUs" "alice" 0.1))
+
+; But OK for token 2
+(burn "t:jQ84xa7TcJGa6kJqrMgF0l9wzpEnl8uD_-OpIAhfqko" "alice" 0.1)
+
+(commit-tx)
+
+; Try to transfer
+(begin-tx "Transfers test")
+(use marmalade-ng.ledger)
+
+(env-data {'alice-ks:["alice-key"],
+           'bob-ks:["bob-key"],
+           'carol-ks:["carol-key"]})
+
+; Token 1 Alice -> Bob (blacklisted)
+(env-sigs [{'key:"alice-key", 'caps:[(TRANSFER "t:EgYRAWXSd4zZlch3B0cLHTSEt4sgYVg5cwKgvP1CoUs" "alice" "bob" 0.1)]}])
+
+(expect-failure "Blacklisted" "Account in blacklist"
+                (transfer-create "t:EgYRAWXSd4zZlch3B0cLHTSEt4sgYVg5cwKgvP1CoUs" "alice" "bob" (read-keyset 'bob-ks) 0.1))
+
+; But should work fir token 2
+(env-sigs [{'key:"alice-key", 'caps:[(TRANSFER "t:jQ84xa7TcJGa6kJqrMgF0l9wzpEnl8uD_-OpIAhfqko" "alice" "bob" 0.1)]}])
+
+(transfer-create "t:jQ84xa7TcJGa6kJqrMgF0l9wzpEnl8uD_-OpIAhfqko" "alice" "bob" (read-keyset 'bob-ks) 0.1)
+
+
+; try to send token 2 to "carol" should not work : RX blacklisted
+(env-sigs [{'key:"alice-key", 'caps:[(TRANSFER "t:jQ84xa7TcJGa6kJqrMgF0l9wzpEnl8uD_-OpIAhfqko" "alice" "carol" 0.1)]}])
+
+(expect-failure "Blacklisted" "Account in blacklist"
+                (transfer-create "t:jQ84xa7TcJGa6kJqrMgF0l9wzpEnl8uD_-OpIAhfqko" "alice" "carol" (read-keyset 'bob-ks) 0.1))
+(commit-tx)
+
+
+; Try an offer
+(begin-tx "Sale test")
+(use marmalade-ng.ledger)
+
+(env-sigs [{'key:"alice-key", 'caps:[(OFFER "t:EgYRAWXSd4zZlch3B0cLHTSEt4sgYVg5cwKgvP1CoUs" "alice" 0.1),
+                                     (OFFER "t:jQ84xa7TcJGa6kJqrMgF0l9wzpEnl8uD_-OpIAhfqko" "alice" 0.1)]}
+          ])
+
+(expect-failure "Blacklisted" "Account in blacklist"
+          (sale "t:EgYRAWXSd4zZlch3B0cLHTSEt4sgYVg5cwKgvP1CoUs" "alice" 0.1 NO-TIMEOUT))
+
+; But OK for token 2
+(sale "t:jQ84xa7TcJGa6kJqrMgF0l9wzpEnl8uD_-OpIAhfqko" "alice" 0.1 NO-TIMEOUT)
+(commit-tx)
+
+
+; Unblacklist for token 1
+(begin-tx "Un-Blacklisting")
+(use marmalade-ng.policy-blacklist)
+(env-data {})
+
+(env-sigs [{'key:"black-1-key", 'caps:[(UPDATE-BLACKLIST "t:EgYRAWXSd4zZlch3B0cLHTSEt4sgYVg5cwKgvP1CoUs" "alice" false)]}
+          ])
+
+(remove-account "t:EgYRAWXSd4zZlch3B0cLHTSEt4sgYVg5cwKgvP1CoUs" "alice")
+
+(expect "Alice is blacklisted" false (is-blacklisted "t:EgYRAWXSd4zZlch3B0cLHTSEt4sgYVg5cwKgvP1CoUs" "alice"))
+
+(expect-that "Alice should be in the lists of token 1" (compose (contains "alice") (not)) (list-blacklisted-accounts "t:EgYRAWXSd4zZlch3B0cLHTSEt4sgYVg5cwKgvP1CoUs"))
+(expect-that "Alice should be in the lists of token 1" (compose (contains "t:EgYRAWXSd4zZlch3B0cLHTSEt4sgYVg5cwKgvP1CoUs") (not))  (list-blacklisted-tokens "alice"))
+(commit-tx)
+
+
+
+; Now rety the transfer
+; Try to transfer
+(begin-tx "Transfers test")
+(use marmalade-ng.ledger)
+
+(env-data {'alice-ks:["alice-key"],
+           'bob-ks:["bob-key"],
+           'carol-ks:["carol-key"]})
+
+; Token 1 Alice -> Bob (blacklisted)
+(env-sigs [{'key:"alice-key", 'caps:[(TRANSFER "t:EgYRAWXSd4zZlch3B0cLHTSEt4sgYVg5cwKgvP1CoUs" "alice" "bob" 0.1)]}])
+
+(transfer-create "t:EgYRAWXSd4zZlch3B0cLHTSEt4sgYVg5cwKgvP1CoUs" "alice" "bob" (read-keyset 'bob-ks) 0.1)
+
+; But should work fir token 2
+(env-sigs [{'key:"alice-key", 'caps:[(TRANSFER "t:jQ84xa7TcJGa6kJqrMgF0l9wzpEnl8uD_-OpIAhfqko" "alice" "bob" 0.1)]}])
+
+(transfer-create "t:jQ84xa7TcJGa6kJqrMgF0l9wzpEnl8uD_-OpIAhfqko" "alice" "bob" (read-keyset 'bob-ks) 0.1)
+
+
+; try to send token 2 to "carol" should not work : RX blacklisted
+(env-sigs [{'key:"alice-key", 'caps:[(TRANSFER "t:jQ84xa7TcJGa6kJqrMgF0l9wzpEnl8uD_-OpIAhfqko" "alice" "carol" 0.1)]}])
+
+(expect-failure "Blacklisted" "Account in blacklist"
+                (transfer-create "t:jQ84xa7TcJGa6kJqrMgF0l9wzpEnl8uD_-OpIAhfqko" "alice" "carol" (read-keyset 'bob-ks) 0.1))
+(commit-tx)

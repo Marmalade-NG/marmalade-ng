@@ -1,0 +1,192 @@
+(env-data {"disable-marmalade":true})
+(load "kadena_repl_sandbox/kda-env/init.repl")
+(load "init/init-ledger.repl")
+(load "init/init-policy-fixed-sale.repl")
+(load "init/init-policy-adjustable-royalty.repl")
+
+(begin-tx "Create a token")
+(env-hash (hash "CreateTx"))
+(use marmalade-ng.ledger)
+(use marmalade-ng.policy-adjustable-royalty)
+
+(env-data {'create-ks:["create"]})
+
+(env-sigs [{'key:"create", 'caps:[(ENFORCE-RESERVED)]}])
+
+(print (+ "Token ID: => " (create-token-id (read-keyset 'create-ks) "http://token-with-royalty" )))
+
+; Try to create without the royalty data
+(expect-failure "Data missing" "royalty not present in data"
+  (create-token "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw" 1 "http://token-with-royalty"
+                [marmalade-ng.policy-fixed-sale, marmalade-ng.policy-adjustable-royalty] (read-keyset 'create-ks)))
+
+; Now add the data => Royalty = 10 %
+(env-data {'create-ks:["create"],
+           'marmalade_royalty:{'creator_acct:"creator",
+                               'creator_guard:{'pred:"keys-all", 'keys:["creator-key"]},
+                               'rate:0.1}})
+(create-token "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw" 1 "http://token-with-royalty"
+              [marmalade-ng.policy-fixed-sale, marmalade-ng.policy-adjustable-royalty] (read-keyset 'create-ks))
+
+
+(env-sigs [ {'key:"nobody", 'caps:[(MINT "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw" "alice" 0.6)]}])
+(env-data {'alice-ks:["alice-key"]})
+
+(mint "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw" "alice" (read-keyset 'alice-ks) 0.6)
+
+; Test the details
+(print (get-royalty-details "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw"))
+(expect-that "Check rate in details" (compose (at 'rate) (= 0.1)) (get-royalty-details "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw"))
+(expect-that "Check accout in details" (compose (at 'creator-account) (= "creator")) (get-royalty-details "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw"))
+
+(expect-that "Check get by creator" (compose (length) (= 1)) (get-royalty-details-per-creator "creator"))
+(expect-that "Check for a unknown creator" (compose (length) (= 0)) (get-royalty-details-per-creator "unknown-creator"))
+
+
+(commit-tx)
+
+(begin-tx "Sales")
+(env-hash (hash "fixed-sale-1"))
+(print (format "Sale ID 1: => {}" [(tx-hash)]))
+
+; Alice will sell 0.1 to bob
+(use marmalade-ng.ledger)
+(use marmalade-ng.policy-fixed-sale)
+
+(env-sigs [ {'key:"alice-key", 'caps:[(OFFER "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw" "alice" 0.1)]}
+           ])
+
+(env-chain-data {"block-time": (time "2023-01-01T00:00:00Z")})
+(expect "Balance of was 0.6" 0.6 (get-balance "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw" "alice"))
+
+
+; try without env-data
+(expect-failure "No env-data provided" "sale not present in data"
+  (sale "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw" "alice" 0.1 (time "2023-06-01T00:00:00Z")))
+
+
+; Now try exrything good
+(env-data {'marmalade_sale: {'sale_type:"fixed", 'currency:coin },
+           'marmalade_fixed_quote: {'recipient:"alice", 'price:5.0 }})
+
+
+(sale "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw" "alice" 0.1 (time "2023-06-01T00:00:00Z"))
+
+
+
+(expect-that "It should exist 1 active sale" (compose (length) (= 1)) (get-all-active-sales))
+(expect-that "It should exist 1 active sale" (compose (length) (= 1)) (get-sales-for-token "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw"))
+
+(print (+ "Escrow account: => " (at 'escrow-account (get-sale (tx-hash)))))
+(commit-tx)
+
+
+; Just before the buy, the crator will raise double the rate
+(begin-tx "Double royalty rate")
+(use marmalade-ng.policy-adjustable-royalty)
+
+; Without signature
+(expect-failure "Without signature" "Keyset failure"
+                (update-rate "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw" 0.2))
+
+; And with signature
+(env-sigs [{'key:"creator-key", 'caps:[]}])
+(update-rate "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw" 0.2)
+
+; Berify that it worked:
+(expect-that "New rate should be 0.2" (compose (at 'rate) (= 0.2)) (get-royalty-details "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw"))
+(commit-tx)
+
+
+
+; Bob will try to buy
+; Even if the creator has changed its rate, the buyer should pay the old rate
+(begin-tx "Sales buy")
+(env-hash (hash "fixed-sale-1-buy"))
+(use marmalade-ng.ledger)
+(use marmalade-ng.policy-fixed-sale)
+
+; First confirm the balances of their respective KDA accounts
+(expect "Initial balance should be 1000" 1000.0 (coin.get-balance "alice"))
+(expect "Initial balance should be 1000" 1000.0 (coin.get-balance "bob"))
+
+(env-data {'buyer:"bob", 'buyer-guard:{'pred:"keys-all", 'keys:["bob-key"]}})
+
+
+(env-sigs [{'key:"bob-key", 'caps:[(coin.TRANSFER "bob" "c:uZK0n0opPMtEMAOctKX2S-nNa3KCotC9TBQCnXPOYeY" 5.0)]}])
+(env-chain-data {"block-time": (time "2023-05-01T00:00:00Z")})
+(continue-pact 1 false (hash  "fixed-sale-1"))
+
+
+; Check the KDA balances
+(expect "Final balance should be 1004.5" 1004.5 (coin.get-balance "alice"))
+(expect "Final balance should be 995" 995.0 (coin.get-balance "bob"))
+(expect "Final balance should be 0.5" 0.5 (coin.get-balance "creator"))
+
+; Checl the token balances
+(expect "Balance of alice is now  0.5" 0.5 (get-balance "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw" "alice"))
+(expect "Balance of alice is now  0.1" 0.1 (get-balance "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw" "bob"))
+
+(expect-that "It should exist 0 active sale" (compose (length) (= 0)) (get-all-active-sales))
+(expect-that "It should exist 0 active sale" (compose (length) (= 0)) (get-sales-for-token "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw"))
+(commit-tx)
+
+
+
+; Let's create a new sale and verify that the new rate is applied
+(begin-tx "Sales 2 ")
+(env-hash (hash "fixed-sale-2"))
+(print (format "Sale ID 2: => {}" [(tx-hash)]))
+
+; Alice will sell 0.1 to carol
+(use marmalade-ng.ledger)
+(use marmalade-ng.policy-fixed-sale)
+
+(env-sigs [ {'key:"alice-key", 'caps:[(OFFER "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw" "alice" 0.1)]}
+            ])
+
+
+; Imagine that alice is not aware of the raise in rate, she will ask for a limitation to 0.1
+(env-data {'marmalade_sale: {'sale_type:"fixed", 'currency:coin },
+           'marmalade_fixed_quote: {'recipient:"alice", 'price:5.0 },
+           'marmalade_royalty_sale: {'maximum_royalty:0.1 }})
+
+(expect-failure "Maximum expected royalty too low" "Royalty is higher than expected"
+                (sale "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw" "alice" 0.1 (time "2023-06-01T00:00:00Z")))
+
+
+; Now we change to 0.2 => should work
+(env-data {'marmalade_sale: {'sale_type:"fixed", 'currency:coin },
+           'marmalade_fixed_quote: {'recipient:"alice", 'price:5.0 },
+           'marmalade_royalty_sale: {'maximum_royalty:0.2 }})
+(sale "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw" "alice" 0.1 (time "2023-06-01T00:00:00Z"))
+
+(print (+ "Escrow account: => " (at 'escrow-account (get-sale (tx-hash)))))
+(commit-tx)
+
+
+; Carol will buy and we will verify that new rate is applied
+
+(begin-tx "Sales buy")
+(env-hash (hash "fixed-sale-2-buy"))
+(use marmalade-ng.ledger)
+(use marmalade-ng.policy-fixed-sale)
+
+; First confirm the balances of Carole KDA
+(expect "Initial balance should be 1004" 1004.5 (coin.get-balance "alice"))
+
+(env-data {'buyer:"carol", 'buyer-guard:{'pred:"keys-all", 'keys:["carol-key"]}})
+
+
+(env-sigs [{'key:"carol-key", 'caps:[(coin.TRANSFER "carol" "c:RofYomFLW13xvivg2XjN3MykJG_1hNRfDvV4W2DjdNU" 5.0)]}])
+(env-chain-data {"block-time": (time "2023-05-01T00:00:00Z")})
+(continue-pact 1 false (hash  "fixed-sale-2"))
+
+; Alice should receive 5.0 * 80% = 4.0
+; Creator shold receive 5.0 *20% = 1.0
+
+; Check the KDA balances
+(expect "Final balance should be 1004.5 + 4.0" 1008.5 (coin.get-balance "alice"))
+(expect "Final balance should be 0.5 + 1.0 = 1.5" 1.5 (coin.get-balance "creator"))
+
+(commit-tx)

@@ -1,0 +1,5 @@
+(begin-tx)
+(print "====> Deploy policy-disable-burn")
+(namespace 'marmalade-ng)
+(load "../../pact/policies/policy-disable-burn.pact")
+(commit-tx)

@@ -1,0 +1,30 @@
+(env-data {"disable-marmalade":true})
+(load "kadena_repl_sandbox/kda-env/init.repl")
+(load "init/init-ledger.repl")
+(load "init/init-policy-instant-mint.repl")
+
+(begin-tx "Create a token")
+(env-hash (hash "CreateTx"))
+(use marmalade-ng.ledger)
+(env-data {'create-ks:["create"]})
+
+(env-sigs [{'key:"create", 'caps:[(ENFORCE-RESERVED)]}])
+(create-token "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" 1 "http://token-1"
+              [marmalade-ng.policy-instant-mint] (read-keyset 'create-ks))
+
+(env-sigs [ {'key:"nobody", 'caps:[(MINT "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice" 0.6)]}])
+(env-data {'alice-ks:["alice"]})
+
+(mint "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice" (read-keyset 'alice-ks) 0.6)
+
+(commit-tx)
+
+(begin-tx)
+(env-hash (hash "MintTx"))
+(use marmalade-ng.ledger)
+
+(env-sigs [ {'key:"nobody", 'caps:[(MINT "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice" 0.6)]}])
+(env-data {'alice-ks:["alice"]})
+(expect-failure "Minting is locked" "must be minted in the same transaction"
+  (mint "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice" (read-keyset 'alice-ks) 0.6))
+(commit-tx)

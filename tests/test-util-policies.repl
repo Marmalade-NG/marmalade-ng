@@ -1,0 +1,32 @@
+(env-data {"disable-marmalade":true})
+(load "kadena_repl_sandbox/kda-env/init.repl")
+(load "init/init-ledger.repl")
+
+
+(begin-tx)
+(use marmalade-ng.util-policies)
+(env-data {"marmalade_domX":{'a:1, 'b:1}})
+
+(expect "Msg OK" {'a:1, 'b:1}
+  (get-msg-data "domX" {'id:"t:one-token",'supply:0.0, 'uri:"", 'precision:0} {}))
+
+
+(env-data {"marmalade_domX_t:one-token":{'a:2, 'b:2},
+           "marmalade_domX":{'a:1, 'b:1}})
+
+(expect "Token specific take precedence" {'a:2, 'b:2}
+        (get-msg-data "domX" {'id:"t:one-token",'supply:0.0, 'uri:"", 'precision:0} {}))
+
+(expect "Failback to global" {'a:1, 'b:1}
+        (get-msg-data "domX" {'id:"t:another-token",'supply:0.0, 'uri:"", 'precision:0} {}))
+
+(expect "Empty Msg" {}
+        (get-msg-data "another_dom" {'id:"t:one-token",'supply:0.0, 'uri:"", 'precision:0} {}))
+
+(expect "Token specific take precedence" {'a:2, 'b:2}
+        (enforce-get-msg-data "domX" {'id:"t:one-token",'supply:0.0, 'uri:"", 'precision:0}))
+
+(expect "Empty Msg" {}
+        (get-msg-data "another_dom" {'id:"t:one-token",'supply:0.0, 'uri:"", 'precision:0} {}))
+
+(commit-tx)

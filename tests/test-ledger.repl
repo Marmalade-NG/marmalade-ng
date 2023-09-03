@@ -1,0 +1,306 @@
+(env-data {"disable-marmalade":true})
+(load "kadena_repl_sandbox/kda-env/init.repl")
+(load "init/init-ledger.repl")
+
+(begin-tx)
+(load "tools/events_analyzer.pact")
+(commit-tx)
+
+
+(begin-tx)
+(namespace 'marmalade-ng)
+(load "stubs/policy-events-A.pact")
+(load "stubs/policy-events-B.pact")
+(commit-tx)
+
+(begin-tx "Create a first token")
+(use marmalade-ng.ledger)
+(env-data {'create-ks:["create"]})
+
+(print (+ "Token-1: => " (create-token-id (read-keyset 'create-ks) "http://token-1" )))
+
+; try to create without signature
+(env-sigs [])
+(expect-failure "Creation guard not signed" "Keyset failure"
+  (create-token "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" 1 "http://token-1"
+                [marmalade-ng.policy-events-A, marmalade-ng.policy-events-B] (read-keyset 'create-ks)))
+
+; try to create with an error in token-id
+(env-sigs [{'key:"create", 'caps:[(ENFORCE-RESERVED)]}])
+(expect-failure "Bad token ID" "Token protocol violation"
+  (create-token "t:bad" 1 "http://token-1"
+                [marmalade-ng.policy-events-A, marmalade-ng.policy-events-B] (read-keyset 'create-ks)))
+
+; Now try with evrything good
+(env-events true)
+(create-token "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" 1 "http://token-1"
+              [marmalade-ng.policy-events-A, marmalade-ng.policy-events-B] (read-keyset 'create-ks))
+
+; Check the events
+(ev-analyzer.store (env-events true))
+(expect "Policy A has been called" true (ev-analyzer.is-present "marmalade-ng.policy-events-A.EVENT-A"))
+(expect "Policy B has been called" true (ev-analyzer.is-present "marmalade-ng.policy-events-B.EVENT-B"))
+
+(expect "Policy A params" ["init"] (ev-analyzer.params "marmalade-ng.policy-events-A.EVENT-A"))
+(expect "Policy B params" ["init"] (ev-analyzer.params "marmalade-ng.policy-events-B.EVENT-B"))
+
+(expect "Policy B called beofre A " true (< (ev-analyzer.position "marmalade-ng.policy-events-B.EVENT-B")
+                                            (ev-analyzer.position "marmalade-ng.policy-events-A.EVENT-A")))
+
+; Check URI
+(expect "URI is good" "http://token-1" (get-uri "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM"))
+; Check policies
+(expect "Policies are good and ordered by rank" [marmalade-ng.policy-events-B, marmalade-ng.policy-events-A] (get-policies "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM"))
+; Check precision
+(expect "Precision" 1 (precision "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM"))
+; Check total supply
+(expect "Total supply empty" 0.0 (total-supply "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM"))
+; Check token-exist
+(expect "Token exist" true (token-exist "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM"))
+; Check a not existent token
+(expect "Token exist" false (token-exist "t:doesnotexist"))
+(commit-tx)
+
+
+
+;-------------------------------------------
+; Minting tests
+;--------------------------------------------
+; We want to mint 60% of the NFT to alice
+;             and 40% to bob
+(begin-tx "Mint token")
+(env-data {'alice-ks:["alice-key"], 'bob-ks:["bob-key"] })
+(use marmalade-ng.ledger)
+(use free.util-lists)
+
+; First try without the managed cap
+(expect-failure "Managed capability not installed" "not installed"
+                (mint "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice" (read-keyset 'alice-ks) 0.6))
+
+; Now sign with the right caps
+(env-sigs [ {'key:"nobody", 'caps:[(MINT "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice" 0.6),
+                                   (MINT "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "bob" 0.4)]}
+          ])
+
+(mint "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice" (read-keyset 'alice-ks) 0.6)
+
+; Check the events
+(ev-analyzer.store (env-events true))
+(expect "Policy A has been called" true (ev-analyzer.is-present "marmalade-ng.policy-events-A.EVENT-A"))
+(expect "Policy B has been called" true (ev-analyzer.is-present "marmalade-ng.policy-events-B.EVENT-B"))
+
+(expect "Policy A params" ["mint"] (ev-analyzer.params "marmalade-ng.policy-events-A.EVENT-A"))
+(expect "Policy B params" ["mint"] (ev-analyzer.params "marmalade-ng.policy-events-B.EVENT-B"))
+
+(mint "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "bob" (read-keyset 'bob-ks) 0.4)
+
+; Check the balances
+(expect "Balance of alice is 0.6" 0.6 (get-balance "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice"))
+(expect "Balance of bob is 0.4" 0.6 (get-balance "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice"))
+
+; Check the guards
+(expect "Alice has the good guard" (read-keyset 'alice-ks) (account-guard "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice"))
+(expect "Bob has the good guard" (read-keyset 'bob-ks) (account-guard "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "bob"))
+
+; List the balances
+(expect-that "Balance list has 1 element" (compose (length) (= 1)) (list-balances "alice"))
+(expect-that "Balance element is right" (compose (first) (= {"balance": 0.6,"id": "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM"})) (list-balances "alice"))
+(commit-tx)
+
+;-------------------------------------------------------------------------------
+; Burning Test
+;-------------------------------------------------------------------------------
+; We will create and mint a new token for burning tests
+(begin-tx "Burn tests")
+(use marmalade-ng.ledger)
+(env-data {'create-ks:["create"],
+          'alice-ks:["alice-key"]})
+
+(env-sigs [{'key:"create", 'caps:[(ENFORCE-RESERVED)]},
+           {'key:"nobody", 'caps:[(MINT "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I" "alice" 1.0)]}
+          ])
+
+(print (+ "Token-2: => " (create-token-id (read-keyset 'create-ks) "http://token-2" )))
+(create-token "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I" 1 "http://token-2"
+              [marmalade-ng.policy-events-A, marmalade-ng.policy-events-B] (read-keyset 'create-ks))
+
+(mint "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I" "alice" (read-keyset 'alice-ks) 1.0)
+
+; Sanity check => Verify the balance of alice
+(expect "Balance of alice should be 1.0" 1.0 (get-balance "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I" "alice"))
+; and the total supply
+(expect "Total supply must be 1.0" 1.0 (total-supply "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I"))
+
+
+; Try to burn without signature
+(env-sigs [])
+(expect-failure "Signature/and cap needed" "Managed capability not installed"
+                (burn "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I" "alice" 0.1))
+
+; Signature but bad cap
+(env-sigs [{'key:"alice-key", 'caps:[(BURN "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I" "bob" 0.1)]}])
+
+(expect-failure "Signature/and cap needed" "Managed capability not installed"
+                (burn "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I" "alice" 0.1))
+
+; Good cap but bad signer
+(env-sigs [{'key:"nobody", 'caps:[(BURN "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I" "alice" 0.1)]}])
+(expect-failure "Signature/and cap needed" "Keyset failure"
+                (burn "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I" "alice" 0.1))
+
+; Evrything good
+(env-sigs [{'key:"alice-key", 'caps:[(BURN "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I" "alice" 0.1)]}])
+
+(env-events true)
+(burn "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I" "alice" 0.1)
+
+; Check the events
+(ev-analyzer.store (env-events true))
+(expect "Policy A has been called" true (ev-analyzer.is-present "marmalade-ng.policy-events-A.EVENT-A"))
+(expect "Policy B has been called" true (ev-analyzer.is-present "marmalade-ng.policy-events-B.EVENT-B"))
+
+(expect "Policy A params" ["burn"] (ev-analyzer.params "marmalade-ng.policy-events-A.EVENT-A"))
+(expect "Policy B params" ["burn"] (ev-analyzer.params "marmalade-ng.policy-events-B.EVENT-B"))
+
+; Check the balance
+(expect "Balance of alice should be 0.9" 0.9 (get-balance "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I" "alice"))
+
+; Check the supply
+(expect "Total supply must be 0.9 (1.0 - 0.1 burnt)" 0.9 (total-supply "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I"))
+(commit-tx)
+
+;-------------------------------------------------------------------------------
+; Transfer test
+;-------------------------------------------------------------------------------
+; We will create and mint a new token for burning tests
+(begin-tx "Transfer tests")
+(use marmalade-ng.ledger)
+(env-data {'create-ks:["create"],
+          'alice-ks:["alice-key"]})
+
+
+(print (+ "Token-3: => " (create-token-id (read-keyset 'create-ks) "http://token-3-test-transfer" )))
+
+(env-sigs [{'key:"create", 'caps:[(ENFORCE-RESERVED)]},
+           {'key:"nobody", 'caps:[(MINT "t:8XZTuI-LC_Zww0mfCzFa8l7dkbZirdM22KJwRQ5PlRg" "alice" 1.0)]}
+          ])
+
+(create-token "t:8XZTuI-LC_Zww0mfCzFa8l7dkbZirdM22KJwRQ5PlRg" 1 "http://token-3-test-transfer"
+              [marmalade-ng.policy-events-A, marmalade-ng.policy-events-B] (read-keyset 'create-ks))
+
+(mint "t:8XZTuI-LC_Zww0mfCzFa8l7dkbZirdM22KJwRQ5PlRg" "alice" (read-keyset 'alice-ks) 1.0)
+
+; Sanity check => Verify the balance of alice
+(expect "Balance of alice should be 1.0" 1.0 (get-balance "t:8XZTuI-LC_Zww0mfCzFa8l7dkbZirdM22KJwRQ5PlRg" "alice"))
+
+; Transfer without the cap
+(env-data {'bob-ks:["bob-key"]})
+(expect-failure "Signature/and cap needed" "Managed capability not installed"
+                (transfer-create "t:8XZTuI-LC_Zww0mfCzFa8l7dkbZirdM22KJwRQ5PlRg" "alice" "bob" (read-keyset 'bob-ks) 0.1))
+
+; Good cap but bad signer
+(env-sigs [{'key:"nobody", 'caps:[(TRANSFER "t:8XZTuI-LC_Zww0mfCzFa8l7dkbZirdM22KJwRQ5PlRg" "alice" "bob" 0.1)]}
+          ])
+(expect-failure "Signature/and cap needed" "Keyset failure"
+  (transfer-create "t:8XZTuI-LC_Zww0mfCzFa8l7dkbZirdM22KJwRQ5PlRg" "alice" "bob" (read-keyset 'bob-ks) 0.1))
+
+
+(env-sigs [{'key:"alice-key", 'caps:[(TRANSFER "t:8XZTuI-LC_Zww0mfCzFa8l7dkbZirdM22KJwRQ5PlRg" "alice" "bob" 0.2)]}
+          ])
+
+(env-events true)
+(transfer-create "t:8XZTuI-LC_Zww0mfCzFa8l7dkbZirdM22KJwRQ5PlRg" "alice" "bob" (read-keyset 'bob-ks) 0.1)
+(ev-analyzer.store (env-events true))
+(expect "Policy A has been called" true (ev-analyzer.is-present "marmalade-ng.policy-events-A.EVENT-A"))
+(expect "Policy B has been called" true (ev-analyzer.is-present "marmalade-ng.policy-events-B.EVENT-B"))
+
+(expect "Policy A params" ["transfer"] (ev-analyzer.params "marmalade-ng.policy-events-A.EVENT-A"))
+(expect "Policy B params" ["transfer"] (ev-analyzer.params "marmalade-ng.policy-events-B.EVENT-B"))
+
+(expect "Balance of alice should be 0.9" 0.9 (get-balance "t:8XZTuI-LC_Zww0mfCzFa8l7dkbZirdM22KJwRQ5PlRg" "alice"))
+(expect "Balance of bob should be 0.1" 0.1 (get-balance "t:8XZTuI-LC_Zww0mfCzFa8l7dkbZirdM22KJwRQ5PlRg" "bob"))
+
+; Since bob has now an account, we can try a simple transfer (not transfer-create)
+(transfer "t:8XZTuI-LC_Zww0mfCzFa8l7dkbZirdM22KJwRQ5PlRg" "alice" "bob"  0.1)
+
+(expect "Balance of alice should be 0.8" 0.8 (get-balance "t:8XZTuI-LC_Zww0mfCzFa8l7dkbZirdM22KJwRQ5PlRg" "alice"))
+(expect "Balance of bob should be 0.2" 0.2 (get-balance "t:8XZTuI-LC_Zww0mfCzFa8l7dkbZirdM22KJwRQ5PlRg" "bob"))
+
+(commit-tx)
+
+;-------------------------------------------------------------------------------
+; Sales tests
+;-------------------------------------------------------------------------------
+(begin-tx "Sales")
+(env-hash (hash "sale 1"))
+(print (format "Sale ID 1: => {}" [(tx-hash)]))
+
+
+; Alice will sell 0.1 to carol
+(use marmalade-ng.ledger)
+
+(env-sigs [ {'key:"alice-key", 'caps:[(OFFER "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice" 0.1)]}
+           ])
+(env-chain-data {"block-time": (time "2023-01-01T00:00:00Z")})
+
+(expect "Balance of was 0.6" 0.6 (get-balance "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice"))
+
+;Try to sell with a biad timeout
+(expect-failure "Tiemout in the past" "Timeout must be in future"
+                (sale "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice" 0.1 (time "2019-06-01T00:00:00Z")))
+
+(sale "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice" 0.1 (time "2023-06-01T00:00:00Z"))
+
+; Check the events
+(ev-analyzer.store (env-events true))
+(expect "Policy A has been called" true (ev-analyzer.is-present "marmalade-ng.policy-events-A.EVENT-A"))
+(expect "Policy B has been called" true (ev-analyzer.is-present "marmalade-ng.policy-events-B.EVENT-B"))
+
+(expect "Policy A params" ["sale-offer"] (ev-analyzer.params "marmalade-ng.policy-events-A.EVENT-A"))
+(expect "Policy B params" ["sale-offer"] (ev-analyzer.params "marmalade-ng.policy-events-B.EVENT-B"))
+
+(expect "Balance of alice is now 0.5" 0.5 (get-balance "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice"))
+
+(commit-tx)
+
+
+(begin-tx "Withdraw Sale")
+(env-hash (hash "withdraw 1"))
+(use marmalade-ng.ledger)
+; Do a rollback
+(continue-pact 0 true (hash "sale 1"))
+
+; Check the events
+(ev-analyzer.store (env-events true))
+(expect "Policy A has been called" true (ev-analyzer.is-present "marmalade-ng.policy-events-A.EVENT-A"))
+(expect "Policy B has been called" true (ev-analyzer.is-present "marmalade-ng.policy-events-B.EVENT-B"))
+
+(expect "Policy A params" ["sale-withdraw"] (ev-analyzer.params "marmalade-ng.policy-events-A.EVENT-A"))
+(expect "Policy B params" ["sale-withdraw"] (ev-analyzer.params "marmalade-ng.policy-events-B.EVENT-B"))
+
+(expect "Balance of alice is now back 0.6" 0.6 (get-balance "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice"))
+(rollback-tx)
+
+
+(begin-tx "Complete Sale")
+(env-hash (hash "complete 1"))
+(use marmalade-ng.ledger)
+; Do a rollback
+(env-data {'buyer: "carol", 'buyer-guard: {'pred:"keys-all", 'keys:["carol-key"]}})
+
+(continue-pact 1 false (hash "sale 1"))
+
+; Check the events
+(ev-analyzer.store (env-events true))
+(expect "Policy A has been called" true (ev-analyzer.is-present "marmalade-ng.policy-events-A.EVENT-A"))
+(expect "Policy B has been called" true (ev-analyzer.is-present "marmalade-ng.policy-events-B.EVENT-B"))
+
+(expect "Policy A params" ["sale-buy"] (ev-analyzer.params "marmalade-ng.policy-events-A.EVENT-A"))
+(expect "Policy B params" ["sale-buy"] (ev-analyzer.params "marmalade-ng.policy-events-B.EVENT-B"))
+
+(expect "Balance of alice is still 0.5" 0.5 (get-balance "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice"))
+
+; But carol got the NFT
+(expect "Balance of alice is still 0.1" 0.1 (get-balance "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "carol"))
+
+(commit-tx)

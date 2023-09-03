@@ -1,0 +1,7 @@
+(begin-tx)
+(print "====> Deploy policy-royalty")
+(namespace 'marmalade-ng)
+(load "../../pact/policies/policy-royalty.pact")
+(create-table royalty-sales)
+(create-table royalty-tokens)
+(commit-tx)

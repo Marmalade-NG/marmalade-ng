@@ -1,0 +1,6 @@
+(begin-tx)
+(print "====> Deploy policy-instant-mint")
+(namespace 'marmalade-ng)
+(load "../../pact/policies/policy-instant-mint.pact")
+(create-table instant-mint)
+(commit-tx)

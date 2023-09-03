@@ -1,0 +1,7 @@
+(begin-tx)
+(print "====> Deploy policy-blacklist")
+(namespace 'marmalade-ng)
+(load "../../pact/policies/policy-blacklist.pact")
+(create-table blacklist)
+(create-table tokens-blacklist)
+(commit-tx)

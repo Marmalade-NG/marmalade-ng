@@ -1,0 +1,6 @@
+(begin-tx)
+(print "====> Deploy policy-fixed-sale")
+(namespace 'marmalade-ng)
+(load "../../pact/policies/policy-fixed-sale.pact")
+(create-table quotes)
+(commit-tx)
