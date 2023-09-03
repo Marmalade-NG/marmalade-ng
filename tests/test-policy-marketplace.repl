@@ -244,16 +244,12 @@
 (expect-that "Check the sale 2" (compose (at 'token-id) (= "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I"))
              (get-marketplace-fee "MdXO502ljyF-O6YJV-ODmTuhqFF2Zn6Wa0ONQZu1P8o"))
 
-(print (get-marketplace-fee "MdXO502ljyF-O6YJV-ODmTuhqFF2Zn6Wa0ONQZu1P8o"))
-
 (expect-that "3 NFTS are currently under sale with market-place policy"  (compose (length) (= 3))
              (get-all-active-sales))
 
 
 (expect-that "3 NFTS are currently under sale with BestMarket"  (compose (length) (= 3))
              (get-active-sales-by-name "BestMarket"))
-
-(print (get-active-sales-by-name "BestMarket"))
 
 (expect-that "1 NFTS is currently under sale with ceil price hash"  (compose (length) (= 1))
              (get-active-sales-by-market-hash "zE-T8f_kTazOs7IuC-dNZ4Nf3KnkDymeozRb66QlrBk" ))

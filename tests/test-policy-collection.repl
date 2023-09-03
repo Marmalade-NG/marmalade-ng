@@ -115,8 +115,6 @@
 (begin-tx)
 (use marmalade-ng.policy-collection)
 
-(print (get-all-collections))
-
 (expect "Get all collections" ["c_Cats_ZMLLJuSq0JoHSR4f_ZgUa2H_p7Rr71CN8CjQ7ZL_hU0",
                                "c_Dogs_8BRJPRYtqM-2w8ASMYq6Toq4PIvhws-kHh0nbYfT1iY"]
         (get-all-collections))

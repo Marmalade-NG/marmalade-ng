@@ -35,7 +35,6 @@
 (mint "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw" "alice" (read-keyset 'alice-ks) 0.6)
 
 ; Test the details
-(print (get-royalty-details "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw"))
 (expect-that "Check rate in details" (compose (at 'rate) (= 0.1)) (get-royalty-details "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw"))
 (expect-that "Check accout in details" (compose (at 'creator-account) (= "creator")) (get-royalty-details "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw"))
 
