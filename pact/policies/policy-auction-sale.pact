@@ -178,8 +178,13 @@
                                    'currency:=currency:module{fungible-v2},
                                    'current-price:=current-price,
                                    'current-buyer:=current-buyer}
+
+      ; Check that the current-price is != 0. It means that someone has placed a bid
       (enforce (>= current-price 0.0) "No bid")
+      ; Check that the buyer that placed the bid is the same as the one that is currently
+      ;    claiming the tokens
       (enforce (= buyer current-buyer) "Buyer does not match")
+      ; Transfer the funds from the "Auction escrow account" -> "Sale escrow account"
       (with-capability (AUCTION-ESCROW-ACCOUNT (pact-id))
         (install-capability (currency::TRANSFER (auction-escrow (pact-id)) (ledger.escrow) current-price))
         (currency::transfer-create (auction-escrow (pact-id)) (ledger.escrow) (ledger.escrow-guard) current-price))
@@ -231,7 +236,7 @@
                "Price too low")
 
       ; The best way to ensure that everything will work at expected during
-      ; settlement is to check that current ledger account or create-it.
+      ; settlement is to check that current ledger account exists or create-it.
       (check-ledger-account token-id buyer buyer-guard)
 
       ; Escrow the new bid
