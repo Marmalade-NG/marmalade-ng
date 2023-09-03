@@ -24,6 +24,7 @@
                                            {'name:"DISABLE-SALE",      'pol:policy-disable-sale},
                                            {'name:"DUTCH-AUCTION-SALE",'pol:policy-dutch-auction-sale},
                                            {'name:"FIXED-SALE",        'pol:policy-fixed-sale},
+                                           {'name:"FIXED-ISSUANCE",    'pol:policy-fixed-issuance},
                                            {'name:"GUARDS",            'pol:policy-guards},
                                            {'name:"INSTANT-MINT",      'pol:policy-instant-mint},
                                            {'name:"MARKETPLACE",       'pol:policy-marketplace},
