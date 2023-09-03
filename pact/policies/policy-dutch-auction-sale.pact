@@ -45,11 +45,10 @@
   ; Input data
   ;-----------------------------------------------------------------------------
   (defschema dutch-quote-msg-sch
-    start_price:decimal
-    end_price:decimal
-    end_time:time
-    recipient:string
-
+    start_price:decimal ; Starting price
+    end_price:decimal ; End price (reached at end time, and until timeout)
+    end_time:time ; End time: end of the price decrease ramp
+    recipient:string ; Recipient of the payment 
   )
 
   ;-----------------------------------------------------------------------------
