@@ -30,7 +30,7 @@ to take a part of the funds from the escrow account.
 
 3 - The ``(enforce-sale-settle)`` hook is called, and the seller is paid with the remaining funds.
 
-The seller is able to withdraw from the sale after the ``timeout has elapsed`` is nobody has placed a bid
+The seller is able to withdraw from the sale after the ``timeout`` has elapsed if nobody has placed a bid.
 
 
 This policy does not support the ``NO-TIMEOUT`` parameter.
@@ -84,7 +84,7 @@ External functions
 ^^^^^^^^^^^^^^^^^^
 place-bid
 ~~~~~~~~~
-*sale-id* ``string` *buyer* ``string`` *buyer-guard* ``guard`` *new-price* ``decimal``  *→* ``string``
+*sale-id* ``string`` *buyer* ``string`` *buyer-guard* ``guard`` *new-price* ``decimal``  *→* ``string``
 
 Place a new bid on the given sale ID.
 

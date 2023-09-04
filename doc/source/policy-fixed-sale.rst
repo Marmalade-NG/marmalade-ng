@@ -25,7 +25,7 @@ to take a part of the funds from the escrow account.
 
 The buyer must complete the Pact before the ``timeout``.
 
-The seller is able to withdraw from the sale after the ``timeout has elapsed``
+The seller is able to withdraw from the sale after the ``timeout`` has elapsed.
 
 
 Although, this policy supports the ``NO-TIMEOUT`` parameter.

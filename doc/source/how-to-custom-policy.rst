@@ -34,7 +34,7 @@ policy must be prioritized within the sale process vs *policy-marketplace*, *pol
 3 - Ledger capabilities requirements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 In the template, each function starts with ``(require-capability (ledger.``.
-This is the core of the Marmalade-NG subsystem.
+This is the core of the Marmalade-NG security subsystem.
 
 Theses statements can safely be removed **ONLY** when the functions only include pure statements.
 By the way, calling any modref is considered as impure. If unsure, you can without problems (but small gas consumption) keep
@@ -57,4 +57,4 @@ If not used (ie the policy does not manage a sale like ``policy-xxxx-sale``), th
 If the policy need to read data from the transaction, it should follow Marmalade-NG conventions.
 
 In this case, the policy should use the functions ``(enforce-get-msg-data )`` and ``(get-msg-data )`` from the ``util-policies`` module.
-This modules contains other function very useful to deal with *standard sale messages*.
+This module contains other functions that are very useful for dealing with *standard sale* messages.
