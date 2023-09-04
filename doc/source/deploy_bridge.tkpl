@@ -1,0 +1,16 @@
+codeFile: tmp.pact
+publicMeta:
+  chainId: "{{bridge-chain}}"
+  sender: {{gas-payer}}
+  gasLimit: 150000
+  gasPrice: 0.00000001
+  ttl: 3600
+networkId: "{{network}}"
+signers:
+  - public: {{namespace-key}}
+    caps: []
+  - public: {{gas-payer-key}}
+    caps: []
+  - public: {{admin-key}}
+    caps: []
+type: exec
