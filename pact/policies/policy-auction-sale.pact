@@ -44,9 +44,9 @@
   ; Input data
   ;-----------------------------------------------------------------------------
   (defschema auction-msg-sch
-    start_price:decimal
-    recipient:string
-    increment_ratio:decimal
+    start_price:decimal ; start price of the auction
+    recipient:string ; recipien account
+    increment_ratio:decimal ;incrment ratio (multiplier) between each bid
   )
 
   ;-----------------------------------------------------------------------------
