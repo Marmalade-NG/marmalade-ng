@@ -1,0 +1,41 @@
+code: |-
+  (use {{namespace}}.ledger)
+  (use {{namespace}}.policy-fixed-sale)
+
+  (sale "{{token-id}}" "{{seller}}" 1.0 (time "{{timeout}}"))
+
+data:
+  marmalade_sale:
+    sale_type: fixed
+    currency:
+      refSpec:
+        - namespace: ~
+          name: fungible-v2
+      refName:
+        namespace: ~
+        name: coin
+
+  marmalade_fixed_quote:
+    price: {{price}}
+    recipient: {{seller}}
+
+publicMeta:
+  chainId: "{{chain}}"
+  sender: {{gas-payer}}
+  gasLimit: 5000
+  gasPrice: 0.00000001
+  ttl: 7200
+networkId: "{{network}}"
+signers:
+  - public: {{gas-payer-key}}
+    caps:
+      - name: "coin.GAS"
+        args: []
+  - public: {{seller-key}}
+    caps:
+      - name: "{{namespace}}.ledger.OFFER"
+        args:
+          - {{token-id}}
+          - {{seller}}
+          - 1.0
+type: exec

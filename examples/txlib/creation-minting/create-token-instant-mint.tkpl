@@ -1,0 +1,61 @@
+# This code create a token with the following policies:
+# - COLLECTION
+# - NON-FUNGIBLE
+# - INSTANT-MINT
+# - ROYALTY
+# - DISABLE-TRANSFER
+# - FIXED-SALE
+# - AUCTION-SALE
+#
+# Since it's an instant-mint token, it is immediatly munted to a choosen receiver.
+
+code: |-
+  (use {{namespace}}.ledger)
+  (use {{namespace}}.std-policies)
+
+  (let* ((tmp-guard (read-keyset 'ks-tmp))
+         (token-id (create-token-id tmp-guard "{{uri}}")))
+
+    (create-token token-id 0 "{{uri}}"
+                  (to-policies "COLLECTION NON-FUNGIBLE INSTANT-MINT ROYALTY DISABLE-TRANSFER FIXED-SALE AUCTION-SALE")
+                  tmp-guard)
+
+    (install-capability (MINT token-id "{{receiver}}" 1.0))
+    (mint token-id "{{receiver}}" (read-keyset 'ks-receiver) 1.0)
+    token-id
+  )
+data:
+  ks-tmp:
+    - {{tmp-key}}
+  ks-receiver:
+    - {{receiver-key}}
+
+  marmalade_collection:
+    id: {{collection-id}}
+
+  marmalade_royalty:
+    creator_acct: {{creator}}
+    creator_guard:
+      pred: keys-all
+      keys:
+        - {{creator-key}}
+    rate: 0.1
+publicMeta:
+  chainId: "{{chain}}"
+  sender: {{gas-payer}}
+  gasLimit: 10000
+  gasPrice: 0.00000001
+  ttl: 7200
+networkId: "{{network}}"
+signers:
+  - public: {{gas-payer-key}}
+    caps:
+      - name: "coin.GAS"
+        args: []
+  - public: {{collection-key}}
+    caps: []
+  - public: {{tmp-key}}
+    caps:
+      - name: "{{namespace}}.ledger.ENFORCE-RESERVED"
+        args: []
+type: exec

@@ -1,0 +1,76 @@
+# This code create a token with the following policies:
+# - COLLECTION
+# - NON-FUNGIBLE
+# - GUARD
+# - ROYALTY
+# - DISABLE-TRANSFER
+# - FIXED-SALE
+# - AUCTION-SALE
+#
+# The token is not minted but guard is used to protect further mint
+
+code: |-
+  (use {{namespace}}.ledger)
+  (use {{namespace}}.std-policies)
+
+  (let* ((tmp-guard (read-keyset 'ks-tmp))
+         (token-id (create-token-id tmp-guard "{{uri}}")))
+
+    (create-token token-id 0 "{{uri}}"
+                  (to-policies "COLLECTION GUARDS NON-FUNGIBLE ROYALTY DISABLE-TRANSFER FIXED-SALE AUCTION-SALE")
+                  tmp-guard)
+    token-id
+  )
+
+data:
+  ks-tmp:
+    - {{tmp-key}}
+
+  marmalade_guards:
+    mint:
+      pred: "keys-all"
+      keys:
+        - {{creator-key}}
+    burn:
+      fun: "{{namespace}}.policy-guards.success"
+      args: []
+    sale:
+      fun: "{{namespace}}.policy-guards.success"
+      args: []
+    transfer:
+      fun: "{{namespace}}.policy-guards.success"
+      args: []
+
+  marmalade_collection:
+    id: {{collection-id}}
+
+  marmalade_royalty:
+    creator_acct: {{creator}}
+    creator_guard:
+      pred: "keys-all"
+      keys:
+        - {{creator-key}}
+    rate: 0.1
+
+publicMeta:
+  chainId: "{{chain}}"
+  sender: {{gas-payer}}
+  gasLimit: 10000
+  gasPrice: 0.00000001
+  ttl: 7200
+networkId: "{{network}}"
+
+
+signers:
+  - public: {{gas-payer-key}}
+    caps:
+      - name: "coin.GAS"
+        args: []
+  - public: {{collection-key}}
+    caps: []
+  - public: {{tmp-key}}
+    caps:
+      - name: "{{namespace}}.ledger.ENFORCE-RESERVED"
+        args: []
+
+type: exec

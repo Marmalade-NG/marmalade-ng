@@ -1,0 +1,30 @@
+code: |-
+  (use {{namespace}}.policy-auction-sale)
+
+  (place-bid "{{sale-id}}" "{{buyer}}" (read-keyset 'buyer-ks) {{price}})
+
+data:
+  buyer-ks:
+    - {{buyer-key}}
+
+publicMeta:
+  chainId: "{{chain}}"
+  sender: {{gas-payer}}
+  gasLimit: 5000
+  gasPrice: 0.00000001
+  ttl: 7200
+networkId: "{{network}}"
+signers:
+  - public: {{gas-payer-key}}
+    caps:
+      - name: "coin.GAS"
+        args: []
+
+  - public: {{buyer-key}}
+    caps:
+      - name: "coin.TRANSFER"
+        args:
+          - {{buyer}}
+          - {{escrow}}
+          - {{price}}
+type: exec

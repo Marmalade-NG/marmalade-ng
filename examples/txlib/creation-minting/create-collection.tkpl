@@ -1,0 +1,29 @@
+# This code create a collection, with no size limit.
+# A collection-key is needed with a signature
+code: |-
+  (use {{namespace}}.policy-collection)
+
+  (let* ((ks (read-keyset 'ks-creator))
+         (collection-id (create-collection-id "{{collection-name}}" ks)))
+    (create-collection collection-id "{{collection-name}}" 0 ks)
+    collection-id
+  )
+
+data:
+  ks-creator:
+    - {{collection-key}}
+publicMeta:
+  chainId: "{{chain}}"
+  sender: {{gas-payer}}
+  gasLimit: 5000
+  gasPrice: 0.00000001
+  ttl: 7200
+networkId: "{{network}}"
+signers:
+  - public: {{gas-payer-key}}
+    caps:
+      - name: "coin.GAS"
+        args: []
+  - public: {{collection-key}}
+    caps: []
+type: exec
