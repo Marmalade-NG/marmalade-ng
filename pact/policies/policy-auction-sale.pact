@@ -70,6 +70,10 @@
   ;-----------------------------------------------------------------------------
   ; Util functions
   ;-----------------------------------------------------------------------------
+  (defun is-registered:bool ()
+    (with-default-read auctions (pact-id) {'sale-id:""} {'sale-id:=sale-id}
+      (= (pact-id) sale-id)))
+
   (defun is-enabled:bool ()
     (with-default-read auctions (pact-id) {'enabled:false} {'enabled:=enabled}
       enabled))
@@ -161,7 +165,7 @@
         false))
   )
 
-  (defun enforce-sale-withdraw:bool (token:object{token-info})
+  (defun --enforce-sale-withdraw:bool (token:object{token-info})
     (require-capability (ledger.POLICY-ENFORCE-WITHDRAW token (pact-id) policy-auction-sale))
     (enforce-enabled)
     (enforce-sale-ended)
@@ -172,7 +176,12 @@
     (disable)
   )
 
-  (defun enforce-sale-buy:bool (token:object{token-info} buyer:string)
+  (defun enforce-sale-withdraw:bool (token:object{token-info})
+    (if (is-registered)
+        (--enforce-sale-withdraw token)
+        false))
+
+  (defun --enforce-sale-buy:bool (token:object{token-info} buyer:string)
     (require-capability (ledger.POLICY-ENFORCE-BUY token (pact-id) policy-auction-sale))
     (enforce-enabled)
     (enforce-sale-ended)
@@ -195,8 +204,12 @@
       true)
   )
 
+  (defun enforce-sale-buy:bool (token:object{token-info} buyer:string)
+    (if (is-registered)
+        (--enforce-sale-buy token buyer)
+        false))
 
-  (defun enforce-sale-settle:bool (token:object{token-info})
+  (defun --enforce-sale-settle:bool (token:object{token-info})
     (require-capability (ledger.POLICY-ENFORCE-SETTLE token (pact-id) policy-auction-sale))
     ; The settle handler is called in the same transaction as the handler buy
     ; => Checking the timeout is not necessary
@@ -209,6 +222,11 @@
         (currency::transfer escrow recipient amount))
       (disable))
   )
+
+  (defun enforce-sale-settle:bool (token:object{token-info})
+    (if (is-registered)
+        (--enforce-sale-settle token)
+        false))
 
   ;-----------------------------------------------------------------------------
   ; Bid function

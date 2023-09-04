@@ -48,6 +48,10 @@
   ;-----------------------------------------------------------------------------
   ; Util functions
   ;-----------------------------------------------------------------------------
+  (defun is-registered:bool ()
+    (with-default-read quotes (pact-id) {'sale-id:""} {'sale-id:=sale-id}
+      (= (pact-id) sale-id)))
+
   (defun sale-not-ended:bool ()
     (with-read quotes (pact-id) {'timeout:=timeout}
       (or? (= NO-TIMEOUT) (is-future) timeout)))
@@ -126,14 +130,19 @@
             false))
   )
 
-  (defun enforce-sale-withdraw:bool (token:object{token-info})
+  (defun --enforce-sale-withdraw:bool (token:object{token-info})
     (require-capability (ledger.POLICY-ENFORCE-WITHDRAW token (pact-id) policy-fixed-sale))
     (enforce-sale-ended)
     (enforce-seller-guard)
     (disable)
   )
 
-  (defun enforce-sale-buy:bool (token:object{token-info} buyer:string)
+  (defun enforce-sale-withdraw:bool (token:object{token-info})
+    (if (is-registered)
+        (--enforce-sale-withdraw token)
+        false))
+
+  (defun --enforce-sale-buy:bool (token:object{token-info} buyer:string)
     (require-capability (ledger.POLICY-ENFORCE-BUY token (pact-id) policy-fixed-sale))
     (enforce-sale-not-ended)
     ; First step to handle the buying part => Transfer the amount to the escrow account
@@ -141,10 +150,15 @@
                                    'price:=price}
       (currency::transfer-create buyer (ledger.escrow) (ledger.escrow-guard) price))
     true
-    )
+  )
+
+  (defun enforce-sale-buy:bool (token:object{token-info} buyer:string)
+    (if (is-registered)
+        (--enforce-sale-buy token buyer)
+        false))
 
 
-  (defun enforce-sale-settle:bool (token:object{token-info})
+  (defun --enforce-sale-settle:bool (token:object{token-info})
     (require-capability (ledger.POLICY-ENFORCE-SETTLE token (pact-id) policy-fixed-sale))
     (with-read quotes (pact-id) {'amount:=amount,
                                  'currency:=currency:module{fungible-v2},
@@ -158,6 +172,11 @@
         (currency::transfer escrow recipient amount)))
     (disable)
   )
+
+  (defun enforce-sale-settle:bool (token:object{token-info})
+    (if (is-registered)
+        (--enforce-sale-settle token)
+        false))
 
   ;-----------------------------------------------------------------------------
   ; Lcoal functions
