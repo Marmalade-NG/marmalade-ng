@@ -15,7 +15,7 @@ to handle tokens with custom policies.
 
 Here is a policy template:
 
-.. literalinclude:: ../../examples/cutom-policies/policy-template.pact
+.. literalinclude:: ../../examples/custom-policies/policy-template.pact
    :language: lisp
 
 
