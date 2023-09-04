@@ -5,7 +5,7 @@ DATA_FILE = testnet_data.yaml
 
 KEY_FILES = keys/a35.yaml \
             keys/e2e.yaml \
-						keys/e97.yaml
+            keys/e97.yaml
 
 INIT=-D__INIT__
 
@@ -13,22 +13,22 @@ TRANSACTION_FILES = interface-poly-fungible \
                     interface-token-policy \
                     core-ledger \
                     core-util-policies \
-										policy-adjustable-royalty \
-										policy-auction-sale \
-										policy-blacklist \
-										policy-collection \
-										policy-disable-burn \
-										policy-disable-sale \
-										policy-disable-transfer \
-										policy-dutch-auction-sale \
-										policy-fixed-issuance \
-										policy-fixed-sale \
-										policy-guards \
-										policy-instant-mint \
-										policy-marketplace \
-										policy-non-fungible \
-										policy-royalty \
-										std-policies
+                    policy-adjustable-royalty \
+                    policy-auction-sale \
+                    policy-blacklist \
+                    policy-collection \
+                    policy-disable-burn \
+                    policy-disable-sale \
+                    policy-disable-transfer \
+                    policy-dutch-auction-sale \
+                    policy-fixed-issuance \
+                    policy-fixed-sale \
+                    policy-guards \
+                    policy-instant-mint \
+                    policy-marketplace \
+                    policy-non-fungible \
+                    policy-royalty \
+                    std-policies
 
 
 
