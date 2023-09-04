@@ -288,11 +288,6 @@
     (select auctions (and? (where 'timeout (is-future))
                            (where 'enabled (= true)))))
 
-  (defun get-all-act-sales:[object{auction-sch}] ()
-   (select auctions (and? (where 'timeout (is-past))
-                          (where 'enabled (= true)))))
-
-
   (defun get-sales-for-token:[object{auction-sch}] (token-id:string)
     (select auctions (and? (where 'enabled (= true))
                            (where 'token-id (= token-id)))))
