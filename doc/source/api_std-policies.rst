@@ -2,8 +2,8 @@ Module std-policies: Reference and API
 =======================================
 
 ``std-policies`` is a module that contains **pure only** helpers to deal with
-standard policies. The modules is intended to be used by wallets, market-places, tokens creator
-to simplify the development. It avoids to manipulate directly modrefs, but instead allows to manipulate simple strings.
+standard policies. The modules if intended to be used by wallets, market-places, tokens creator
+to simplify development. It avoids manipulating directly modrefs, but instead allows manipulating simple strings.
 
 Helpers
 -------
@@ -24,7 +24,7 @@ list-to-policies
 ~~~~~~~~~~~~~~~~
 *name* ``[string]`` *→* ``[module{token-policy-ng-v1}]``
 
-Convert a list of policies names to a list of policies
+Convert a list of policies names to a list of policies.
 
 .. code:: lisp
 
@@ -36,7 +36,7 @@ to-policies
 ~~~~~~~~~~~
 *names* ``string`` *→* ``[module{token-policy-ng-v1}]``
 
-Convert a list of names concatenated in a single string to a list of policies
+Convert a list of names concatenated in a single string to a list of policies.
 
 .. code:: lisp
 
@@ -69,7 +69,7 @@ policies-to-list
 ~~~~~~~~~~~~~~~~
  *policies* ``[module{token-policy-ng-v1}]`` *→* ``[string]``
 
-Convert a list of policies names to a list of policies
+Convert a list of policies names to a list of policies.
 
 .. code:: lisp
 
@@ -81,7 +81,7 @@ from-policies
 ~~~~~~~~~~~~~
  *policies* ``[module{token-policy-ng-v1}]`` *→*  ``string``
 
-Convert a list of policies to a concatenated string
+Convert a list of policies to a concatenated string.
 
 .. code:: lisp
 

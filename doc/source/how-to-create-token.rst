@@ -1,7 +1,7 @@
 For tokens creators
 -------------------
 
-This cookbook is just an example, on how it can be done. But there are multiple
+This cookbook is just an example of how it can be done. But there are multiple
 other possibilities.
 
 Choose a set of policies
@@ -10,7 +10,7 @@ There is no rule of thumb...
 
 However some guidelines:
 
-Choose at least one policy that manaage the minting process:
+Choose at least one policy that manaages the minting process:
    - ``INSTANT-MINT`` or ``GUARDS``
    - ``FIXED-ISSUANCE``
    - ``NON-FUNGIBLE``
@@ -34,14 +34,14 @@ As well, you may want to choose ``ROYALTY`` or ``ADJUSTABLE-ROYALTY``.
 
 Optional: Create a collection
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-If your tokens will be part of a collection (and will use the ``COLLECTION`` policy),
+If your tokens will be part of a collection (and you will use the ``COLLECTION`` policy),
 you have to create a collection before creating your tokens.
 
 You need a keypair to protect your collection.
 
-Generate a collectionID
-^^^^^^^^^^^^^^^^^^^^^^^
-We need to create off-line (using a local call to a node) a collectionID.
+Generate a collection-id
+^^^^^^^^^^^^^^^^^^^^^^^^
+We need to create off-line (using a local call to a node) a collection-id.
 
 .. code-block:: lisp
   :caption: Pact code
@@ -57,7 +57,7 @@ We need to create off-line (using a local call to a node) a collectionID.
 
 Create the collection
 ^^^^^^^^^^^^^^^^^^^^^
-Send a transaction to create the collection using the transactionID you just get from the last step.
+Send a transaction to create the collection using the collection-id you just get from the last step.
 Sign the transaction with "collection-key".
 
 .. code-block:: lisp
@@ -77,7 +77,7 @@ Create the token
 ~~~~~~~~~~~~~~~~
 A temporary keypair is needed to protect the token creation.
 
-Another key will be used to protect mintig
+Another key will be used to protect minting.
 
 In this example, we generate a token with the following policies:
     - COLLECTION
@@ -87,9 +87,9 @@ In this example, we generate a token with the following policies:
     - ROYALTY
     - NON-FUNGIBLE
 
-Generate a tokenID
-^^^^^^^^^^^^^^^^^^
-We need to create off-line (using a local call to a node) a tokenID.
+Generate a token-id
+^^^^^^^^^^^^^^^^^^^
+We need to create off-line (using a local call to a node) a token-id.
 
 .. code-block:: lisp
   :caption: Pact code
@@ -109,7 +109,7 @@ Create and mint the token
 
 Since we use the policy **INSTANT-MINT**, the token will be minted in the same transaction
 
-To create the policy list, we can use th ``std-policies`` module which provides some helpers.
+To create the policy list, we can use the ``std-policies`` module, which provides some helpers.
 
 We need to include the objects ``marmalade_collection`` and ``marmalade_royalty`` in the data section of the transaction.
 

@@ -1,7 +1,7 @@
 Ledger: Reference and API
 =========================
 
-This section only lists the most important functions that are intendeed to be called externally.
+This section only lists the most important functions that are intended to be called externally.
 
 
 Token creation
@@ -10,8 +10,8 @@ create-token-id
 ~~~~~~~~~~~~~~~
 *token-uri* ``string`` *creation-guard* ``guard``  *→* ``string``
 
-Create a tokenId from an URI and a creation guard. This function does not write anything in tables.
-It's just a pure function that allow a token creator to compute in advance the TokenID
+Create a tokenId from an URI and a creation guard. This function does not write anything to tables.
+It's just a pure function that allows a token creator to compute the TokenID in advance.
 
 .. code:: lisp
 
@@ -27,9 +27,9 @@ Create a token and store it into the ledger. The token-id should have been preco
 
 The list of policies can be generated using the helpers function from ``std-policies`` module.
 
-The creation-guard is enforced, and can be scoped by the capability ``(ENFORCE-RESERVED)``
+The creation-guard is enforced and can be scoped by the capability ``(ENFORCE-RESERVED)``
 
-The hooks ``(enforce-init)`` of the polcies are called during the creation.
+The hooks ``(enforce-init)`` of the policies are called during the creation.
 
 .. code:: lisp
 
@@ -45,7 +45,7 @@ get-policies
 ~~~~~~~~~~~~
 *token-id* ``string`` *→* ``[module{token-policy-ng-v1}]``
 
-Return the policies associated with a token. The list of policies can be made more humain readable
+Return the policies associated with a token. The list of policies can be made more human readable
 using the ``std-policy`` module
 
 .. code:: lisp
@@ -79,7 +79,7 @@ total-supply
 ~~~~~~~~~~~~
 *token-id* ``string`` *→* ``integer``
 
-Return the total supply of a token (ie: minted - burned)
+Return the total supply of a token (ie: minted - burned).
 
 .. code:: lisp
 
@@ -90,7 +90,7 @@ token-exist
 ~~~~~~~~~~~~
 *token-id* ``string`` *→* ``bool``
 
-Returns true if the token exists
+Returns true if the token exists.
 
 .. code:: lisp
 
@@ -105,7 +105,7 @@ create-account
 ~~~~~~~~~~~~~~
 *id* ``string`` *account* ``string`` **guard** ``guard`` *→* ``bool``
 
-Create an account for a given token. If the account in a principal name, principal is enforced.
+Create an account for a given token. If the account is a principal name, principal is enforced.
 
 
 .. code:: lisp
@@ -139,7 +139,7 @@ account-exist
 ~~~~~~~~~~~~~
 *id* ``string`` *account* ``string`` *→* ``bool``
 
-Return true if the account exist for a given token id.
+Return true if the account exists for a given token id.
 
 .. code:: lisp
 
