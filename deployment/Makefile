@@ -49,8 +49,6 @@ all: $(addsuffix .json, ${TRANSACTION_FILES})
 %.yaml: templates/%.tkpl .pact/%.pact
 	kda gen -t $< -o $*.yaml -d ${DATA_FILE}
 
-%.json:
-
 clean:
 		rm -rf .pact
 		rm -f *.json
