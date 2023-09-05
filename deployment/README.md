@@ -26,6 +26,7 @@ Modify the data.yaml file according to your parameters:
 Modify the Makefile:
   - `NAMESPACE` variable
   - uncomment the line `INIT=-D__INIT__` if it the first deployment and you need to initialize the modules.
+  - List of signing keys
 
 ## Generate the transactions files
 
