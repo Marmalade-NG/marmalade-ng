@@ -44,9 +44,8 @@ External functions
 ^^^^^^^^^^^^^^^^^^
 Nope
 
-External request functions
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-
+View functions
+^^^^^^^^^^^^^^
 .. _POLICY-FIXED-ISSUANCE-GET-ISSUANCE-SPEC:
 
 get-issuance-spec

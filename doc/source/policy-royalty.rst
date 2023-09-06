@@ -82,9 +82,8 @@ The transaction must be signed by the current guard.
   (rotate "t:EgYRAWXSd4zZlch3B0cLHTSEt4sgYVg5cwKgvP1CoUs" "r:user.genius-pascal" (create-keyset-ref-guard "user.genius-pascal"))
 
 
-External request functions
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-
+View functions
+^^^^^^^^^^^^^^
 .. _POLICY-ROYALTY-GET-ROYALTY-DETAILS:
 
 get-royalty-details

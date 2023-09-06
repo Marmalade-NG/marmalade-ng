@@ -33,8 +33,8 @@ Input data structures
 ^^^^^^^^^^^^^^^^^^^^^
 Nope
 
-External functions
-^^^^^^^^^^^^^^^^^^
+View functions
+^^^^^^^^^^^^^^
 Nope
 
 External request functions

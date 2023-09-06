@@ -91,8 +91,8 @@ If *size* is 0, the collection is unlimited.
   (create-collection "c_PrettyKitties_e8XfSKUAM1fZ8HkaM1FqaYIc6v-xPUF1S2qyzz6vqQs"
                       "PrettyKitties" 112 (keyset-ref-guard "user.pretty-kitties-owner"))
 
-External request functions
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+View functions
+^^^^^^^^^^^^^^
 get-collection
 ~~~~~~~~~~~~~~
 *collection-id* ``string`` *→* ``object{collection-sch}``

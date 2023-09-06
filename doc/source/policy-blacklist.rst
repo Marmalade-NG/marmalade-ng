@@ -85,9 +85,8 @@ The signature can be scoped by ``(UPDATE-BLACKLIST token-id account false)``
 
 
 
-External request functions
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-
+View functions
+^^^^^^^^^^^^^^
 is-blacklisted
 ~~~~~~~~~~~~~~
 *token-id* ``string`` *account* ``string`` *→* ``bool``

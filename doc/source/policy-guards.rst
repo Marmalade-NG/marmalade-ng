@@ -87,8 +87,8 @@ External functions
 ^^^^^^^^^^^^^^^^^^
 Nope
 
-External request functions
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+View functions
+^^^^^^^^^^^^^^
 get-guards
 ~~~~~~~~~~
 *token-id* ``string`` *→* ``object{guards-sch}``

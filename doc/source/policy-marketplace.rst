@@ -75,10 +75,8 @@ External functions
 ^^^^^^^^^^^^^^^^^^
 Nope
 
-
-External request functions
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-
+View functions
+^^^^^^^^^^^^^^
 get-marketplace-fee
 ~~~~~~~~~~~~~~~~~~~~
 *sale-id* ``string`` *→* ``object{marketplace-sale-sch}``

@@ -31,6 +31,6 @@ External functions
 ^^^^^^^^^^^^^^^^^^
 Nope
 
-External request functions
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+View functions
+^^^^^^^^^^^^^^
 Nope

@@ -114,9 +114,8 @@ The transaction must be signed by the guard of the creator.
 
 
 
-External request functions
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-
+View functions
+^^^^^^^^^^^^^^
 get-royalty-details
 ~~~~~~~~~~~~~~~~~~~
 *token-id* ``string`` *→* ``object{royalty-token-sch}``

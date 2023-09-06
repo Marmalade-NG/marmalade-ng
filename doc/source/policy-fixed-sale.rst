@@ -83,8 +83,8 @@ External functions
 Nope
 
 
-External request functions
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+View functions
+^^^^^^^^^^^^^^
 get-sale
 ~~~~~~~~
 *sale-id* ``string`` *→* ``object{quote-sch}``
