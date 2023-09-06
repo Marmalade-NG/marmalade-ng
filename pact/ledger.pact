@@ -370,6 +370,24 @@
   )
 
   ;-----------------------------------------------------------------------------
+  ; Escrow accounts management
+  ;-----------------------------------------------------------------------------
+
+  ; Note that the escrow account is guarded by a capabilty-pact-guard.
+  ; This capability can only be accessed with a specific defpact; and thus
+  ; parameterizing the capability is not necessary
+  (defcap ESCROW ()
+    true)
+
+  (defun escrow-guard:guard ()
+    @doc "Return the guard of the escrow account"
+    (create-capability-pact-guard (ESCROW)))
+
+  (defun escrow:string ()
+    @doc "Return the escrow account"
+    (create-principal (escrow-guard)))
+
+  ;-----------------------------------------------------------------------------
   ; Public Marmalade functions => Sale
   ;-----------------------------------------------------------------------------
   (defcap POLICY-ENFORCE-OFFER (token:object{token-info} sale-id:string mod:module{token-policy-ng-v1})
@@ -388,14 +406,7 @@
     ;@managed
     true)
 
-  (defcap ESCROW ()
-    true)
 
-  (defun escrow-guard:guard ()
-     (create-capability-pact-guard (ESCROW)))
-
-  (defun escrow:string ()
-    (create-principal (escrow-guard)))
 
   (defpact sale:bool (id:string seller:string amount:decimal timeout:time)
     (step-with-rollback
@@ -406,30 +417,46 @@
                                   ;(install-capability (POLICY-ENFORCE-OFFER token-info (pact-id) m))
                                   (with-capability (POLICY-ENFORCE-OFFER token-info (pact-id) m)
                                     (m::enforce-sale-offer token-info seller amount timeout)))))
+
+        ; Check that the amount is positive and check the decimals
         (enforce-valid-amount (precision id) amount)
+
+        ; Cehck that the account is valid
         (enforce-valid-account seller)
+
+        ; Check that the tiemout is NO-TIEMOUT and in the future
+        ; A policy may dp additional checks on this tiemout
         (enforce (or? (is-future) (= NO-TIMEOUT) timeout) "Timeout must be in future")
 
+        ; Call the policies => All the returns values are ORed using fold.
+        ; This ensures that at least one policy has handled the sale
         (let ((offer-handled (fold (or) false (map (call-policy) policies))))
           (enforce offer-handled "No policy to handle the offer"))
 
+        ; Transfer the token to the escorw account
         (with-capability (SALE id seller amount timeout (pact-id))
           (let ((snd-bal (debit id seller amount))
                 (rcv-bal (credit id (escrow) (escrow-guard) amount)))
             (emit-event (RECONCILE id amount snd-bal rcv-bal)))))
+        ; The first part of the PACT is finished
 
-      ;;Step 0, rollback: withdraw
+      ;;Step 0, rollback: withdraw. We have to refund the seller and give him back
+      ;                             the token
       (let* ((policies (get-policies id))
              (token-info (get-token-info id))
              (call-policy (lambda (m:module{token-policy-ng-v1})
                                   ;(install-capability (POLICY-ENFORCE-WITHDRAW token-info (pact-id) m))
                                   (with-capability (POLICY-ENFORCE-WITHDRAW token-info (pact-id) m)
                                     (m::enforce-sale-withdraw token-info)))))
+        ; Call the policies
         (map (call-policy) policies)
+
+        ; And transfer back the token to the seller
         (with-capability (WITHDRAW id seller amount)
           (let ((snd-bal (debit id (escrow) amount))
                 (rcv-bal (credit id seller (account-guard id seller) amount)))
             (emit-event (RECONCILE id amount snd-bal rcv-bal)))))
+        ; The PACT is definitvely closed
     )
     (step
       ;; Step 1: buy and settle payments
@@ -445,12 +472,24 @@
                                   ;(install-capability (POLICY-ENFORCE-SETTLE token-info (pact-id) m))
                                   (with-capability (POLICY-ENFORCE-SETTLE token-info (pact-id) m)
                                                    (m::enforce-sale-settle token-info)))))
+
+            ; Check the validity of the buyer account
             (enforce-valid-account buyer)
+
+            ; Call the sale-buy hooks of the policies
+            ; The policies must check here that the buyer is OK and the sale
+            ; ready to be settled
             (map (call-buy) policies)
+
+            ; Transfer the token from the ecrow to the buyer;
+            ; Here the BUY capability allows to access to the escrow account
             (with-capability (BUY id seller buyer amount)
               (let ((snd-bal (debit id (escrow) amount))
                     (rcv-bal (credit id buyer buyer-guard amount)))
                 (emit-event (RECONCILE id amount snd-bal rcv-bal))))
+
+            ; Now call the sale-setlle hooks of the policy to finish the job
+            ; The capability ESCROW allow us to access the escrow account.
             (with-capability (ESCROW)
               (map (call-settle) policies))
             true)
