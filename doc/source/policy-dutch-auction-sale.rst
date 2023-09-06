@@ -18,7 +18,7 @@ The price is calculated using the following formula:
 - **exp ( (Elapsed Time / Total time) * ( log(end-price) - log(start-price)))**
 
 After all the allowed time has been elapsed, and the floor price has been reached, the price stay
-constant until the sale tiemout is reached.
+constant until the sale timeout is reached.
 
 Note: The NO-TIMEOUT is supported.
 

@@ -6,7 +6,7 @@ policy-non-fungible
 Description
 ^^^^^^^^^^^
 
-This policy ensures that the token is non fungible:
+This policy ensures that the token is non-fungible:
   - The precision is 0
   - The minted quantity is 1.0
   - It's impossible to "break" the token

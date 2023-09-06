@@ -6,7 +6,7 @@ policy-guards
 Description
 ^^^^^^^^^^^
 
-This policy allow the creator to limit some functions by adding guards.
+This policy allows the creator to limit some functions by adding guards.
 
 The guards can be any of the guards supported by Pact:
    - keysets
@@ -14,7 +14,7 @@ The guards can be any of the guards supported by Pact:
    - user guards
 
 
-Thus this policy can be very flexible. It can just help the creator to limit to himself some functions
+Thus, this policy can be very flexible. It can just help the creator to limit to himself some functions
 like ``mint``.
 
 But by using user guards, the creator can create more complex scenarios without creating a policy.
@@ -33,7 +33,7 @@ The policy module provide two helpers function:
 
 
 **Note:** Since the guards are immutable, it is recommended to not use bare keysets.
-But instead, it is preferable to use refrence to named keysets to allow further rotation.
+But instead, it is preferable to use reference to named keysets to allow further rotation.
 
 
 Implemented hooks

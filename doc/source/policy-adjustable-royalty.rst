@@ -6,7 +6,7 @@ policy-adjustable-royalty
 Description
 ^^^^^^^^^^^
 
-This policy allows the creator to receive a royalty for each sale.  It's very similar to tge standard royalty
+This policy allows the creator to receive a royalty for each sale.  It's very similar to the standard royalty
 policy. The main difference is that the creator is allowed to change the royalty rate at any moment.
 
 The policy have to be initialized at token creation with a receiver account and a royalty fixed rate.

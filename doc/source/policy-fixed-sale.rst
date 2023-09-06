@@ -18,7 +18,7 @@ The policy record the requested price.
 2 - The buyer chose to buy and complete the defpact. In the `(enforce-sale-buy)` hook, the price
 is transferred to the escrow account.
 
-In the mean time, some policies with an higher priority (like marketplace or royalty) are allowed
+In the meantime, some policies with a higher priority (like marketplace or royalty) are allowed
 to take a part of the funds from the escrow account.
 
 3 - The ``(enforce-sale-setlle)`` hook is called, and the seller is paid with the remaining funds.

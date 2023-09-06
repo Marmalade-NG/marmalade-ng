@@ -6,25 +6,25 @@ policy-collection
 Description
 ^^^^^^^^^^^
 
-This policy allows to create collections of tokens.
+This policy allows to creating collections of tokens.
 
 A collection is defined by an unique collection ID.
 
-The collection ID has the following form: ``c_${name}_${hash}``
+The collection-id has the following form: ``c_${name}_${hash}``
 
 where:
-  - ${name} is the human readable name of the collection.
+  - ${name} is the human-readable name of the collection.
   - ${hash} is a hash derived from the collection guard and name.
 
 The collection ID is protected from from-running and unauthorized use or declaration.
-However the collection human readable name has no protection and can be reused by anybody else.
+However, the collection-human readable name has no protection and can be reused by anybody else.
 As such, wallets, market-places should only rely on the collection ID.
 
 
 A collection is protected by a guard which prohibits someone other than the collection
 creator to include tokens. The guard is enforced on token creation.
 
-If the guard is a keyset, the signature may be scopped to the capability:
+If the guard is a keyset, the signature may be scoped to the capability:
 ``(ADD-TO-COLLECTION collection-id token-id)``
 
 Ranks
@@ -66,7 +66,7 @@ create-collection-id
 
 Pure function
 
-Create a collection-id from an human readable name.
+Create a collection-id from an human-readable name.
 
 .. code:: lisp
 
@@ -119,7 +119,7 @@ get-token-collection
 ~~~~~~~~~~~~~~~~~~~~
 *token-id* ``string`` *→* ``object{collection-sch}``
 
-Get collection details os a token.
+Get collection details of a token.
 
 .. code:: lisp
 
@@ -140,7 +140,7 @@ get-all-collections
 ~~~~~~~~~~~~~~~~~~~~
   *→* ``[string]``
 
-Return all collections ID  of the system.
+Return all collection-ids of the system.
 
 **Important**: Local only function. Do not use in transactions.
 
@@ -168,7 +168,7 @@ list-tokens-of-collection
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 *collection-id* ``string`` *→* ``[string]``
 
-List all token IDs belonging to a collection.
+List all token-ids belonging to a collection.
 
 Tokens are sorted by rank.
 

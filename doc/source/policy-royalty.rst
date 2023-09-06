@@ -10,7 +10,7 @@ This policy allows the creator to receive a royalty for each sale.
 
 The policy have to be initialized at token creation with a receiver account and a royalty fixed rate.
 
-In this policy the rate is defitively fixed and can't be changed in the future. This comfort the investors that the creator
+In this policy, the rate is definitively fixed and can't be changed in the future. This comforts the investors that the creator
 won't change the rules in the future.
 
 The royalty is paid in the same currency as used during the sale.

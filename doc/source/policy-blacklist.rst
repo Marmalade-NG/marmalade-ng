@@ -11,7 +11,7 @@ to blacklist accounts. The blacklisted accounts are frozen and any further usage
 
 The blacklisting is done per token basis.
 
-To activate this feature the field ``marmalade_blacklist`` or ``marmalade_blacklist_tokenid`` must be present during the token creation.
+To activate this feature, the field ``marmalade_blacklist`` or ``marmalade_blacklist_tokenid`` must be present during the token creation.
 
 
 Implemented hooks
@@ -54,7 +54,7 @@ add-account
 ~~~~~~~~~~~
 *token-id* ``string`` *account* ``string`` *→* ``string``
 
-Add an account in the blacklist for a given **token-id**.
+Add an account in the blacklist for a given token.
 
 The transaction must be signed by the guard given during token creation.
 
@@ -72,7 +72,7 @@ remove-account
 ~~~~~~~~~~~~~~
 *token-id* ``string`` *account* ``string`` *→* ``string``
 
-Remove an account from the blacklist for a given **token-id**.
+Remove an account from the blacklist for a given token.
 
 The transaction must be signed by the guard given during token creation.
 
@@ -92,7 +92,7 @@ is-blacklisted
 ~~~~~~~~~~~~~~
 *token-id* ``string`` *account* ``string`` *→* ``bool``
 
-Return true if the account is blacklisted for the given token
+Return true if the account is blacklisted for the given token.
 
 .. code:: lisp
 

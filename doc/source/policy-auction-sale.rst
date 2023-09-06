@@ -18,14 +18,14 @@ the auctions. The funds from this second escrow account are then transferred to 
 
 This policy work in several steps:
 
-1 - The seller call the defpact ``sale``. The policy is triggered when ``sale_type`` = "auction".
+1 - The seller calls the defpact ``sale``. The policy is triggered when ``sale_type`` = "auction".
 The policy record the minimum price and the increment.
 
 2 - Buyers call `(place-bid)` and transfers the amount of their bids to the escrow account.
 
 2 - Once the timeout has elapsed, the seller, the buyer or anybody else complete the defpact. The dale amount is transferred to the main escrow account.
 
-In the mean time, some policies with an higher priority (like marketplace or royalty) are allowed
+In the meantime, some policies with a higher priority (like marketplace or royalty) are allowed
 to take a part of the funds from the escrow account.
 
 3 - The ``(enforce-sale-settle)`` hook is called, and the seller is paid with the remaining funds.
@@ -86,7 +86,7 @@ place-bid
 ~~~~~~~~~
 *sale-id* ``string`` *buyer* ``string`` *buyer-guard* ``guard`` *new-price* ``decimal``  *→* ``string``
 
-Place a new bid on the given sale ID.
+Place a new bid on the given sale-id.
 
 The bidder should before call ``(get-sale)`` to check the current state of the sale:
 

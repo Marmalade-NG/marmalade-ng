@@ -6,9 +6,9 @@ policy-fixed-issuance
 Description
 ^^^^^^^^^^^
 
-This policy ensures that a token follow an insuance spec:
+This policy ensures that a token follow an issuance spec:
 - Precision
-- Minimum mint ammount
+- Minimum mint amount
 - Total maximum supply
 
 It could make sense to associate with :ref:'POLICY-DISABLE-BURN'
