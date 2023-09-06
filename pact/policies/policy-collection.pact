@@ -24,6 +24,7 @@
   (defschema token-collection-sch
     token-id:string
     collection-id:string
+    rank:integer
   )
 
   (deftable tokens:{token-collection-sch})
@@ -86,8 +87,10 @@
           ; max-size=0 means unlimited collection
           (enforce (or? (= 0) (< current-size) max-size) "Exceeds collection size")
 
-          (update collections collection-id {'size:(++ current-size)}))
-        (insert tokens token-id {'token-id:token-id, 'collection-id:collection-id})
+          (update collections collection-id {'size:(++ current-size)})
+          (insert tokens token-id {'token-id:token-id,
+                                   'collection-id:collection-id,
+                                   'rank: (++ current-size)}))
         true))
   )
 
@@ -125,8 +128,14 @@
     (with-read tokens token-id {'collection-id:=collection-id}
       (get-collection collection-id)))
 
+  (defun get-token-rank-in-collection:integer (token-id:string)
+    (with-read tokens token-id {'rank:=r}
+      r))
+
   (defun list-tokens-of-collection:[string] (collection-id:string)
     (map (at 'token-id)
-         (select tokens ['token-id]  (where 'collection-id (= collection-id)))))
+         (sort ['rank]
+               (select tokens ['token-id, 'rank]  (where 'collection-id (= collection-id)))))
+  )
 
 )

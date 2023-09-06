@@ -27,6 +27,13 @@ creator to include tokens. The guard is enforced on token creation.
 If the guard is a keyset, the signature may be scopped to the capability:
 ``(ADD-TO-COLLECTION collection-id token-id)``
 
+Ranks
+~~~~~
+Each token when created inside a collection is given automatically a rank.
+
+Ranks start with #1 and are immutable.
+
+
 
 Implemented hooks
 ^^^^^^^^^^^^^^^^^
@@ -143,11 +150,27 @@ Return all collections ID  of the system.
   (get-all-collections)
     > ["c_Dogs_8BRJPRYtqM-2w8ASMYq6Toq4PIvhws-kHh0nbYfT1iY", "c_Cats_ZMLLJuSq0JoHSR4f_ZgUa2H_p7Rr71CN8CjQ7ZL_hU0"]
 
+
+get-token-rank-in-collection
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*token-id* ``string`` *→* ``int``
+
+Return the rank of a given token inside the collection.
+
+.. code:: lisp
+
+  (use marmalade-ng.policy-collection)
+  (get-token-rank-in-collection "t:MkygmZK2iaGHuTTmKnzJMke3HcALz8SgTyxnD5A-VkA")
+    > 2
+
+
 list-tokens-of-collection
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 *collection-id* ``string`` *→* ``[string]``
 
 List all token IDs belonging to a collection.
+
+Tokens are sorted by rank.
 
 **Important**: Local only function. Do not use in transactions.
 
