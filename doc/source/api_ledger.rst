@@ -11,7 +11,7 @@ create-token-id
 *token-uri* ``string`` *creation-guard* ``guard``  *→* ``string``
 
 Create a tokenId from an URI and a creation guard. This function does not write anything to tables.
-It's just a pure function that allows a token creator to compute the TokenID in advance.
+It's just a pure function that allows a token creator to compute the token-id in advance.
 
 .. code:: lisp
 
@@ -27,7 +27,7 @@ Create a token and store it into the ledger. The token-id should have been preco
 
 The list of policies can be generated using the helpers function from ``std-policies`` module.
 
-The creation-guard is enforced and can be scoped by the capability ``(ENFORCE-RESERVED)``
+The creation-guard is enforced and can be scoped by the capability ``(ENFORCE-RESERVED)``.
 
 The hooks ``(enforce-init)`` of the policies are called during the creation.
 
@@ -41,28 +41,35 @@ The hooks ``(enforce-init)`` of the policies are called during the creation.
 
 Tokens management
 -----------------
+
+.. _LEDGER-GET-POLICIES:
+
 get-policies
 ~~~~~~~~~~~~
 *token-id* ``string`` *→* ``[module{token-policy-ng-v1}]``
 
 Return the policies associated with a token. The list of policies can be made more human readable
-using the ``std-policy`` module
+using the ``std-policy`` module.
 
 .. code:: lisp
 
   (marmalade-ng.std-policies.from-policies (get-policies "t:_yTD6obGrZk07HIEDaZ9pTwKce2Swv4NMN7DhjzjCbI"))
     > "COLLECTION INSTANT-MINT"
 
+.. _LEDGER-GET-URI:
+
 get-uri
 ~~~~~~~~~~~~
 *token-id* ``string`` *→* ``string``
 
-Return the URI associated with a token
+Return the URI associated with a token.
 
 .. code:: lisp
 
   (get-uri "t:_yTD6obGrZk07HIEDaZ9pTwKce2Swv4NMN7DhjzjCbI")
     > "https://red-tulips.com/tulip-1"
+
+.. _LEDGER-PRECISION:
 
 precision
 ~~~~~~~~~
@@ -74,6 +81,8 @@ Return the precsion of a token
 
   (get-precision "t:_yTD6obGrZk07HIEDaZ9pTwKce2Swv4NMN7DhjzjCbI")
     > 0
+
+.. _LEDGER-TOTAL-SUPPLY:
 
 total-supply
 ~~~~~~~~~~~~
@@ -117,7 +126,7 @@ get-balance
 ~~~~~~~~~~~
 *id* ``string`` *account* ``string`` *→* ``decimal``
 
-Return the balance of an account for a given token id.
+Return the balance of an account for a given token-id.
 
 .. code:: lisp
 
@@ -128,7 +137,7 @@ account-guard
 ~~~~~~~~~~~~~
 *id* ``string`` *account* ``string`` *→* ``guard``
 
-Return the guard of an account for the given token id.
+Return the guard of an account for the given token-id.
 
 .. code:: lisp
 
@@ -139,7 +148,7 @@ account-exist
 ~~~~~~~~~~~~~
 *id* ``string`` *account* ``string`` *→* ``bool``
 
-Return true if the account exists for a given token id.
+Return true if the account exists for a given token-id.
 
 .. code:: lisp
 
@@ -150,7 +159,7 @@ details
 ~~~~~~~
 *id* ``string`` *account* ``string`` *→* ``object{account-details}``
 
-Return the account details for a given token id.
+Return the account details for a given token-id.
 
 .. code:: lisp
 
@@ -168,7 +177,7 @@ list-balances
 ~~~~~~~~~~~~~
 *account* ``string`` *→* ``[object]``
 
-Return the lists tokens and corresponding balances owned by an account.
+Return the list of tokens and corresponding balances owned by an account.
 
 .. code:: lisp
 

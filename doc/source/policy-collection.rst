@@ -114,6 +114,7 @@ Get collection details from a collection-id.
    "size": 3
   }
 
+.. _POLICY-COLLECTION-GET-TOKEN-COLLECTION:
 
 get-token-collection
 ~~~~~~~~~~~~~~~~~~~~

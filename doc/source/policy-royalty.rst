@@ -85,6 +85,8 @@ The transaction must be signed by the current guard.
 External request functions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+.. _POLICY-ROYALTY-GET-ROYALTY-DETAILS:
+
 get-royalty-details
 ~~~~~~~~~~~~~~~~~~~
 *token-id* ``string`` *→* ``object{royalty-token-sch}``

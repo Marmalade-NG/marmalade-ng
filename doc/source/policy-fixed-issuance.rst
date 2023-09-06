@@ -46,6 +46,9 @@ Nope
 
 External request functions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. _POLICY-FIXED-ISSUANCE-GET-ISSUANCE-SPEC:
+
 get-issuance-spec
 ~~~~~~~~~~~~~~~~~
 *token-id* ``string`` *→* ``object{fixed-issuance-sch}``

@@ -65,6 +65,8 @@ where xxxxxx is an unique 6 hexadecimals characters derived from the hash of the
     > "UNKNOWN_AB147D"
 
 
+.. _STD-POLICIES-POLICIES-TO-LIST:
+
 policies-to-list
 ~~~~~~~~~~~~~~~~
  *policies* ``[module{token-policy-ng-v1}]`` *→* ``[string]``
