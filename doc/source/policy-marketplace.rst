@@ -51,6 +51,8 @@ Handled by ``(enforce-sale-offer)``
     currency:module{fungible-v2} ; Currency of sale
   )
 
+.. _POLICY-MARKETPLACE-MARMALADE-MARKETPLACE:
+
 marmalade_marketplace
 ~~~~~~~~~~~~~~~~~~~~~
 Handled by ``(enforce-sale-offer)``
@@ -143,6 +145,7 @@ A marketplace should not rely blindly on these information. The marketplace must
      "token-id": "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I"}
    ]
 
+.. _POLICY-MARKETPLACE-BY-MARKET-HASH:
 
 get-active-sales-by-market-hash
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

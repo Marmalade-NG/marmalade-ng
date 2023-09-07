@@ -79,6 +79,8 @@ Convert a list of policies names to a list of policies.
   (policies-to-list [marmalade-ng.std-policies.instant-mint, marmalade-ng.std-policies.roaylty])
     > ["INSTANT-MINT", "ROYALTY"]
 
+.. _STD-POLICIES-FROM-POLICIES:
+
 from-policies
 ~~~~~~~~~~~~~
  *policies* ``[module{token-policy-ng-v1}]`` *→*  ``string``

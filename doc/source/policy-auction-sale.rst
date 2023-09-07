@@ -82,6 +82,9 @@ Mandatory
 
 External functions
 ^^^^^^^^^^^^^^^^^^
+
+.. _POLICY-AUCTION-SALE-PLACE-BID:
+
 place-bid
 ~~~~~~~~~
 *sale-id* ``string`` *buyer* ``string`` *buyer-guard* ``guard`` *new-price* ``decimal``  *→* ``string``
@@ -96,7 +99,7 @@ The bidder should before call ``(get-sale)`` to check the current state of the s
 
 The bidder must have installed the TRANSFER capability of the payment currency.
 
-The previous best buyer is automatically refunded
+The previous best buyer is automatically refunded.
 
 .. code:: lisp
 
@@ -109,6 +112,9 @@ The previous best buyer is automatically refunded
 
 View functions
 ^^^^^^^^^^^^^^
+
+.. _POLICY-AUCTION-SALE-GET-SALE:
+
 get-sale
 ~~~~~~~~
 *sale-id* ``string`` *→* ``object{quote-sch}``
@@ -165,6 +171,8 @@ Return all the active sales details for a given token.
      "timeout": "2023-06-01T00:00:00Z",
      "token-id": "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8"
     }]
+
+.. _POLICY-AUCTION-SALE-GET-ALL-ACTIVE-SALES:
 
 get-all-active-sales
 ~~~~~~~~~~~~~~~~~~~~

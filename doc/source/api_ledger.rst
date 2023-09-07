@@ -133,6 +133,8 @@ Return the balance of an account for a given token-id.
   (get-balance "t:_yTD6obGrZk07HIEDaZ9pTwKce2Swv4NMN7DhjzjCbI" "r:user.pascal")
     > 1.0
 
+.. _LEDGER-TOTAL-ACCOUNT-GUARD:
+
 account-guard
 ~~~~~~~~~~~~~
 *id* ``string`` *account* ``string`` *→* ``guard``

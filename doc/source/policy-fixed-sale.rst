@@ -85,6 +85,9 @@ Nope
 
 View functions
 ^^^^^^^^^^^^^^
+
+.. _POLICY-FIXED-SALE-GET-SALE:
+
 get-sale
 ~~~~~~~~
 *sale-id* ``string`` *→* ``object{quote-sch}``
@@ -137,6 +140,9 @@ Return all the active sales details for a given token.
    "timeout": "2023-06-01T00:00:00Z",
    "token-id": "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM"
    }]
+
+
+.. _POLICY-FIXED-SALE-GET-ALL-ACTIVE-SALES:
 
 get-all-active-sales
 ~~~~~~~~~~~~~~~~~~~~
