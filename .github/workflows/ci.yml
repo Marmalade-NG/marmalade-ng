@@ -1,0 +1,29 @@
+name: CI-pact-util-lib
+
+
+on:
+  push:
+
+  workflow_dispatch:
+
+
+jobs:
+  UT:
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Install Pact
+        run: |
+          wget -nv https://github.com/kadena-io/pact/releases/download/v4.8/pact-4.8-linux-20.04.zip
+          unzip pact-4.8-linux-20.04.zip pact -d .bin
+          chmod +x .bin/pact
+
+      - name: Units Tests
+        run: |
+          cd tests
+          PACT_BIN=../.bin/pact ./run_tests.sh | tee out.txt
+          if [ "$(grep "Load successful" out.txt|wc -l )" -eq 17 ]; then echo "OK"; exit 0; else echo "Fail";exit 1; fi

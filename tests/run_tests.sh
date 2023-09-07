@@ -1,4 +1,5 @@
 #!/bin/bash
+PACT="${PACT_BIN:-pact}"
 
 case $1 in
 "--short")
@@ -29,6 +30,6 @@ for repl in $REPL_SCRIPTS
   do echo "============================================================"
      echo "Running $repl"
      echo "============================================================"
-     pact $repl 2>&1 | $POSTPROCESS
+     ${PACT} $repl 2>&1 | $POSTPROCESS
      echo ""
 done
