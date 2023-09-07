@@ -17,6 +17,7 @@
   ;-----------------------------------------------------------------------------
 
   (defschema marketplace-sale-sch
+    sale-id:string
     token-id:string
     marketplace-fee:object{marketplace-fee-sch}
     marketplace-hash:string
@@ -106,7 +107,8 @@
           ; Check market-place object
           (enforce-marketplace-input-valid marketplace-msg)
           ; Store the data
-          (insert marketplace-sales (pact-id) {'token-id: (at 'id token),
+          (insert marketplace-sales (pact-id) {'sale-id:(pact-id),
+                                               'token-id: (at 'id token),
                                                'marketplace-fee:marketplace-msg,
                                                'marketplace-hash:(hash marketplace-msg),
                                                'enabled:true})

@@ -244,6 +244,9 @@
 (expect-that "Check the sale 2" (compose (at 'token-id) (= "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I"))
              (get-marketplace-fee "MdXO502ljyF-O6YJV-ODmTuhqFF2Zn6Wa0ONQZu1P8o"))
 
+(expect-that "Check the sale 2" (compose (at 'sale-id) (= (hash "fixed-sale-2")))
+              (get-marketplace-fee "MdXO502ljyF-O6YJV-ODmTuhqFF2Zn6Wa0ONQZu1P8o"))
+
 (expect-that "3 NFTS are currently under sale with market-place policy"  (compose (length) (= 3))
              (get-all-active-sales))
 

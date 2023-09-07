@@ -98,6 +98,7 @@ Return the detail of the marketplace fee record for the given sale
                        "max-fee": 10000.0,
                        "min-fee": 0.2},
    "marketplace-hash": "clALAwFdf6Xd17bVFGK1Jxo6b92TkNdZ2YHD4I3ZtKw",
+   "sale-id": "MdXO502ljyF-O6YJV-ODmTuhqFF2Zn6Wa0ONQZu1P8o",
    "token-id": "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I"}
 
 
@@ -114,7 +115,7 @@ A marketplace should not rely blindly on these information. The marketplace must
 .. code:: lisp
 
   (use marmalade-ng.policy-marketplace)
-  (get-active-sales-by-name "MdXO502ljyF-O6YJV-ODmTuhqFF2Zn6Wa0ONQZu1P8o")
+  (get-active-sales-by-name "BestMarket")
 
 
 .. code-block::
@@ -127,6 +128,7 @@ A marketplace should not rely blindly on these information. The marketplace must
                        "max-fee": 0.2,
                        "min-fee": 0.0},
     "marketplace-hash": "zE-T8f_kTazOs7IuC-dNZ4Nf3KnkDymeozRb66QlrBk",
+    "sale-id": "rmIkCdd9907zaaVDRhnkIiig1mZclYnkLbsGzgXuCLk",
     "token-id": "t:9Dh2pSjMjXLPERZnbE-aDuXQuquuOkgxSOgS-hYYX7Q"},
 
     {"enabled": true,
@@ -137,6 +139,7 @@ A marketplace should not rely blindly on these information. The marketplace must
                          "max-fee": 10000.0,
                          "min-fee": 0.2},
      "marketplace-hash": "clALAwFdf6Xd17bVFGK1Jxo6b92TkNdZ2YHD4I3ZtKw",
+     "sale-id": "MdXO502ljyF-O6YJV-ODmTuhqFF2Zn6Wa0ONQZu1P8o",
      "token-id": "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I"}
    ]
 
@@ -164,5 +167,6 @@ Return the details of the market place fee record for a given market hash.
                        "max-fee": 0.2,
                        "min-fee": 0.0},
     "marketplace-hash": "zE-T8f_kTazOs7IuC-dNZ4Nf3KnkDymeozRb66QlrBk",
+    "sale-id": "rmIkCdd9907zaaVDRhnkIiig1mZclYnkLbsGzgXuCLk",
     "token-id": "t:9Dh2pSjMjXLPERZnbE-aDuXQuquuOkgxSOgS-hYYX7Q"}
    ]
