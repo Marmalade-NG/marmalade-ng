@@ -13,7 +13,7 @@ The central part of Marmalade-NG is the ledger module:
 
 Marmalade-V2 contains 15 standard policies that can be declared by tokens.
 
-Every policy has a static dependency to the ledger:
+Every policy has a static dependency on the ledger:
   - For security: The policies need to refer to the ledger capabilities.
   - Some policies need some functions declared by the ledger for doing some basic account management, like retrieving guards, creating accounts.
 
@@ -36,8 +36,8 @@ The architecture model is simple.
 It leaves only the minimum possible in the ledger module.
 
 There are no associated centralized ``policy-manager`` or ``quote-manager`` as in Marmalade V2:
-   - All circular dependencies are avoided
-   - Avoid multiply Singles Point of Failure with added complexity
+   - All circular dependencies are avoided.
+   - Avoid multiplying Single Points of Failure with added complexity.
 
 Most of the business logic resides in policies.
 
@@ -47,12 +47,12 @@ Policies isolation
 Thanks to Pact capabilities, all policies and hooks inside are isolated from each other.
    - Prevent cross-tokens calls
    - Prevent cross-policies calls
-   - Prevent cross-hooks calls inside a single policy
+   - Prevent cross-hooks calls within a single policy
 
 All the standards policies use the same paradigm: avoid any dependencies between policies.
-As a rule of thumb, policies must stay independent of each other, without the need to use external data from other policies.
+As a rule of thumb, policies must stay independent of each other without the need to use external data from other policies.
 
-This guarantees that most bugs and possible security breaches inside a policy (even a custom one) will have a limited range and a limited exploitability.
+This guarantees that most bugs and possible security breaches inside a policy (even a custom one) will have a limited range and limited exploitability.
 
 Sales escrow account
 ~~~~~~~~~~~~~~~~~~~~
@@ -65,7 +65,7 @@ This has been done by breaking the *buy operation* into 2 steps.
 
 Front-running considerations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-In the Maramalade-NG, front-running attacks that could lead to a loss of funds or a Denial of Service are considered.
+In Maramalade-NG, front-running attacks that could lead to a loss of funds or a Denial of Service are considered.
 
 Especially these two critical cases are considered:
   - tokens creation
@@ -150,22 +150,22 @@ For each operation (*e.g:* a transfer), the ledger calls the corresponding hook 
 
 A policy hook can:
   - Check the allowed usage of a token and make the transaction fail if one of the conditions is not respected by using a pact ``(enforce)``
-  - Doing more complicated things, like storing data, moving funds, managing a sale.
+  - Doing more complicated things, like storing data, moving funds, or managing a sale.
 
-The calling order of the policies is set-up by a special function ``(rank)`` that all policies should implement.
+The calling order of the policies is set up by a special function ``(rank)`` that all policies should implement.
 
-For most hooks the return value (a bool) is not checked.
+For most hooks, the return value (a bool) is not checked.
 
 As a consequence, a hook must:
  - return ``true`` or ``false`` if everything is OK.
- - or make the transaction fail by a false enforcement.
+ - or make the transaction fail through a false enforcement.
 
 Important: The only exception for the hook ``(enforce-sale-offer)``. The policy must:
   - make the transaction fail if the sale is not allowed
   - return ``false`` if the policy accepts the sale but does not handle it.
   - return ``true`` **only** if the policy has chosen to handle the sale.
 
-The ledger ensures that at least 1 policy has handled the sale. This is necessary to prevent the dramatic case when no policy wants to manage the sale.
+The ledger ensures that at least one policy has handled the sale. This is necessary to prevent the dramatic case when no policy wants to manage the sale.
 
 Example:
 
@@ -175,8 +175,8 @@ Example:
 
 Passing data to policies
 ------------------------
-Since the poly-fungible API does not allow to pass specific information to the policies, parameters must
-be passed by using the data section of the transaction.
+Since the poly-fungible API does not allow passing specific information to the policies, parameters must
+be passed using the data section of the transaction.
 
 Marmalade-NG uses a standardized way to encode the data.
 
@@ -237,11 +237,11 @@ The Marmalade-NG core only does the minimum
 During a sale, the ledger manages:
   - The transmission of the token itself
   - The escrow account guard
-  - Delegates most processing to the policies by calling the 4 related sales hooks.
+  - Delegation of most processing to the policies by calling the 4 related sales hooks.
 
 Step 1:
 ~~~~~~~
-User start the defpact by calling ``(sale)``.
+User starts the defpact by calling ``(sale)``.
 
 In this transaction, by convention, the user includes a ``marmalade_sale`` object in the data section
 of the transaction:
@@ -253,7 +253,7 @@ of the transaction:
     currency:module{fungible-v2} ; Currency of sale
   )
 
-All "sales managing policy" are required to recognize this object and get triggered when
+All "sales management policies" are required to recognize this object and get triggered when
 they recognize the right ``sale_type`` they support.
 
 Each policy's hook ``(enforce-sale-offer)`` is being called.
@@ -266,7 +266,7 @@ Steps between 1 and 2:
 ~~~~~~~~~~~~~~~~~~~~~~
 Some policies may require some extra steps before ending the sale (eg: bidding for an auction sale).
 
-But this is a direct interaction between users and the policy and is not managed by the Marmalade-NG core and the ledger.
+But this is a direct interaction between users and the policy and is not managed by the Marmalade-NG core or the ledger.
 
 
 Step 2:
@@ -287,7 +287,7 @@ escrow accounts are unlocked, allowing the policy to make the needed payments:
 
 - to the seller
 
-- to the market place
+- to the marketplace
 
 - to the creator (royalties)
 
