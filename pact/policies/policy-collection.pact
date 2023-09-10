@@ -50,13 +50,19 @@
     true)
 
   ;-----------------------------------------------------------------------------
+  ; Constants
+  ;-----------------------------------------------------------------------------
+  (defconst MAXIMUM-SIZE:integer 10000000)
+
+  ;-----------------------------------------------------------------------------
   ; Collection creation
   ;-----------------------------------------------------------------------------
   (defun create-collection-id:string (name:string creator-guard:guard)
     (format "c_{}_{}" [name, (hash {'n:name, 'g:creator-guard})]))
 
   (defun create-collection:bool (id:string name:string size:integer creator-guard:guard)
-    (enforce (>= size 0) "Collection size must be positive")
+    (enforce (and? (<= 0) (>= MAXIMUM-SIZE) size)
+             (format "Collection size must be positive and less than {}" [MAXIMUM-SIZE]))
     (enforce-guard creator-guard)
     (enforce (= id (create-collection-id name creator-guard)) "Collection ID does not match")
     (insert collections id {'id:id,

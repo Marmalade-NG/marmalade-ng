@@ -26,6 +26,13 @@
 (expect-failure "No keys" "does not match"
                 (create-collection "c_Dogs_bad_id" "Dogs" 3 (read-keyset 'dogs-ks)))
 
+; Test with a bad size
+(expect-failure "negative size" "Collection size must be positive and less than"
+                (create-collection "c_Dogs_8BRJPRYtqM-2w8ASMYq6Toq4PIvhws-kHh0nbYfT1iY" "Dogs" -4 (read-keyset 'dogs-ks)))
+
+(expect-failure "huge size" "Collection size must be positive and less than"
+                (create-collection "c_Dogs_8BRJPRYtqM-2w8ASMYq6Toq4PIvhws-kHh0nbYfT1iY" "Dogs" 100000000000000000 (read-keyset 'dogs-ks)))
+
 
 ; Now evrything good
 (create-collection "c_Dogs_8BRJPRYtqM-2w8ASMYq6Toq4PIvhws-kHh0nbYfT1iY" "Dogs" 2 (read-keyset 'dogs-ks))
