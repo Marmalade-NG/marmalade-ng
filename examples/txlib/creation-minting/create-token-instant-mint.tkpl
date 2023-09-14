@@ -1,4 +1,4 @@
-# This code create a token with the following policies:
+# This code creates a token with the following policies:
 # - COLLECTION
 # - NON-FUNGIBLE
 # - INSTANT-MINT
@@ -7,7 +7,7 @@
 # - FIXED-SALE
 # - AUCTION-SALE
 #
-# Since it's an instant-mint token, it is immediatly munted to a choosen receiver.
+# The token is sent to the receiver immediately since it is an instant-mint token.
 
 code: |-
   (use {{namespace}}.ledger)
