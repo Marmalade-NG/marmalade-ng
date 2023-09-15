@@ -217,3 +217,37 @@ Return all the active sales details.
     "timeout": "2023-06-01T00:00:00Z",
     "token-id": "t:sMd0A3s6ZoiHd0RCzZ3XqVcTmOcoNvi73hl1gWXUMSA"}
   ]
+
+
+get-ended-sales
+~~~~~~~~~~~~~~~
+*→* ``[object{quote-sch}]``
+
+Return all ended sales:
+  - The timeout has expired.
+  - The sale's defpact is required to be closed (with a standard or a rollback continuation)
+
+**Important**: Local only function. Do not use in transactions
+
+
+.. code:: lisp
+
+  (use marmalade-ng.policy-auction-sale)
+  (get-ended-sales)
+
+.. code-block::
+
+  [{"amount": 0.1,
+     "currency": coin,
+     "current-buyer": "",
+     "current-price": 0.0,
+     "enabled": true,
+     "escrow-account": "c:09-juxzBu412pfsgBlM6Au7fOnwvSsX78Er66vnC6sI",
+     "increment-ratio": 1.1,
+     "recipient": "alice",
+     "sale-id": "",
+     "start-price": 10.0,
+     "timeout": "2023-06-01T00:00:00Z",
+     "token-id": "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8"
+    }
+  ]

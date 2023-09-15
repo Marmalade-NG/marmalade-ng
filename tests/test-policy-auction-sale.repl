@@ -46,7 +46,6 @@
 (env-data {'marmalade_sale:{'sale_type:"auction", 'currency:coin }})
 (expect-failure "auction_quote not present in data" "auction not present in data"
   (sale "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8" "alice" 0.1 (time "2023-06-01T00:00:00Z")))
- 
 ; Try with a missing recipient
 (env-data {'marmalade_sale: {'sale_type:"auction", 'currency:coin },
            'marmalade_auction: {'recipient:"", 'start_price:10.0, 'increment_ratio:1.1 }})
@@ -93,6 +92,7 @@
 
 (expect-that "It should exist 1 active sale" (compose (length) (= 1)) (get-all-active-sales))
 (expect-that "It should exist 1 active sale" (compose (length) (= 1)) (get-sales-for-token "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8"))
+(expect-that "It should exist 0 ended sale" (compose (length) (= 0)) (get-ended-sales))
 
 (print (+ "Escrow account: => " (at 'escrow-account (get-sale (tx-hash)))))
 (commit-tx)
@@ -192,11 +192,14 @@
 
 
 
-;Now teh auction goes t o it's end; We close the defpact
+;Now the auction goes to its end; We close the defpact
 (begin-tx "Close the defpact")
 (env-chain-data {"block-time": (time "2023-06-06T00:00:00Z")})
 (use marmalade-ng.ledger)
 (use marmalade-ng.policy-auction-sale)
+
+(expect-that "It should exist 0 active sale" (compose (length) (= 0)) (get-all-active-sales))
+(expect-that "It should exist 1 ended sale" (compose (length) (= 1)) (get-ended-sales))
 
 ; Try with the bad buyer
 (env-data {'buyer:"carol", 'buyer-guard:{'pred:"keys-all", 'keys:["carol-key"]}})
@@ -215,6 +218,6 @@
 
 (expect-that "It should exist 0 active sale" (compose (length) (= 0)) (get-all-active-sales))
 (expect-that "It should exist 0 active sale" (compose (length) (= 0)) (get-sales-for-token "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8"))
-
+(expect-that "It should exist 0 ended sale" (compose (length) (= 0)) (get-ended-sales))
 
 (commit-tx)

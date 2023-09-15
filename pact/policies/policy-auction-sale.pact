@@ -298,6 +298,11 @@
     (select auctions (and? (where 'timeout (is-future))
                            (where 'enabled (= true)))))
 
+  (defun get-ended-sales:[object{auction-sch}] ()
+    @doc "Return the ended sales (timeout elapsed), but not settled"
+    (select auctions (and? (where 'timeout (is-past))
+                           (where 'enabled (= true)))))
+
   (defun get-sales-for-token:[object{auction-sch}] (token-id:string)
     @doc "Return all active sales managed by this policy for a given token-id"
     (select auctions (and? (where 'enabled (= true))
