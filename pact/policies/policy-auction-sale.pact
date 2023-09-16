@@ -146,10 +146,10 @@
           (enforce (> increment-ratio 1.0) "Increment must be > 1")
           ; Auction sale does not support no-timeout
           (enforce (!= NO-TIMEOUT timeout) "No timeout not supported for auction sale")
-          ; Check that the recipient account is valid and already exist in the currency
+          ; Check that the recipient account is valid and already exists in the currency
           (check-fungible-account currency recipient)
 
-          ; Insert teh quote intor the DB.
+          ; Insert the quote into the DB.
           (insert auctions (pact-id) {'sale-id: (pact-id),
                                       'token-id: (at 'id token),
                                       'amount:amount,
@@ -289,7 +289,6 @@
     @doc "Return the details of a sale"
     (read auctions sale-id))
 
-
   ;-----------------------------------------------------------------------------
   ; View functions (local only)
   ;-----------------------------------------------------------------------------
@@ -307,7 +306,4 @@
     @doc "Return all active sales managed by this policy for a given token-id"
     (select auctions (and? (where 'enabled (= true))
                            (where 'token-id (= token-id)))))
-
-
-
 )
