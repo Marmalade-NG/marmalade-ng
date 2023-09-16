@@ -88,7 +88,8 @@
 
 (sale "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8" "alice" 0.1 (time "2023-06-01T00:00:00Z"))
 
-
+; CVerify that0.1 has been deducted from the balance of Alice
+(expect "Balance of alice is 0.6 - 0.1" 0.5 (get-balance "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8" "alice"))
 
 (expect-that "It should exist 1 active sale" (compose (length) (= 1)) (get-all-active-sales))
 (expect-that "It should exist 1 active sale" (compose (length) (= 1)) (get-sales-for-token "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8"))
@@ -201,6 +202,10 @@
 (expect-that "It should exist 0 active sale" (compose (length) (= 0)) (get-all-active-sales))
 (expect-that "It should exist 1 ended sale" (compose (length) (= 1)) (get-ended-sales))
 
+;Withdrawing should not work as  there is an existing bidder
+(expect-failure "A bidder exist" "Bid active"
+                (continue-pact 0 true (hash "auction-sale-1")))
+
 ; Try with the bad buyer
 (env-data {'buyer:"carol", 'buyer-guard:{'pred:"keys-all", 'keys:["carol-key"]}})
 (expect-failure "To early to end the defpact" "uyer does not match"
@@ -219,5 +224,58 @@
 (expect-that "It should exist 0 active sale" (compose (length) (= 0)) (get-all-active-sales))
 (expect-that "It should exist 0 active sale" (compose (length) (= 0)) (get-sales-for-token "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8"))
 (expect-that "It should exist 0 ended sale" (compose (length) (= 0)) (get-ended-sales))
+
+(commit-tx)
+
+; try another auction but with no bidder
+(begin-tx "Sales 2")
+(env-hash (hash "auction-sale-2"))
+(env-chain-data {"block-time": (time "2023-07-01T00:00:00Z")})
+(print (format "Sale ID 2: => {}" [(tx-hash)]))
+
+; Alice will sell 0.2
+(use marmalade-ng.ledger)
+(use marmalade-ng.policy-auction-sale)
+
+; Verify the initial balance of alice
+(expect "Balance of alice is 0.5" 0.5 (get-balance "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8" "alice"))
+
+
+(env-sigs [ {'key:"alice-key", 'caps:[(OFFER "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8" "alice" 0.2)]}
+           ])
+
+(env-data {'marmalade_sale: {'sale_type:"auction", 'currency:coin },
+           'marmalade_auction: {'recipient:"alice", 'start_price:10.0, 'increment_ratio:1.1 }})
+
+
+(sale "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8" "alice" 0.2 (time "2023-08-01T00:00:00Z"))
+
+(print (+ "Escrow account: => " (at 'escrow-account (get-sale (tx-hash)))))
+
+(commit-tx)
+
+; try to withdraw before the end of the of the sale
+(begin-tx "try withdraw")
+(env-chain-data {"block-time": (time "2023-07-14T00:00:00Z")})
+(expect-failure "Withdraw too early" "Sale not ended"
+                (continue-pact 0 true (hash "auction-sale-2")))
+(commit-tx)
+
+; The sale has now ended with no bidders
+(begin-tx "Withdraw")
+(use marmalade-ng.ledger)
+(env-chain-data {"block-time": (time "2023-08-02T00:00:00Z")})
+
+; Try to buy however
+(env-data {'buyer:"bob", 'buyer-guard:{'pred:"keys-all", 'keys:["bob-key"]}})
+(expect-failure "Bob didn't place a bid" "No bid"
+   (continue-pact 1 false (hash "auction-sale-2")))
+
+; But alice should be able to withdraw
+(continue-pact 0 true (hash "auction-sale-2"))
+
+; Verify that the NFT has been refunded to alice
+(expect "Balance of alice is 0.5" 0.5 (get-balance "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8" "alice"))
+
 
 (commit-tx)
