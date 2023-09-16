@@ -134,7 +134,7 @@
             ; Do some basic checks
             (map  (check-price currency) [start-price end-price])
             (enforce (is-future end-time) "End time must be in the future")
-            (enforce (or? (= NO-TIMEOUT) (< end-time) timeout) "Timeout must be later tha end-time")
+            (enforce (or? (= NO-TIMEOUT) (<= end-time) timeout) "Timeout must be later tha end-time")
 
             (enforce (< end-price start-price) "end-price must be less than start-price")
 
