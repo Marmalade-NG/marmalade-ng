@@ -132,7 +132,7 @@ instead of the ``fixed-auction-sale``:
 
 Bidding
 ^^^^^^^
-When a buyer wants to bid for a token, the dApp has to call ref:`POLICY-AUCTION-SALE-GET-SALE` to check the conditions:
+When a buyer wants to bid for a token, the dApp has to call :ref:`POLICY-AUCTION-SALE-GET-SALE` to check the conditions:
 
 - current-price / start-price / increment
 - currency
@@ -169,7 +169,7 @@ The continuation transaction can be triggered by:
   - the buyer
   - or anybody else, including a bot that works for the marketplace.
 
-It is necessary to retrieve the following parameters using ref:`POLICY-AUCTION-SALE-GET-SALE`:
+It is necessary to retrieve the following parameters using :ref:`POLICY-AUCTION-SALE-GET-SALE`:
   - buyer
   - end-date
 
