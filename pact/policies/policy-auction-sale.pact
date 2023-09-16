@@ -191,8 +191,8 @@
                                    'current-price:=current-price,
                                    'current-buyer:=current-buyer}
 
-      ; Check that the current-price is != 0. It means that someone has placed a bid
-      (enforce (>= current-price 0.0) "No bid")
+      ; Check that the buyer is different from EMPTY. It means that someone has placed a bid
+      (enforce (!= current-buyer "") "No bid")
 
       ; Check that the buyer that placed the bid is the same as the one that is currently
       ;    claiming the tokens
