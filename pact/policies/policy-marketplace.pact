@@ -15,7 +15,6 @@
   ;-----------------------------------------------------------------------------
   ; Schemas and Tables
   ;-----------------------------------------------------------------------------
-
   (defschema marketplace-sale-sch
     sale-id:string
     token-id:string
@@ -173,5 +172,4 @@
       (select marketplace-sales (and? (where 'enabled (= true))
                                       (where 'marketplace-hash (= fee-hash))))
   )
-
 )

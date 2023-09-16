@@ -151,5 +151,4 @@
          (sort ['rank]
                (select tokens ['token-id, 'rank]  (where 'collection-id (= collection-id)))))
   )
-
 )

@@ -223,7 +223,4 @@
     @doc "Returns all currently actives sales related to a token"
     (select quotes (and? (where 'enabled (=  true))
                          (where 'token-id (= token-id)))))
-
-
-
 )

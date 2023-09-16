@@ -157,7 +157,6 @@
         (--enforce-sale-buy token buyer)
         false))
 
-
   (defun --enforce-sale-settle:bool (token:object{token-info})
     (require-capability (ledger.POLICY-ENFORCE-SETTLE token (pact-id) policy-fixed-sale))
     (with-read quotes (pact-id) {'amount:=amount,
