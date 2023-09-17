@@ -38,14 +38,14 @@
 
 ; Check the events
 (ev-analyzer.store (env-events true))
-(expect "Policy A has been called" true (ev-analyzer.is-present "marmalade-ng.policy-events-A.EVENT-A"))
-(expect "Policy B has been called" true (ev-analyzer.is-present "marmalade-ng.policy-events-B.EVENT-B"))
+(expect "Policy A has been called" true (ev-analyzer.is-present "EVENT-A"))
+(expect "Policy B has been called" true (ev-analyzer.is-present "EVENT-B"))
 
-(expect "Policy A params" ["init"] (ev-analyzer.params "marmalade-ng.policy-events-A.EVENT-A"))
-(expect "Policy B params" ["init"] (ev-analyzer.params "marmalade-ng.policy-events-B.EVENT-B"))
+(expect "Policy A params" ["init"] (ev-analyzer.params "EVENT-A"))
+(expect "Policy B params" ["init"] (ev-analyzer.params "EVENT-B"))
 
-(expect "Policy B called beofre A " true (< (ev-analyzer.position "marmalade-ng.policy-events-B.EVENT-B")
-                                            (ev-analyzer.position "marmalade-ng.policy-events-A.EVENT-A")))
+(expect "Policy B called beofre A " true (< (ev-analyzer.position "EVENT-B")
+                                            (ev-analyzer.position "EVENT-A")))
 
 ; Check URI
 (expect "URI is good" "http://token-1" (get-uri "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM"))
@@ -86,11 +86,11 @@
 
 ; Check the events
 (ev-analyzer.store (env-events true))
-(expect "Policy A has been called" true (ev-analyzer.is-present "marmalade-ng.policy-events-A.EVENT-A"))
-(expect "Policy B has been called" true (ev-analyzer.is-present "marmalade-ng.policy-events-B.EVENT-B"))
+(expect "Policy A has been called" true (ev-analyzer.is-present "EVENT-A"))
+(expect "Policy B has been called" true (ev-analyzer.is-present "EVENT-B"))
 
-(expect "Policy A params" ["mint"] (ev-analyzer.params "marmalade-ng.policy-events-A.EVENT-A"))
-(expect "Policy B params" ["mint"] (ev-analyzer.params "marmalade-ng.policy-events-B.EVENT-B"))
+(expect "Policy A params" ["mint"] (ev-analyzer.params "EVENT-A"))
+(expect "Policy B params" ["mint"] (ev-analyzer.params "EVENT-B"))
 
 (mint "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "bob" (read-keyset 'bob-ks) 0.4)
 
@@ -156,11 +156,11 @@
 
 ; Check the events
 (ev-analyzer.store (env-events true))
-(expect "Policy A has been called" true (ev-analyzer.is-present "marmalade-ng.policy-events-A.EVENT-A"))
-(expect "Policy B has been called" true (ev-analyzer.is-present "marmalade-ng.policy-events-B.EVENT-B"))
+(expect "Policy A has been called" true (ev-analyzer.is-present "EVENT-A"))
+(expect "Policy B has been called" true (ev-analyzer.is-present "EVENT-B"))
 
-(expect "Policy A params" ["burn"] (ev-analyzer.params "marmalade-ng.policy-events-A.EVENT-A"))
-(expect "Policy B params" ["burn"] (ev-analyzer.params "marmalade-ng.policy-events-B.EVENT-B"))
+(expect "Policy A params" ["burn"] (ev-analyzer.params "EVENT-A"))
+(expect "Policy B params" ["burn"] (ev-analyzer.params "EVENT-B"))
 
 ; Check the balance
 (expect "Balance of alice should be 0.9" 0.9 (get-balance "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I" "alice"))
@@ -211,11 +211,11 @@
 (env-events true)
 (transfer-create "t:8XZTuI-LC_Zww0mfCzFa8l7dkbZirdM22KJwRQ5PlRg" "alice" "bob" (read-keyset 'bob-ks) 0.1)
 (ev-analyzer.store (env-events true))
-(expect "Policy A has been called" true (ev-analyzer.is-present "marmalade-ng.policy-events-A.EVENT-A"))
-(expect "Policy B has been called" true (ev-analyzer.is-present "marmalade-ng.policy-events-B.EVENT-B"))
+(expect "Policy A has been called" true (ev-analyzer.is-present "EVENT-A"))
+(expect "Policy B has been called" true (ev-analyzer.is-present "EVENT-B"))
 
-(expect "Policy A params" ["transfer"] (ev-analyzer.params "marmalade-ng.policy-events-A.EVENT-A"))
-(expect "Policy B params" ["transfer"] (ev-analyzer.params "marmalade-ng.policy-events-B.EVENT-B"))
+(expect "Policy A params" ["transfer"] (ev-analyzer.params "EVENT-A"))
+(expect "Policy B params" ["transfer"] (ev-analyzer.params "EVENT-B"))
 
 (expect "Balance of alice should be 0.9" 0.9 (get-balance "t:8XZTuI-LC_Zww0mfCzFa8l7dkbZirdM22KJwRQ5PlRg" "alice"))
 (expect "Balance of bob should be 0.1" 0.1 (get-balance "t:8XZTuI-LC_Zww0mfCzFa8l7dkbZirdM22KJwRQ5PlRg" "bob"))
@@ -253,11 +253,11 @@
 
 ; Check the events
 (ev-analyzer.store (env-events true))
-(expect "Policy A has been called" true (ev-analyzer.is-present "marmalade-ng.policy-events-A.EVENT-A"))
-(expect "Policy B has been called" true (ev-analyzer.is-present "marmalade-ng.policy-events-B.EVENT-B"))
+(expect "Policy A has been called" true (ev-analyzer.is-present "EVENT-A"))
+(expect "Policy B has been called" true (ev-analyzer.is-present "EVENT-B"))
 
-(expect "Policy A params" ["sale-offer"] (ev-analyzer.params "marmalade-ng.policy-events-A.EVENT-A"))
-(expect "Policy B params" ["sale-offer"] (ev-analyzer.params "marmalade-ng.policy-events-B.EVENT-B"))
+(expect "Policy A params" ["sale-offer"] (ev-analyzer.params "EVENT-A"))
+(expect "Policy B params" ["sale-offer"] (ev-analyzer.params "EVENT-B"))
 
 (expect "Balance of alice is now 0.5" 0.5 (get-balance "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice"))
 
@@ -272,11 +272,11 @@
 
 ; Check the events
 (ev-analyzer.store (env-events true))
-(expect "Policy A has been called" true (ev-analyzer.is-present "marmalade-ng.policy-events-A.EVENT-A"))
-(expect "Policy B has been called" true (ev-analyzer.is-present "marmalade-ng.policy-events-B.EVENT-B"))
+(expect "Policy A has been called" true (ev-analyzer.is-present "EVENT-A"))
+(expect "Policy B has been called" true (ev-analyzer.is-present "EVENT-B"))
 
-(expect "Policy A params" ["sale-withdraw"] (ev-analyzer.params "marmalade-ng.policy-events-A.EVENT-A"))
-(expect "Policy B params" ["sale-withdraw"] (ev-analyzer.params "marmalade-ng.policy-events-B.EVENT-B"))
+(expect "Policy A params" ["sale-withdraw"] (ev-analyzer.params "EVENT-A"))
+(expect "Policy B params" ["sale-withdraw"] (ev-analyzer.params "EVENT-B"))
 
 (expect "Balance of alice is now back 0.6" 0.6 (get-balance "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice"))
 (rollback-tx)
@@ -292,11 +292,11 @@
 
 ; Check the events
 (ev-analyzer.store (env-events true))
-(expect "Policy A has been called" true (ev-analyzer.is-present "marmalade-ng.policy-events-A.EVENT-A"))
-(expect "Policy B has been called" true (ev-analyzer.is-present "marmalade-ng.policy-events-B.EVENT-B"))
+(expect "Policy A has been called" true (ev-analyzer.is-present "EVENT-A"))
+(expect "Policy B has been called" true (ev-analyzer.is-present "EVENT-B"))
 
-(expect "Policy A params" ["sale-buy"] (ev-analyzer.params "marmalade-ng.policy-events-A.EVENT-A"))
-(expect "Policy B params" ["sale-buy"] (ev-analyzer.params "marmalade-ng.policy-events-B.EVENT-B"))
+(expect "Policy A params" ["sale-buy"] (ev-analyzer.params "EVENT-A"))
+(expect "Policy B params" ["sale-buy"] (ev-analyzer.params "EVENT-B"))
 
 (expect "Balance of alice is still 0.5" 0.5 (get-balance "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice"))
 

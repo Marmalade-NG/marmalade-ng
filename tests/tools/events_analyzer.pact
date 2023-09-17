@@ -17,8 +17,11 @@
     (with-read temp-storage-table "last" {'evs:=x}
       x))
 
+  (defun extract-name (x)
+    (compose (split ".") (last) (at 'name x)))
+
   (defun get-names ()
-    (map (at "name") (get)))
+    (map (extract-name) (get)))
 
   (defun format-evs:string ()
     (join "\n" (map (to-string) (get))))
@@ -30,7 +33,7 @@
     (first (search (get-names) ev-name)))
 
   (defun params:list (ev-name:string)
-    (at "params" (first (filter (where 'name (= ev-name)) (get)))))
+    (at "params" (first (filter (compose (extract-name) (= ev-name)) (get)))))
 
 )
 
