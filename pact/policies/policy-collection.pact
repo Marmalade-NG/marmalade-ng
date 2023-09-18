@@ -41,6 +41,7 @@
   ;-----------------------------------------------------------------------------
   (defcap ADD-TO-COLLECTION (collection-id:string token-id:string)
     @doc "Capability to grant creation of a collection's token"
+    @event
     (with-read collections collection-id {'creator-guard:=cg}
       (enforce-guard cg))
   true)

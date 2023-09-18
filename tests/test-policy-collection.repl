@@ -3,6 +3,10 @@
 (load "init/init-ledger.repl")
 (load "init/init-policy-collection.repl")
 
+(begin-tx)
+(load "tools/events_analyzer.pact")
+(commit-tx)
+
 ;; Create collections
 ; try 2 create 2 collection Dogs and Cats
 (begin-tx "Create collections")
@@ -37,8 +41,15 @@
 ; Now evrything good
 (create-collection "c_Dogs_8BRJPRYtqM-2w8ASMYq6Toq4PIvhws-kHh0nbYfT1iY" "Dogs" 2 (read-keyset 'dogs-ks))
 (env-sigs [{'key:"cats-owner-key", 'caps:[]}])
-(create-collection "c_Cats_ZMLLJuSq0JoHSR4f_ZgUa2H_p7Rr71CN8CjQ7ZL_hU0" "Cats" 0 (read-keyset 'cats-ks))
 
+
+(env-events true)
+(create-collection "c_Cats_ZMLLJuSq0JoHSR4f_ZgUa2H_p7Rr71CN8CjQ7ZL_hU0" "Cats" 0 (read-keyset 'cats-ks))
+(ev-analyzer.store (env-events true))
+
+(print (ev-analyzer.get-names))
+(expect "Event CREATE-COLLECTION has been emitted" true (ev-analyzer.is-present "CREATE-COLLECTION"))
+(expect "CREATE COLLECTION good params" ["c_Cats_ZMLLJuSq0JoHSR4f_ZgUa2H_p7Rr71CN8CjQ7ZL_hU0" "Cats" 0] (ev-analyzer.params "CREATE-COLLECTION"))
 
 (commit-tx)
 
@@ -82,9 +93,14 @@
            {'key:"create", 'caps:[(ENFORCE-RESERVED)]}
            ])
 
-
+(env-events true)
 (create-token "t:C6KzoW9DSYdSbrZuUOazHzlpdA_vtZyiwFo9WTIUhP8" 0 "http://dog1"
               [marmalade-ng.policy-collection] (read-keyset 'create-ks))
+(ev-analyzer.store (env-events true))
+
+(expect "Event ADD-TO-COLLECTION has been emitted" true (ev-analyzer.is-present "ADD-TO-COLLECTION"))
+(expect "ADD-TO-COLLECTION good params" ["c_Dogs_8BRJPRYtqM-2w8ASMYq6Toq4PIvhws-kHh0nbYfT1iY" "t:C6KzoW9DSYdSbrZuUOazHzlpdA_vtZyiwFo9WTIUhP8" ]
+        (ev-analyzer.params "ADD-TO-COLLECTION"))
 
 (create-token "t:MkygmZK2iaGHuTTmKnzJMke3HcALz8SgTyxnD5A-VkA" 0 "http://dog2"
               [marmalade-ng.policy-collection] (read-keyset 'create-ks))

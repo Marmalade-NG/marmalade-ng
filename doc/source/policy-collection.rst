@@ -182,3 +182,19 @@ Tokens are sorted by rank.
     > ["t:C6KzoW9DSYdSbrZuUOazHzlpdA_vtZyiwFo9WTIUhP8",
        "t:MkygmZK2iaGHuTTmKnzJMke3HcALz8SgTyxnD5A-VkA",
        "t:Axc6q-aWpN9g1u3NveIXaNMOqJ5n_Wsudw4GDnFiZNM"]
+
+
+Events
+^^^^^^
+CREATE-COLLECTION
+~~~~~~~~~~~~~~~~~
+*collection-id* ``string`` *collection-name* ``string`` *collection-size* ``integer``
+
+Emitted when a collection is created.
+
+
+ADD-TO-COLLECTION
+~~~~~~~~~~~~~~~~~
+*collection-id* ``string`` *token-id* ``string``
+
+Emitted when a token is added to a collection.
