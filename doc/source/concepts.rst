@@ -227,6 +227,7 @@ Example: Imagine a transaction that creates two tokens but with different royalt
     }
 
 
+.. _CONCEPTS-SALE:
 
 Sales
 -----
@@ -239,7 +240,7 @@ During a sale, the ledger manages:
   - The escrow account guard
   - Delegation of most processing to the policies by calling the 4 related sales hooks.
 
-Step 1:
+Step 0:
 ~~~~~~~
 User starts the defpact by calling ``(sale)``.
 
@@ -262,14 +263,14 @@ At least one policy must answer ``true``.  Usually, the policy stores the sales 
 The ledger moves the token amount being sold to the escrow account.
 
 
-Steps between 1 and 2:
+Steps between 0 and 1:
 ~~~~~~~~~~~~~~~~~~~~~~
 Some policies may require some extra steps before ending the sale (eg: bidding for an auction sale).
 
 But this is a direct interaction between users and the policy and is not managed by the Marmalade-NG core or the ledger.
 
 
-Step 2:
+Step 1:
 ~~~~~~~
 A user calls the defpact continuation. The transaction data section must include the fields
 ``buyer`` and ``buyer-guard`` to indicate the destination account of the token.
@@ -296,7 +297,7 @@ escrow accounts are unlocked, allowing the policy to make the needed payments:
 Here, we can see the importance of the rank of the policy, as the order in which policies are called is important.
 
 
-Withdraw step (alternative to step 2)
+Withdraw step (alternative to step 1)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Alternatively, the sale can be canceled. During a cancellation (rollback of the defpact), the ``(enforce-sale-withdraw)`` hooks
 are being called.

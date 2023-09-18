@@ -1,0 +1,57 @@
+<mxfile host="app.diagrams.net" modified="2023-09-18T10:09:09.150Z" agent="Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/111.0" etag="CsRR8Mi0KBSekLi2X-SL" version="21.7.2" type="device">
+  <diagram name="Page-1" id="27lC5j9CiZZiGHrSjYYL">
+    <mxGraphModel dx="1914" dy="1071" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="D6FWBxTIdnaUBAZ0wiwy-4" value="&lt;div&gt;Step 0&lt;/div&gt;" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="120" y="280" width="160" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="D6FWBxTIdnaUBAZ0wiwy-7" value="" style="endArrow=none;html=1;rounded=0;" edge="1" parent="D6FWBxTIdnaUBAZ0wiwy-4">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint y="99.5" as="sourcePoint" />
+            <mxPoint x="160" y="99.5" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="D6FWBxTIdnaUBAZ0wiwy-8" value="Initiate&lt;br&gt;The sale" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="D6FWBxTIdnaUBAZ0wiwy-4">
+          <mxGeometry x="25" y="40" width="110" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="D6FWBxTIdnaUBAZ0wiwy-11" value="Rollback&lt;br&gt;Refund seller" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="D6FWBxTIdnaUBAZ0wiwy-4">
+          <mxGeometry x="25" y="130" width="110" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="D6FWBxTIdnaUBAZ0wiwy-6" value="Step 1" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="480" y="280" width="160" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="D6FWBxTIdnaUBAZ0wiwy-12" value="Finish the Sale" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="D6FWBxTIdnaUBAZ0wiwy-6">
+          <mxGeometry x="20" y="80" width="110" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="D6FWBxTIdnaUBAZ0wiwy-13" value="" style="edgeStyle=segmentEdgeStyle;endArrow=classic;html=1;curved=0;rounded=0;endSize=8;startSize=8;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="280" y="340" as="sourcePoint" />
+            <mxPoint x="480" y="340" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="D6FWBxTIdnaUBAZ0wiwy-15" value="Continue 1, False" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="D6FWBxTIdnaUBAZ0wiwy-13">
+          <mxGeometry x="-0.01" y="-1" relative="1" as="geometry">
+            <mxPoint y="-11" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="D6FWBxTIdnaUBAZ0wiwy-14" value="" style="edgeStyle=segmentEdgeStyle;endArrow=classic;html=1;curved=0;rounded=0;endSize=8;startSize=8;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="280" y="360" as="sourcePoint" />
+            <mxPoint x="280" y="440" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="380" y="360" />
+              <mxPoint x="380" y="440" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="D6FWBxTIdnaUBAZ0wiwy-16" value="Continue 0, True" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="D6FWBxTIdnaUBAZ0wiwy-14">
+          <mxGeometry x="0.4357" y="-3" relative="1" as="geometry">
+            <mxPoint x="-9" y="13" as="offset" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
