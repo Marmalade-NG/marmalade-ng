@@ -97,11 +97,6 @@
         (floor price (currency::precision))))
   )
 
-  (defun disable:bool ()
-    @doc "Mark the sale as being disabled"
-    (update quotes (pact-id) {'enabled: false})
-    true)
-
   (defun read-dutch-quote-msg:object{dutch-quote-msg-sch} (token:object{token-info})
     (enforce-get-msg-data "dutch_quote" token))
 
@@ -163,7 +158,9 @@
     (require-capability (ledger.POLICY-ENFORCE-WITHDRAW token (pact-id) policy-dutch-auction-sale))
     (enforce-sale-ended)
     (enforce-seller-guard)
-    (disable)
+    ; Disable the sale
+    (update quotes (pact-id) {'enabled: false})
+    true
   )
 
   (defun enforce-sale-withdraw:bool (token:object{token-info})
@@ -197,7 +194,9 @@
              (amount (currency::get-balance escrow)))
         (install-capability (currency::TRANSFER escrow recipient amount))
         (currency::transfer escrow recipient amount)))
-    (disable)
+    ; Disable the sale
+    (update quotes (pact-id) {'enabled: false})
+    true
   )
 
   (defun enforce-sale-settle:bool (token:object{token-info})

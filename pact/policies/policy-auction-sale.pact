@@ -100,11 +100,6 @@
     (let ((not-ended (sale-not-ended)))
       (enforce not-ended "Sale not ended")))
 
-  (defun disable:bool ()
-    (update auctions (pact-id) {'enabled: false})
-    true)
-
-
   (defun check-ledger-account:bool (token-id:string account:string guard:guard)
     @doc "Check an account on the Marmalade legder \
         \   - If it already exist, check that the guard does match \
@@ -174,7 +169,9 @@
     ; Check that nobody has placed a bid before withdrawing
     (with-read auctions (pact-id) {'current-buyer:=current-buyer}
       (enforce (= current-buyer "") "Bid active"))
-    (disable)
+    ; Disable the sale
+    (update auctions (pact-id) {'enabled: false})
+    true
   )
 
   (defun enforce-sale-withdraw:bool (token:object{token-info})
@@ -221,7 +218,9 @@
              (amount (currency::get-balance escrow)))
         (install-capability (currency::TRANSFER escrow recipient amount))
         (currency::transfer escrow recipient amount))
-      (disable))
+      ; Disable the sale
+      (update auctions (pact-id) {'enabled: false}))
+    true
   )
 
   (defun enforce-sale-settle:bool (token:object{token-info})
