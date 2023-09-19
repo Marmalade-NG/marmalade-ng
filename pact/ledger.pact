@@ -63,7 +63,7 @@
     true)
 
   (defcap ACCOUNT_GUARD:bool (id:string account:string guard:guard)
-    @doc " Emitted when ACCOUNT guard is updated."
+    @doc "Deprecated... Not emitted anymore"
     @event
     true)
 
@@ -247,7 +247,7 @@
                                      'guard:guard,
                                      'id:id,
                                      'account:account})
-    (emit-event (ACCOUNT_GUARD id account guard))
+    true
   )
 
   (defun get-balance:decimal (id:string account:string)
@@ -574,7 +574,6 @@
                                         'guard:guard,
                                         'id:id,
                                         'account:account})
-        (if is-new (emit-event (ACCOUNT_GUARD id account guard)) true)
         {'account: account, 'previous: old-bal, 'current: new-bal}))
     )
 )

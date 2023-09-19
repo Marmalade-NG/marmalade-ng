@@ -29,3 +29,7 @@ Unlike existing Marmalade V2, Marmalade-NG addresses and consider most front-run
 Marmalade-NG uses a simple and clean design. The core of Marmalade-NG is contained in only 1 module: `ledger`.
 
 No complex modules stack with insane circular dependencies.
+
+### TODO
+
+Remove the `ACCOUNT_GUARD` event from the ledger interface.

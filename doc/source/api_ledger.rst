@@ -351,16 +351,6 @@ TOKEN-CREATE
 
 Emitted when a token is created.
 
-
-ACCOUNT_GUARD
-~~~~~~~~~~~~~
-*id* ``string`` *account* ``string`` *guard* ``guard``
-
-Emitted when an account guard is updated.
-
-This event is emitted by either ``create-account``, ``transfer-create`` or ``sale``.
-
-
 SUPPLY
 ~~~~~~
 *id* ``string`` *supply* ``decimal``
