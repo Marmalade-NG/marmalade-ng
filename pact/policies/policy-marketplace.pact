@@ -70,11 +70,6 @@
       (check-fungible-account currency account))
   )
 
-  (defun disable:bool ()
-      @doc "Mark the sale as being disabled"
-      (update marketplace-sales (pact-id) {'enabled: false})
-      true)
-
   ;-----------------------------------------------------------------------------
   ; Policy hooks
   ;-----------------------------------------------------------------------------
@@ -117,7 +112,8 @@
 
   (defun enforce-sale-withdraw:bool (token:object{token-info})
     (require-capability (ledger.POLICY-ENFORCE-WITHDRAW token (pact-id) policy-marketplace))
-    (disable)
+    (update marketplace-sales (pact-id) {'enabled: false})
+    true
   )
 
   (defun enforce-sale-buy:bool (token:object{token-info} buyer:string)
@@ -139,13 +135,13 @@
                    (amount (clamp min-fee max-fee  (* fee-rate escrow-balance)))
                    (amount (floor amount (currency::precision))))
 
-              (if (>= amount 0.0)
+              (if (> amount 0.0)
                   (let ((_ 0))
-                    (install-capability (currency::TRANSFER escrow account amount))
-                    (currency::transfer escrow account amount)
-                    true)
-                  true))
-            (disable))
+                    (install-capability (currency::TRANSFER escrow account escrow-balance))
+                    (currency::transfer escrow account amount))
+                  ""))
+            (update marketplace-sales (pact-id) {'enabled: false})
+            true)
           true))
     )
 
