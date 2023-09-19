@@ -26,6 +26,14 @@
   (deftable marketplace-sales:{marketplace-sale-sch})
 
   ;-----------------------------------------------------------------------------
+  ; Events
+  ;-----------------------------------------------------------------------------
+  (defcap MARKETPLACE-PAID (token-id:string marketplace-account:string marketplace-hash:string amount:decimal)
+    @doc "Event emitted when a fee is paid to the market-place"
+    @event
+    true)
+
+  ;-----------------------------------------------------------------------------
   ; Input data
   ;-----------------------------------------------------------------------------
   (defschema marketplace-fee-sch
@@ -121,14 +129,16 @@
 
   (defun enforce-sale-settle:bool (token:object{token-info})
     (require-capability (ledger.POLICY-ENFORCE-SETTLE token (pact-id) policy-marketplace))
-    (with-default-read marketplace-sales (pact-id) {'marketplace-fee:DEFAULT-MARKETPLACE-FEE}
-                                                   {'marketplace-fee:=marketplace-fee}
-      (if (!= marketplace-fee DEFAULT-MARKETPLACE-FEE)
-          (bind marketplace-fee {'marketplace-account:=account,
-                                  'currency:=currency:module{fungible-v2},
-                                  'min-fee:=min-fee,
-                                  'fee-rate:=fee-rate,
-                                  'max-fee:=max-fee}
+    (with-default-read marketplace-sales (pact-id) {'marketplace-fee:DEFAULT-MARKETPLACE-FEE,
+                                                    'marketplace-hash:"DEFAULT-HASH"}
+                                                   {'marketplace-fee:=market-fee,
+                                                    'marketplace-hash:=market-hash}
+      (if (!= market-hash "DEFAULT-HASH")
+          (bind market-fee {'marketplace-account:=account,
+                            'currency:=currency:module{fungible-v2},
+                            'min-fee:=min-fee,
+                            'fee-rate:=fee-rate,
+                            'max-fee:=max-fee}
 
             (let* ((escrow (ledger.escrow))
                    (escrow-balance (currency::get-balance escrow))
@@ -138,8 +148,9 @@
               (if (> amount 0.0)
                   (let ((_ 0))
                     (install-capability (currency::TRANSFER escrow account escrow-balance))
-                    (currency::transfer escrow account amount))
-                  ""))
+                    (currency::transfer escrow account amount)
+                    (emit-event (MARKETPLACE-PAID (at 'id token) account market-hash amount)))
+                  true))
             (update marketplace-sales (pact-id) {'enabled: false})
             true)
           true))

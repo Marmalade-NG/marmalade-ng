@@ -4,6 +4,10 @@
 (load "init/init-policy-fixed-sale.repl")
 (load "init/init-policy-marketplace.repl")
 
+(begin-tx)
+(load "tools/events_analyzer.pact")
+(commit-tx)
+
 (begin-tx "Create 4 tokens")
 (env-hash (hash "CreateTx"))
 (use marmalade-ng.ledger)
@@ -90,8 +94,12 @@
 
 
 (env-sigs [{'key:"bob-key", 'caps:[(coin.TRANSFER "bob" "c:uZK0n0opPMtEMAOctKX2S-nNa3KCotC9TBQCnXPOYeY" 5.0)]}])
-(continue-pact 1 false (hash  "fixed-sale-1"))
 
+(ev-analyzer.store (env-events true))
+(continue-pact 1 false (hash  "fixed-sale-1"))
+(ev-analyzer.store (env-events true))
+
+(expect "No market place => No event" false (ev-analyzer.is-present "MARKETPLACE-PAID"))
 
 ; Check the KDA balances
 (expect "Final balance should be 1005.0" 1005.0 (coin.get-balance "alice"))
@@ -265,7 +273,21 @@
 
 (env-data {'buyer:"bob", 'buyer-guard:{'pred:"keys-all", 'keys:["bob-key"]}})
 (env-sigs [{'key:"bob-key", 'caps:[(coin.TRANSFER "bob" "c:RofYomFLW13xvivg2XjN3MykJG_1hNRfDvV4W2DjdNU" 5.0)]}])
+
+
+(ev-analyzer.store (env-events true))
 (continue-pact 1 false (hash  "fixed-sale-2"))
+(ev-analyzer.store (env-events true))
+
+(expect "MARKETPLACE-PAID event emitted" true (ev-analyzer.is-present "MARKETPLACE-PAID"))
+(expect-that "MARKET-PLACE-PAID param token-id" (compose (at 0) (= "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I"))
+             (ev-analyzer.params "MARKETPLACE-PAID"))
+(expect-that "MARKET-PLACE-PAID param account" (compose (at 1) (= "r.user.best-market"))
+             (ev-analyzer.params "MARKETPLACE-PAID"))
+(expect-that "MARKET-PLACE-PAID param market hash" (compose (at 2) (compose (length) (= 43)))
+             (ev-analyzer.params "MARKETPLACE-PAID"))
+(expect-that "MARKET-PLACE-PAID param market " (compose (at 3) (= 0.5))
+             (ev-analyzer.params "MARKETPLACE-PAID"))
 
 ; The price was 5.0 - 10%  = 4.5 for Alice
 ; Check the KDA balances

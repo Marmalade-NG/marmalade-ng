@@ -173,3 +173,12 @@ Return the details of the market place fee record for a given market hash.
     "sale-id": "rmIkCdd9907zaaVDRhnkIiig1mZclYnkLbsGzgXuCLk",
     "token-id": "t:9Dh2pSjMjXLPERZnbE-aDuXQuquuOkgxSOgS-hYYX7Q"}
    ]
+
+
+Events
+^^^^^^
+MARKETPLACE-PAID
+~~~~~~~~~~~~~~~~
+*token-id* ``string`` *marketplace-account* ``string`` *marketplace-hash* ``string`` *amount* ``decimal``
+
+Event emitted when a fee is paid to the marketplace.
