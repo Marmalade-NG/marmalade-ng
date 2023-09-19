@@ -31,6 +31,14 @@
   (deftable royalty-sales:{royalty-sale-sch})
 
   ;-----------------------------------------------------------------------------
+  ; Events
+  ;-----------------------------------------------------------------------------
+  (defcap ROYALTY-PAID (token-id:string creator-account:string amount:decimal)
+    @doc "Event emitted when a royalty is paid to a creator"
+    @event
+    true)
+
+  ;-----------------------------------------------------------------------------
   ; Input data
   ;-----------------------------------------------------------------------------
   (defschema royalty-init-msg-sch
@@ -103,7 +111,7 @@
               (let ((_ 0))
                 (install-capability (currency::TRANSFER escrow creator-a escrow-balance))
                 (currency::transfer-create escrow creator-a creator-g royalty-amount)
-                true)
+                (emit-event (ROYALTY-PAID (at 'id token) creator-a royalty-amount)))
               false))))
     )
 

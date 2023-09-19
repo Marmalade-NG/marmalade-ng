@@ -4,6 +4,10 @@
 (load "init/init-policy-fixed-sale.repl")
 (load "init/init-policy-adjustable-royalty.repl")
 
+(begin-tx)
+(load "tools/events_analyzer.pact")
+(commit-tx)
+
 (begin-tx "Create a token")
 (env-hash (hash "CreateTx"))
 (use marmalade-ng.ledger)
@@ -114,7 +118,14 @@
 
 (env-sigs [{'key:"bob-key", 'caps:[(coin.TRANSFER "bob" "c:uZK0n0opPMtEMAOctKX2S-nNa3KCotC9TBQCnXPOYeY" 5.0)]}])
 (env-chain-data {"block-time": (time "2023-05-01T00:00:00Z")})
+
+(ev-analyzer.store (env-events true))
 (continue-pact 1 false (hash  "fixed-sale-1"))
+(ev-analyzer.store (env-events true))
+
+(expect "Event ROYALTY-PAID has been emitted" true (ev-analyzer.is-present "ROYALTY-PAID"))
+(expect "ROYALTY-PAIDgood params" ["t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw" "creator" 0.5] (ev-analyzer.params "ROYALTY-PAID"))
+
 
 
 ; Check the KDA balances

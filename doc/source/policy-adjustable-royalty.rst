@@ -161,3 +161,12 @@ Return the details of the royalties for a token for a given creator account.
     "rate": 0.1,
     "token-id": "t:9Dh2pSjMjXLPERZnbE-aDuXQuquuOkgxSOgS-hYYX7Q"}
   ]
+
+
+Events
+^^^^^^
+ROYALTY-PAID
+~~~~~~~~~~~~
+*token-id* ``string`` *creator-account* ``string`` *amount* ``decimal``
+
+Event emitted when a royalty is paid to a creator.
