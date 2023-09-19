@@ -99,9 +99,9 @@
           ;        => transfer-create will transfer the funds safely
           ;   - Creator account already exists but the guard doesn't match with the registered guard
           ;        => To be sure, we don't charge the royalty
-          (if (and (>= royalty-amount 0.0) (= creator-g current-creator-g))
+          (if (and (> royalty-amount 0.0) (= creator-g current-creator-g))
               (let ((_ 0))
-                (install-capability (currency::TRANSFER escrow creator-a royalty-amount))
+                (install-capability (currency::TRANSFER escrow creator-a escrow-balance))
                 (currency::transfer-create escrow creator-a creator-g royalty-amount)
                 true)
               false))))
