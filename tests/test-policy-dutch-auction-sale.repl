@@ -63,14 +63,14 @@
 (env-data {'marmalade_sale: {'sale_type:"dutch_auction", 'currency:coin },
            'marmalade_dutch_quote: {'recipient:"", 'start_price:-100.0, 'end_price:1.0, 'end_time:(time "2023-01-05T00:00:00Z")  }})
 
-(expect-failure "bad price" "price must be positive"
+(expect-failure "bad price" "Price out of range"
   (sale "t:jH6cLnR-L_tehD874FGubaGQ0zx9BTxzlh8ENcXqWxc" "alice" 0.1 (time "2023-06-01T00:00:00Z")))
 
 ; Try with a bad end-price
 (env-data {'marmalade_sale: {'sale_type:"dutch_auction", 'currency:coin },
            'marmalade_dutch_quote: {'recipient:"", 'start_price:100.0, 'end_price:-1.0, 'end_time:(time "2023-01-05T00:00:00Z")  }})
 
-(expect-failure "bad price" "price must be positive"
+(expect-failure "bad price" "Price out of range"
   (sale "t:jH6cLnR-L_tehD874FGubaGQ0zx9BTxzlh8ENcXqWxc" "alice" 0.1 (time "2023-06-01T00:00:00Z")))
 
 ; Try with an unknown account

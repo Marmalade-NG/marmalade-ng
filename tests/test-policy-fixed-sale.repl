@@ -60,7 +60,7 @@
 (env-data {'marmalade_sale: {'sale_type:"fixed", 'currency:coin },
            'marmalade_fixed_quote: {'recipient:"alice", 'price:-3.0 }})
 
-(expect-failure "bad price" "price must be positive"
+(expect-failure "bad price" "Price out of range"
   (sale "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice" 0.1 (time "2023-06-01T00:00:00Z")))
 
 ; Try with an unknown account

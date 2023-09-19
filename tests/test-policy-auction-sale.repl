@@ -57,7 +57,7 @@
 (env-data {'marmalade_sale: {'sale_type:"auction", 'currency:coin },
            'marmalade_auction: {'recipient:"alice", 'start_price:-10.0, 'increment_ratio:1.1 }})
 
-(expect-failure "bad price" "price must be positive"
+(expect-failure "bad price" "Price out of range"
   (sale "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8" "alice" 0.1 (time "2023-06-01T00:00:00Z")))
 
 ; Try with an unknown account
