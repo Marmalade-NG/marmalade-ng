@@ -26,6 +26,7 @@
   (defschema auction-sch
     sale-id:string
     token-id:string
+    seller:string
     amount:decimal
     escrow-account:string
     currency:module{fungible-v2}
@@ -147,7 +148,8 @@
           ; Insert the quote into the DB.
           (insert auctions (pact-id) {'sale-id: (pact-id),
                                       'token-id: (at 'id token),
-                                      'amount:amount,
+                                      'seller: seller,
+                                      'amount: amount,
                                       'escrow-account: (auction-escrow (pact-id)),
                                       'currency: currency,
                                       'start-price: start-price,
@@ -295,6 +297,11 @@
     @doc "Return all active sales managed by this policy"
     (select auctions (and? (where 'timeout (is-future))
                            (where 'enabled (= true)))))
+
+  (defun get-sales-from-account:[object{auction-sch}] (account:string)
+   @doc "Return all currently active sales from an account"
+   (select auctions (and? (where 'enabled (=  true))
+                          (where 'seller (= account)))))
 
   (defun get-ended-sales:[object{auction-sch}] ()
     @doc "Return the ended sales (timeout elapsed), but not settled"

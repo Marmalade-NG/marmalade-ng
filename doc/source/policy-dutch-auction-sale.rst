@@ -97,6 +97,7 @@ Return the sale details of a given sale-id.
    "escrow-account": "c:uZK0n0opPMtEMAOctKX2S-nNa3KCotC9TBQCnXPOYeY",
    "recipient": "alice",
    "sale-id": "vGA9N7tLIhStJCwKPqWvlXJ5cCDkgLPh8pfhgilLPas",
+   "seller": "alice",
    "seller-guard": KeySet {keys: [alice-key],pred: keys-all},
    "start-price": 100.0,"start-time": "2023-01-01T00:00:00Z",
    "timeout": "2023-06-01T00:00:00Z",
@@ -127,11 +128,61 @@ Return all the active sales details for a given token.
    "escrow-account": "c:uZK0n0opPMtEMAOctKX2S-nNa3KCotC9TBQCnXPOYeY",
    "recipient": "alice",
    "sale-id": "vGA9N7tLIhStJCwKPqWvlXJ5cCDkgLPh8pfhgilLPas",
+   "seller": "alice",
    "seller-guard": KeySet {keys: [alice-key],pred: keys-all},
    "start-price": 100.0,"start-time": "2023-01-01T00:00:00Z",
    "timeout": "2023-06-01T00:00:00Z",
    "token-id": "t:jH6cLnR-L_tehD874FGubaGQ0zx9BTxzlh8ENcXqWxc"
   }]
+
+.. _POLICY-DUTCH-AUCTION-SALE-GET-SALES-FROM-ACCOUNT:
+
+get-sales-from-account
+~~~~~~~~~~~~~~~~~~~~~~
+*account* ``string`` *→* ``[object{quote-sch}]``
+
+Return all the active sales details initiated by a given account.
+
+**Important**: Local only function. Do not use in transactions
+
+
+.. code:: lisp
+
+  (use marmalade-ng.policy-dutch-auction-sale)
+  (get-sales-from-account "alice")
+
+.. code-block::
+
+  [{"amount": 0.1,
+   "currency": coin,
+   "enabled": true,
+   "end-price": 1.0,
+   "end-time": "2023-01-05T00:00:00Z",
+   "escrow-account": "c:uZK0n0opPMtEMAOctKX2S-nNa3KCotC9TBQCnXPOYeY",
+   "recipient": "alice",
+   "sale-id": "vGA9N7tLIhStJCwKPqWvlXJ5cCDkgLPh8pfhgilLPas",
+   "seller": "alice",
+   "seller-guard": KeySet {keys: [alice-key],pred: keys-all},
+   "start-price": 100.0,"start-time": "2023-01-01T00:00:00Z",
+   "timeout": "2023-06-01T00:00:00Z",
+   "token-id": "t:jH6cLnR-L_tehD874FGubaGQ0zx9BTxzlh8ENcXqWxc"
+   },
+
+   {"amount": 0.1,
+    "currency": coin,
+    "enabled": true,
+    "end-price": 1.0,
+    "end-time": "2023-01-05T00:00:00Z",
+    "escrow-account": "c:RofYomFLW13xvivg2XjN3MykJG_1hNRfDvV4W2DjdNU",
+    "recipient": "alice",
+    "sale-id": "MdXO502ljyF-O6YJV-ODmTuhqFF2Zn6Wa0ONQZu1P8o",
+    "seller": "alice",
+    "seller-guard": KeySet {keys: [alice-key],pred: keys-all},
+    "start-price": 100.0,"start-time": "2023-01-01T00:00:00Z",
+    "timeout": "2023-06-01T00:00:00Z",
+    "token-id": "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM"
+   }]
+
 
 get-all-active-sales
 ~~~~~~~~~~~~~~~~~~~~
@@ -157,6 +208,7 @@ Return all the active sales details.
    "escrow-account": "c:uZK0n0opPMtEMAOctKX2S-nNa3KCotC9TBQCnXPOYeY",
    "recipient": "alice",
    "sale-id": "vGA9N7tLIhStJCwKPqWvlXJ5cCDkgLPh8pfhgilLPas",
+   "seller": "alice",
    "seller-guard": KeySet {keys: [alice-key],pred: keys-all},
    "start-price": 100.0,"start-time": "2023-01-01T00:00:00Z",
    "timeout": "2023-06-01T00:00:00Z",
@@ -171,6 +223,7 @@ Return all the active sales details.
     "escrow-account": "c:RofYomFLW13xvivg2XjN3MykJG_1hNRfDvV4W2DjdNU",
     "recipient": "alice",
     "sale-id": "MdXO502ljyF-O6YJV-ODmTuhqFF2Zn6Wa0ONQZu1P8o",
+    "seller": "alice",
     "seller-guard": KeySet {keys: [alice-key],pred: keys-all},
     "start-price": 100.0,"start-time": "2023-01-01T00:00:00Z",
     "timeout": "2023-06-01T00:00:00Z",

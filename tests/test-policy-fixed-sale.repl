@@ -79,6 +79,10 @@
 
 (expect-that "It should exist 1 active sale" (compose (length) (= 1)) (get-all-active-sales))
 (expect-that "It should exist 1 active sale" (compose (length) (= 1)) (get-sales-for-token "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM"))
+(expect-that "It should exist 1 active sale from alice" (compose (length) (= 1)) (get-sales-from-account "alice"))
+(expect-that "It should exist 0 active sale from bob" (compose (length) (= 0)) (get-sales-from-account "bob"))
+
+
 
 (print (+ "Escrow account: => " (at 'escrow-account (get-sale (tx-hash)))))
 
@@ -143,6 +147,8 @@
 
 (expect-that "It should exist 0 active sale" (compose (length) (= 0)) (get-all-active-sales))
 (expect-that "It should exist 0 active sale" (compose (length) (= 0)) (get-sales-for-token "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM"))
+(expect-that "It should exist 0 active sale from alice" (compose (length) (= 0)) (get-sales-from-account "alice"))
+
 (commit-tx)
 
 

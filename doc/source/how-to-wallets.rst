@@ -17,6 +17,23 @@ The list of tokens can simply be retrieved from the ledger using the `list-balan
      {"balance":1,"id":"t:gvCLwzNLVtZzF2KHEQjUb3pEpyz0iCsXb8ovzfIrPrU"},
      {"balance":1,"id":"t:rJsiA4_qhpNtKgsPtjDzxRo6pvGIB21EMHRLmatjyDg"}]
 
+Retrieving the list of tokens being currently sold by an account
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In Marmalade-NG, when being put in sale, tokens are transferred to escrow accounts.
+
+As consequence, they don't appear anymore in the results given by ``(list-balances)``.
+
+The wallet could retrieve these "hidden" tokens using the ``(get-sales-from-account)`` function
+of the sales policies:
+:ref:`POLICY-FIXED-SALE-GET-SALES-FROM-ACCOUNT`, :ref:`POLICY-AUCTION-SALE-GET-SALES-FROM-ACCOUNT`, :ref:`POLICY-DUTCH-AUCTION-SALE-GET-SALES-FROM-ACCOUNT`
+
+.. code-block:: lisp
+
+  (free.util-lists.chain [
+    (marmalade-ng.policy-fixed-sale.get-sales-from-account "k:a2eef345a1084d4cd095d172d429152767d30f496d9af30ad54922fdca1b3a76"),
+    (marmalade-ng.policy-auction-sale.get-sales-from-account "k:a2eef345a1084d4cd095d172d429152767d30f496d9af30ad54922fdca1b3a76"),
+    (marmalade-ng.policy-dutch-auction-sale.get-sales-from-account "k:a2eef345a1084d4cd095d172d429152767d30f496d9af30ad54922fdca1b3a76")
+  ])
 
 
 Retrieve information about a token

@@ -137,6 +137,7 @@ Return the sale details of a given sale-id.
    "increment-ratio": 1.1,
    "recipient": "alice",
    "sale-id": "",
+   "seller: "alice",
    "start-price": 10.0,
    "timeout": "2023-06-01T00:00:00Z",
    "token-id": "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8"
@@ -166,10 +167,62 @@ Return the sale details of a given sale-id.
        "increment-ratio": 1.1,
        "recipient": "alice",
        "sale-id": "",
+       "seller: "alice",
        "start-price": 10.0,
        "timeout": "2023-06-01T00:00:00Z",
        "token-id": "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8"
       }]
+
+
+.. _POLICY-AUCTION-SALE-GET-SALES-FROM-ACCOUNT:
+
+get-sales-from-account
+~~~~~~~~~~~~~~~~~~~~~~~
+*account* ``string`` *→* ``[object{auction-sch}]``
+
+Return all the active sales details initiated by a given account.
+
+**Important**: Local only function. Do not use in transactions
+
+
+.. code:: lisp
+
+  (use marmalade-ng.policy-auction-sale)
+  (get-sales-from-account "alice")
+
+.. code-block::
+
+  [{"amount": 0.1,
+     "currency": coin,
+     "current-buyer": "",
+     "current-price": 0.0,
+     "enabled": true,
+     "escrow-account": "c:09-juxzBu412pfsgBlM6Au7fOnwvSsX78Er66vnC6sI",
+     "increment-ratio": 1.1,
+     "recipient": "alice",
+     "sale-id": "",
+     "seller: "alice",
+     "start-price": 10.0,
+     "timeout": "2023-06-01T00:00:00Z",
+     "token-id": "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8"
+    },
+
+   {"amount": 0.5,
+    "currency": coin,
+    "current-buyer": "",
+    "current-price": 0.0,
+    "enabled": true,
+    "escrow-account": "c:_xRzg2I2WJu1hov-d8HmuKGq0Kxr5hndunDnkbFpu0Q",
+    "increment-ratio": 1.1,
+    "recipient": "alice",
+    "sale-id": "DmxMgittQd4Duf0WQdeySZkx_I4yvQ3phecLpWMzmw8",
+    "seller: "alice",
+    "start-price": 10.0,
+    "timeout": "2023-06-01T00:00:00Z",
+    "token-id": "t:sMd0A3s6ZoiHd0RCzZ3XqVcTmOcoNvi73hl1gWXUMSA"}
+  ]
+
+
 
 .. _POLICY-AUCTION-SALE-GET-ALL-ACTIVE-SALES:
 
@@ -198,6 +251,7 @@ Return all the active sales details.
      "increment-ratio": 1.1,
      "recipient": "alice",
      "sale-id": "",
+     "seller: "alice",
      "start-price": 10.0,
      "timeout": "2023-06-01T00:00:00Z",
      "token-id": "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8"
@@ -212,6 +266,7 @@ Return all the active sales details.
     "increment-ratio": 1.1,
     "recipient": "alice",
     "sale-id": "DmxMgittQd4Duf0WQdeySZkx_I4yvQ3phecLpWMzmw8",
+    "seller: "alice",
     "start-price": 10.0,
     "timeout": "2023-06-01T00:00:00Z",
     "token-id": "t:sMd0A3s6ZoiHd0RCzZ3XqVcTmOcoNvi73hl1gWXUMSA"}

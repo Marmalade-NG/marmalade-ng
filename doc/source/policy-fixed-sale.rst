@@ -108,10 +108,41 @@ Return the sale details of a given sale-id.
    "price": 5.0,
    "recipient": "k:91c9fc1e6943613eb7017e895a15b5147d273a2e1b1450d27ea67139b8a1b336",
    "sale-id": "vGA9N7tLIhStJCwKPqWvlXJ5cCDkgLPh8pfhgilLPas",
+   "seller": "k:91c9fc1e6943613eb7017e895a15b5147d273a2e1b1450d27ea67139b8a1b336",
    "seller-guard": KeySet {keys: ["91c9fc1e6943613eb7017e895a15b5147d273a2e1b1450d27ea67139b8a1b336"],pred: keys-all},
    "timeout": "2023-06-01T00:00:00Z",
    "token-id": "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM"
    }
+
+.. _POLICY-FIXED-SALE-GET-SALES-FROM-ACCOUNT:
+
+get-sales-from-account
+~~~~~~~~~~~~~~~~~~~~~~
+*account* ``string`` *→* ``[object{quote-sch}]``
+
+Return all the active sales details initiated by a given account.
+
+**Important**: Local only function. Do not use in transactions
+
+.. code:: lisp
+
+  (use marmalade-ng.policy-fixed-sale)
+  (get-sales-from-account "k:91c9fc1e6943613eb7017e895a15b5147d273a2e1b1450d27ea67139b8a1b336")
+
+.. code-block::
+
+  [{"amount": 0.1,
+   "enabled": true,
+   "escrow-account": "c:uZK0n0opPMtEMAOctKX2S-nNa3KCotC9TBQCnXPOYeY",
+   "fungible": coin,
+   "price": 5.0,
+   "recipient": "k:91c9fc1e6943613eb7017e895a15b5147d273a2e1b1450d27ea67139b8a1b336",
+   "sale-id": "vGA9N7tLIhStJCwKPqWvlXJ5cCDkgLPh8pfhgilLPas",
+   "seller": "k:91c9fc1e6943613eb7017e895a15b5147d273a2e1b1450d27ea67139b8a1b336",
+   "seller-guard": KeySet {keys: ["91c9fc1e6943613eb7017e895a15b5147d273a2e1b1450d27ea67139b8a1b336"],pred: keys-all},
+   "timeout": "2023-06-01T00:00:00Z",
+   "token-id": "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM"
+   }]
 
 
 get-sales-for-token
@@ -136,6 +167,7 @@ Return all the active sales details for a given token.
    "price": 5.0,
    "recipient": "k:91c9fc1e6943613eb7017e895a15b5147d273a2e1b1450d27ea67139b8a1b336",
    "sale-id": "vGA9N7tLIhStJCwKPqWvlXJ5cCDkgLPh8pfhgilLPas",
+   "seller": "k:91c9fc1e6943613eb7017e895a15b5147d273a2e1b1450d27ea67139b8a1b336",
    "seller-guard": KeySet {keys: ["91c9fc1e6943613eb7017e895a15b5147d273a2e1b1450d27ea67139b8a1b336"],pred: keys-all},
    "timeout": "2023-06-01T00:00:00Z",
    "token-id": "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM"
@@ -167,6 +199,7 @@ Return all the active sales details.
    "price": 5.0,
    "recipient": "k:91c9fc1e6943613eb7017e895a15b5147d273a2e1b1450d27ea67139b8a1b336",
    "sale-id": "vGA9N7tLIhStJCwKPqWvlXJ5cCDkgLPh8pfhgilLPas",
+   "seller": "k:91c9fc1e6943613eb7017e895a15b5147d273a2e1b1450d27ea67139b8a1b336",
    "seller-guard": KeySet {keys: ["91c9fc1e6943613eb7017e895a15b5147d273a2e1b1450d27ea67139b8a1b336"],pred: keys-all},
    "timeout": "2023-06-01T00:00:00Z",
    "token-id": "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM"
@@ -179,7 +212,8 @@ Return all the active sales details.
     "price": 8.0,
     "recipient": "k:91c9fc1e6943613eb7017e895a15b5147d273a2e1b1450d27ea67139b8a1b336",
     "sale-id": "MdXO502ljyF-O6YJV-ODmTuhqFF2Zn6Wa0ONQZu1P8o",
-    "seller-guard": KeySet {keys: ["91c9fc1e6943613eb7017e895a15b5147d273a2e1b1450d27ea67139b8a1b336"],pred: keys-all},
+    "seller": "k:5389405a22b8376211f2c98bc79e72a9b9b0533da5c3c28f0c2f0b3882a95e78",
+    "seller-guard": KeySet {keys: ["5389405a22b8376211f2c98bc79e72a9b9b0533da5c3c28f0c2f0b3882a95e78"],pred: keys-all},
     "timeout": "2023-06-01T00:00:00Z",
     "token-id": "t:2Q74RY998p-_uKdehMLFKeLN6erO5GRTkTS3vAWdzhg"
     }]

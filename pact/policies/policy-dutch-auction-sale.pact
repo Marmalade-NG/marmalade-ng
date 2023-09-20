@@ -26,6 +26,7 @@
   (defschema quote-sch
     sale-id:string
     token-id:string
+    seller:string
     seller-guard:guard
     amount:decimal
     escrow-account:string
@@ -139,6 +140,7 @@
             ; Insert teh quote intor the DB.
             (insert quotes (pact-id) {'sale-id: (pact-id),
                                       'token-id: (at 'id token),
+                                      'seller: seller,
                                       'seller-guard: (account-guard (at 'id token) seller),
                                       'amount:amount,
                                       'escrow-account: (ledger.escrow),
@@ -217,6 +219,11 @@
   (defun get-all-active-sales:[object{quote-sch}] ()
     @doc "Returns all currently active sales"
     (select quotes (where 'enabled (=  true))))
+
+  (defun get-sales-from-account:[object{quote-sch}] (account:string)
+    @doc "Return all currently active sales from an account"
+    (select quotes (and? (where 'enabled (=  true))
+                         (where 'seller (= account)))))
 
   (defun get-sales-for-token:[object{quote-sch}] (token-id:string)
     @doc "Returns all currently actives sales related to a token"
