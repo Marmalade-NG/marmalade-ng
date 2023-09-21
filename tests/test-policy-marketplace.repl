@@ -81,6 +81,24 @@
 (commit-tx)
 
 
+(begin-tx "Sale 1 withdraw")
+(env-hash (hash "fixed-sale-1-buy"))
+(use marmalade-ng.ledger)
+(use marmalade-ng.policy-fixed-sale)
+
+; Force withdraw signature is necessary to withdraw a no-timeout sale
+(env-sigs [ {'key:"alice-key", 'caps:[(FORCE-WITHDRAW (hash  "fixed-sale-1"))]}
+           ])
+
+(ev-analyzer.store (env-events true))
+(continue-pact 0 true (hash  "fixed-sale-1"))
+(ev-analyzer.store (env-events true))
+
+(expect "No market place => No event" false (ev-analyzer.is-present "MARKETPLACE-PAID"))
+(rollback-tx)
+
+;=> Rollback and and buy
+
 (begin-tx "Sale 1 buy")
 (env-hash (hash "fixed-sale-1-buy"))
 (use marmalade-ng.ledger)
@@ -267,6 +285,26 @@
 (commit-tx)
 
 
+; => We try to rollback sale-2
+(begin-tx "Sale 1 withdraw")
+(env-hash (hash "fixed-sale-1-buy"))
+(use marmalade-ng.ledger)
+(use marmalade-ng.policy-fixed-sale)
+
+; Force withdraw signature is necessary to withdraw a no-timeout sale
+(env-sigs [ {'key:"alice-key", 'caps:[(FORCE-WITHDRAW (hash  "fixed-sale-2"))]}
+           ])
+
+(ev-analyzer.store (env-events true))
+(continue-pact 0 true (hash  "fixed-sale-2"))
+(ev-analyzer.store (env-events true))
+
+(expect "No market place => No event" false (ev-analyzer.is-present "MARKETPLACE-PAID"))
+(expect "Check that the marketplace balance is still 0" 0.0 (coin.get-balance "r.user.best-market"))
+(rollback-tx)
+
+;=> Rollback and and buy
+
 (begin-tx "Sale 2 buy")
 (env-hash (hash "fixed-sale-2-buy"))
 (use marmalade-ng.ledger)
@@ -293,6 +331,7 @@
 ; Check the KDA balances
 (expect "Final balance should be 1005.0 + 4.5"  1009.5 (coin.get-balance "alice"))
 (expect "Final balance should be 995 - 5 " 990.0 (coin.get-balance "bob"))
+(expect "Check that the marketplace balance is now 0.5" 0.5 (coin.get-balance "r.user.best-market"))
 (commit-tx)
 
 
@@ -308,6 +347,7 @@
 ; Check the KDA balances
 (expect "Final balance should be 1005.0 + 4.5 + 4.0"  1013.5 (coin.get-balance "alice"))
 (expect "Final balance should be 995 - 5 -5" 985.0 (coin.get-balance "bob"))
+(expect "Check that the marketplace balance is now 1.5" 1.5 (coin.get-balance "r.user.best-market"))
 (commit-tx)
 
 (begin-tx "Sale 4 buy")
@@ -322,6 +362,7 @@
 ; Check the KDA balances
 (expect "Final balance should be 1005.0 + 4.5 + 4.0 + 4.8"  1018.3 (coin.get-balance "alice"))
 (expect "Final balance should be 995 - 5 -5 -5" 980.0 (coin.get-balance "bob"))
+(expect "Check that the marketplace balance is now 1.7" 1.7 (coin.get-balance "r.user.best-market"))
 (commit-tx)
 
 

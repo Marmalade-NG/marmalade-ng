@@ -120,7 +120,12 @@
 
   (defun enforce-sale-withdraw:bool (token:object{token-info})
     (require-capability (ledger.POLICY-ENFORCE-WITHDRAW token (pact-id) policy-marketplace))
-    (update marketplace-sales (pact-id) {'enabled: false})
+    ; Check whether marketplace policy has been activated for this sale
+    (with-default-read marketplace-sales (pact-id) {'marketplace-hash:"DEFAULT-HASH"} {'marketplace-hash:=mh}
+      (if (!= mh "DEFAULT-HASH")
+          ; If yes, flag the sale as disabled (=ended)
+          (update marketplace-sales (pact-id) {'enabled: false})
+          ""))
     true
   )
 
