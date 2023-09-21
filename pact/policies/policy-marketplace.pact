@@ -29,7 +29,7 @@
   ; Events
   ;-----------------------------------------------------------------------------
   (defcap MARKETPLACE-PAID (token-id:string marketplace-account:string marketplace-hash:string amount:decimal)
-    @doc "Event emitted when a fee is paid to the market-place"
+    @doc "Event emitted when a fee is paid to the marketplace"
     @event
     true)
 

@@ -473,15 +473,15 @@
         (enforce-valid-account seller)
 
         ; Check that the timeout is NO-TIMEOUT or in the future
-        ; A policy may dp additional checks on this timeout
+        ; A policy may do additional checks on this timeout
         (enforce (or? (is-future) (= NO-TIMEOUT) timeout) "Timeout must be in future")
 
         ; Call the policies => All the returns values are ORed using fold.
-        ; This ensures that at least one policy has handled the sale
+        ; This ensures that at least one policy has handled the sale.
         (let ((offer-handled (fold (or) false (map (call-policy) policies))))
           (enforce offer-handled "No policy to handle the offer"))
 
-        ; Transfer the token to the escorw account
+        ; Transfer the token to the escrow account
         (with-capability (SALE id seller amount timeout (pact-id))
           (let ((snd-bal (debit id seller amount))
                 (rcv-bal (credit id (escrow) (escrow-guard) amount)))
