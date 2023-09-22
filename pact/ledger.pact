@@ -316,10 +316,10 @@
       (map (call-policy) _policies)
       ; Insert the token into the database
       (insert tokens id {'id: id,
-                               'uri: uri,
-                               'precision: precision,
-                               'supply: 0.0,
-                               'policies: _policies})
+                         'uri: uri,
+                         'precision: precision,
+                         'supply: 0.0,
+                         'policies: _policies})
       ; And emit the corresponding event
       (emit-event (TOKEN-CREATE id uri precision _policies)))
   )
