@@ -5,7 +5,7 @@ code: |-
 
   (let* ((ks (read-keyset 'ks-creator))
          (collection-id (create-collection-id "{{collection-name}}" ks)))
-    (create-collection collection-id "{{collection-name}}" 0 ks)
+    (create-collection collection-id "{{collection-name}}" 0 "{{collection-creator}}" ks)
     collection-id
   )
 
