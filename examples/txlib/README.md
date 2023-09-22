@@ -52,6 +52,10 @@
 - Mint a token created with the previous template
 - Needed signatures : ``gas-payer-key``, ``creator-key``
 
+**creation-minting/batch-minting.tkpl:**
+- Create and mint a collection of 20 NFTS in a single transaction
+- Needed signatures : ``gas-payer-key``, ``collection-key``, , ``tmp-key``
+
 **fixed-sale/fixed-sale.tkpl:**
 - Start a fixed quote sale
 - Needed signatures : ``gas-payer-key``, ``seller-XX.key``

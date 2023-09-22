@@ -1,0 +1,101 @@
+# This template create/mints a batch of 20 NFTS in a single transaction
+#
+# This template shows some interesting features:
+#   - How a policy list can easily be defined directly in the data section
+#   - How the list of URI can be defined too in the data section.
+#   - How (zip) and (map) can be used to create/mint a list of NFT
+#
+# Do not use as is, since the URIs list is defined in the template
+# A collection-key is needed with a signature
+code: |-
+  (use {{namespace}}.ledger)
+  (use {{namespace}}.std-policies)
+
+  (let* ((policies (list-to-policies (read-msg 'policies)))
+         (tmp-guard (read-keyset 'ks-tmp))
+         (receiver (read-string 'receiver))
+         (receiver-guard (read-keyset 'ks-receiver))
+         (uris (read-msg 'uris))
+         (token-ids (map (create-token-id tmp-guard) uris)))
+
+    ; Create tokens
+    (zip (lambda (id uri) (create-token id 0 uri policies tmp-guard)) token-ids uris)
+
+    ; Install map capabilities
+    (map (lambda (id) (install-capability (MINT id receiver 1.0))) token-ids)
+
+    ; Mint
+    (map (lambda (id) (mint id receiver receiver-guard 1.0)) token-ids)
+
+    ; Return token IDs
+    token-ids)
+
+data:
+  ks-tmp:
+    - {{tmp-key}}
+  ks-receiver:
+    - {{receiver-key}}
+  receiver: {{receiver}}
+  policies:
+    - COLLECTION
+    - NON-FUNGIBLE
+    - INSTANT-MINT
+    - ROYALTY
+    - DISABLE-TRANSFER
+    - FIXED-SALE
+    - DUTCH-AUCTION-SALE
+    - AUCTION-SALE
+    - MARKETPLACE
+
+  uris:
+    - ipfs://bafybeih7zjcmnig2hka52qtdpgtmczqqrgcg2zahim33trxkb6hza2qkvy #1
+    - ipfs://bafybeid6c3atas6rxp5bsvufk2hgvabbxk3vaubelbkdyomw4tydpo53ge #2
+    - ipfs://bafybeicaflcxpmazk53gmgqbprpf7nsd7whpl74q6rrsozf7s6pz64j3he #3
+    - ipfs://bafybeifuosewgppj55skb4xghkwd4ph75kzsee7pjb2gwvl3oyq6j6mfze #4
+    - ipfs://bafybeigwcsh456zw4bf4tll7y6nbyux4245fojriocqf7wuu2paidb4gi4 #5
+    - ipfs://bafybeienik24zamnu4ommntyuc7bdk2eio7x2tjgepv7pye2pzzsfst5ja #6
+    - ipfs://bafybeifh4zt2cdmp2fh2iim4jnmaj46ods5jbwxz65g7hnsd3ys4k4p3da #7
+    - ipfs://bafybeihujjyqugdz2rcb4qletb2hngidvrfkv267tla6xinhf75gefpzji #8
+    - ipfs://bafybeie6pxposltxddblmkvpjweznihuicelpuu4o4rghvbildt24hwnxa #9
+    - ipfs://bafybeihtpl77au5fyu5rcwpdplrc4fqws5vkr374ibtilwn4egzzoy6lxe #10
+    - ipfs://bafybeiejbgxxmeintghfl6ajneccxeuu7wnj7xpidplndkcsvjjlu5y2pu #11
+    - ipfs://bafybeicbwsx7nuvx2ywcbjdvpixdxwqsodq4kb6uww7hd7pfkn7mtvpzsu #12
+    - ipfs://bafybeigb3uvr2dfowk7c2sqzvligwye5dhr4c4z56pvfaalxnlp3hqlfli #13
+    - ipfs://bafybeiddnlssue5idvsjjxajhb2u7b5q43iuuqfhpbo7uf4djgzoay26wy #14
+    - ipfs://bafybeiawnk7bdsqx3yvdau3e5dlub7ye7yzqqc6tcuyonaj3dh2xbujreq #15
+    - ipfs://bafybeifadtdc63hig3ymnogftwp65oolwsv7kipdqdaliairqkh4jyyk74 #16
+    - ipfs://bafybeiae6trpxbuuxfh5qc3mxnugfdzkxeu7hb4nutxgetlh7i7ptlau5a #17
+    - ipfs://bafybeih7u6gxwr2illc67n46eks6gx7gllephhgwdxyytqigccfzzqx6f4 #18
+    - ipfs://bafybeia4blsv4ibxkbxv7jgxcyfpwcnrenjefj2mxi6kwn25cp6jz2f2ke #19
+    - ipfs://bafybeicrbwllwkjtqdvmh6hyy55fy4hsae2h7wmyfeg5jj5oblnjf4xl2e #20
+
+
+  marmalade_collection:
+    id: {{collection-id}}
+
+  marmalade_royalty:
+    creator_acct: {{creator}}
+    creator_guard:
+      pred: keys-all
+      keys:
+        - {{creator-key}}
+    rate: 0.1
+publicMeta:
+  chainId: "{{chain}}"
+  sender: {{gas-payer}}
+  gasLimit: 140000
+  gasPrice: 0.00000001
+  ttl: 7200
+networkId: "{{network}}"
+signers:
+  - public: {{gas-payer-key}}
+    caps:
+      - name: "coin.GAS"
+        args: []
+  - public: {{collection-key}}
+    caps: []
+  - public: {{tmp-key}}
+    caps:
+      - name: "{{namespace}}.ledger.ENFORCE-RESERVED"
+        args: []
+type: exec
