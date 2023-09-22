@@ -13,43 +13,71 @@
 (use marmalade-ng.policy-collection)
 
 (env-data {'dogs-ks:["dogs-owner-key"],
-           'cats-ks:["cats-owner-key"] })
+           'cats-ks:["cats-owner-key"],
+           'pigs-ks:["pigs-owner-key"]})
 
-(print (+ "Collection ID: => "
+; Create a defined keysit to test Pigs
+(namespace "user")
+(define-keyset "user.PigsLover" (read-keyset 'pigs-ks))
+(namespace "")
+
+(print (+ "Dogs Collection ID: => "
           (create-collection-id "Dogs" (read-keyset 'dogs-ks))))
 
-(print (+ "Collection ID: => "
+(print (+ "Cats Collection ID: => "
           (create-collection-id "Cats" (read-keyset 'cats-ks))))
+
+(print (+ "SmallPigs Collection ID: => "
+          (create-collection-id "SmallPigs" (keyset-ref-guard "user.PigsLover"))))
+
+(print (+ "BigPigs Collection ID: => "
+          (create-collection-id "BigsPigs" (keyset-ref-guard "user.PigsLover"))))
 
 ; try to create without signature
 (expect-failure "No keys" "Keyset failure"
-                (create-collection "c_Dogs_8BRJPRYtqM-2w8ASMYq6Toq4PIvhws-kHh0nbYfT1iY" "Dogs" 3 (read-keyset 'dogs-ks)))
+                (create-collection "c_Dogs_8BRJPRYtqM-2w8ASMYq6Toq4PIvhws-kHh0nbYfT1iY" "Dogs" 3 "DogsLover" (read-keyset 'dogs-ks)))
 
 ; Try with a bad id
 (env-sigs [{'key:"dogs-owner-key", 'caps:[]}])
 (expect-failure "No keys" "does not match"
-                (create-collection "c_Dogs_bad_id" "Dogs" 3 (read-keyset 'dogs-ks)))
+                (create-collection "c_Dogs_bad_id" "Dogs" 3 "DogsLover" (read-keyset 'dogs-ks)))
 
 ; Test with a bad size
 (expect-failure "negative size" "Collection size must be positive and less than"
-                (create-collection "c_Dogs_8BRJPRYtqM-2w8ASMYq6Toq4PIvhws-kHh0nbYfT1iY" "Dogs" -4 (read-keyset 'dogs-ks)))
+                (create-collection "c_Dogs_8BRJPRYtqM-2w8ASMYq6Toq4PIvhws-kHh0nbYfT1iY" "Dogs" -4 "DogsLover" (read-keyset 'dogs-ks)))
 
 (expect-failure "huge size" "Collection size must be positive and less than"
-                (create-collection "c_Dogs_8BRJPRYtqM-2w8ASMYq6Toq4PIvhws-kHh0nbYfT1iY" "Dogs" 100000000000000000 (read-keyset 'dogs-ks)))
+                (create-collection "c_Dogs_8BRJPRYtqM-2w8ASMYq6Toq4PIvhws-kHh0nbYfT1iY" "Dogs" 100000000000000000 "DogsLover" (read-keyset 'dogs-ks)))
 
 
 ; Now evrything good
-(create-collection "c_Dogs_8BRJPRYtqM-2w8ASMYq6Toq4PIvhws-kHh0nbYfT1iY" "Dogs" 2 (read-keyset 'dogs-ks))
+(create-collection "c_Dogs_8BRJPRYtqM-2w8ASMYq6Toq4PIvhws-kHh0nbYfT1iY" "Dogs" 2 "DogsLover" (read-keyset 'dogs-ks))
 (env-sigs [{'key:"cats-owner-key", 'caps:[]}])
 
 
 (env-events true)
-(create-collection "c_Cats_ZMLLJuSq0JoHSR4f_ZgUa2H_p7Rr71CN8CjQ7ZL_hU0" "Cats" 0 (read-keyset 'cats-ks))
+(create-collection "c_Cats_ZMLLJuSq0JoHSR4f_ZgUa2H_p7Rr71CN8CjQ7ZL_hU0" "Cats" 0 "CatsLover" (read-keyset 'cats-ks))
 (ev-analyzer.store (env-events true))
 
-(print (ev-analyzer.get-names))
 (expect "Event CREATE-COLLECTION has been emitted" true (ev-analyzer.is-present "CREATE-COLLECTION"))
-(expect "CREATE COLLECTION good params" ["c_Cats_ZMLLJuSq0JoHSR4f_ZgUa2H_p7Rr71CN8CjQ7ZL_hU0" "Cats" 0] (ev-analyzer.params "CREATE-COLLECTION"))
+(expect "CREATE COLLECTION good params" ["c_Cats_ZMLLJuSq0JoHSR4f_ZgUa2H_p7Rr71CN8CjQ7ZL_hU0" "Cats" 0 "CatsLover"] (ev-analyzer.params "CREATE-COLLECTION"))
+
+
+; Try princapals creator with the pigs collection
+
+
+(env-sigs [{'key:"pigs-owner-key", 'caps:[]}])
+; Try with a principal account that doesn't match to the guard
+(expect-failure "Bad principal owner name" "Reserved protocol guard violation"
+                (create-collection "c_SmallPigs_OpMyaBMEuVD9flzeMZ7gHNk2xEH3HU8yDGib4w3S5gs" "SmallPigs" 0 "r:user.PigsHater" (keyset-ref-guard "user.PigsLover")))
+
+(expect-failure "Bad principal owner name" "Reserved protocol guard violation"
+                (create-collection "c_SmallPigs_OpMyaBMEuVD9flzeMZ7gHNk2xEH3HU8yDGib4w3S5gs" "SmallPigs" 0 "r:user.PigsLover" (read-keyset 'pigs-ks)))
+
+
+(create-collection "c_SmallPigs_OpMyaBMEuVD9flzeMZ7gHNk2xEH3HU8yDGib4w3S5gs" "SmallPigs" 0 "r:user.PigsLover" (keyset-ref-guard "user.PigsLover"))
+
+(create-collection "c_BigsPigs_lZnDio-8EqbWxznH2r0v7q1iB_QRjfSWFrBp9Xj-Prc" "BigsPigs" 0 "r:user.PigsLover" (keyset-ref-guard "user.PigsLover"))
 
 (commit-tx)
 
@@ -138,9 +166,24 @@
 (begin-tx)
 (use marmalade-ng.policy-collection)
 
-(expect "Get all collections" ["c_Cats_ZMLLJuSq0JoHSR4f_ZgUa2H_p7Rr71CN8CjQ7ZL_hU0",
-                               "c_Dogs_8BRJPRYtqM-2w8ASMYq6Toq4PIvhws-kHh0nbYfT1iY"]
-        (get-all-collections))
+(expect-that "Get all collections" (compose (sort) (= ["c_BigsPigs_lZnDio-8EqbWxznH2r0v7q1iB_QRjfSWFrBp9Xj-Prc",
+                                                       "c_Cats_ZMLLJuSq0JoHSR4f_ZgUa2H_p7Rr71CN8CjQ7ZL_hU0",
+                                                       "c_Dogs_8BRJPRYtqM-2w8ASMYq6Toq4PIvhws-kHh0nbYfT1iY",
+                                                       "c_SmallPigs_OpMyaBMEuVD9flzeMZ7gHNk2xEH3HU8yDGib4w3S5gs"]))
+             (get-all-collections))
+
+
+(expect-that "Get all collections of Pigs" (compose (map (at 'id)) (compose (sort) (= ["c_BigsPigs_lZnDio-8EqbWxznH2r0v7q1iB_QRjfSWFrBp9Xj-Prc",
+                                                                                       "c_SmallPigs_OpMyaBMEuVD9flzeMZ7gHNk2xEH3HU8yDGib4w3S5gs"])))
+             (get-collections-by-creator "r:user.PigsLover"))
+
+(expect-that "Get all collections of Dogs" (compose (map (at 'id)) (= ["c_Dogs_8BRJPRYtqM-2w8ASMYq6Toq4PIvhws-kHh0nbYfT1iY"]))
+             (get-collections-by-creator "DogsLover"))
+
+(expect-that "Get all collections of Cats" (compose (map (at 'id)) (= ["c_Cats_ZMLLJuSq0JoHSR4f_ZgUa2H_p7Rr71CN8CjQ7ZL_hU0"]))
+             (get-collections-by-creator "CatsLover"))
+
+
 
 (expect-that "Get cat collection" (compose (at 'name) (= "Cats"))
              (get-collection "c_Cats_ZMLLJuSq0JoHSR4f_ZgUa2H_p7Rr71CN8CjQ7ZL_hU0"))
