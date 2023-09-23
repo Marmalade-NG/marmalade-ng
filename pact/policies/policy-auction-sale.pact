@@ -145,7 +145,7 @@
           ; Check that the recipient account is valid and already exists in the currency
           (check-fungible-account currency recipient)
 
-          ; Insert the quote into the DB.
+          ; Insert the quote into the DB
           (insert auctions (pact-id) {'sale-id: (pact-id),
                                       'token-id: (at 'id token),
                                       'seller: seller,
@@ -211,8 +211,8 @@
 
   (defun --enforce-sale-settle:bool (token:object{token-info})
     (require-capability (ledger.POLICY-ENFORCE-SETTLE token (pact-id) policy-auction-sale))
-    ; The settle handler is called in the same transaction as the handler buy
-    ; => Checking the timeout is not necessary
+    ; The (enforce-settle) handler is called in the same transaction
+    ; as the (enforce-buy) handler
     ; Transfer the remaining from the escrow account to the recipient
     (with-read auctions (pact-id) {'currency:=currency:module{fungible-v2},
                                    'recipient:=recipient}
@@ -251,15 +251,15 @@
       (enforce (is-future timeout) "Sale has ended")
       (currency::enforce-unit new-price)
 
-      ; Check that the proposed price is correct
-      ;   - If it is the first bid, it must at least the staring price
+      ; Check that the proposed price is correct:
+      ;   - If it is the first bid, it must be at least the starting price
       ;   - If not is should be at least more than previous_bid * increment-ratio
       (enforce (if (= 0.0 current-price)
                    (>= new-price start-price)
                    (>= new-price (* current-price increment-ratio)))
                "Price too low")
 
-      ; The best way to ensure that everything will work at expected during
+      ; The best way to ensure that everything will work as expected during
       ; settlement is to check that current ledger account already exists  with the declared
       ; guard or create-it. This prevents most risks of being front-runned, account squatting with
       ; token stolen.

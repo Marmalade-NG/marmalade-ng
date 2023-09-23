@@ -134,10 +134,10 @@
 
             (enforce (< end-price start-price) "end-price must be less than start-price")
 
-            ; Check that the recipient account already exist in the currency
+            ; Check that the recipient account already exists in the currency
             (check-fungible-account currency recipient)
 
-            ; Insert teh quote intor the DB.
+            ; Insert the quote into the DB
             (insert quotes (pact-id) {'sale-id: (pact-id),
                                       'token-id: (at 'id token),
                                       'seller: seller,
@@ -189,7 +189,8 @@
     (with-read quotes (pact-id) {'amount:=amount,
                                  'currency:=currency:module{fungible-v2},
                                  'recipient:=recipient}
-      ; The settle handler is called in the same transaction as the handler buy
+      ; The (enforce-settle) handler is called in the same transaction
+      ; as the (enforce-buy) handler
       ; => Checking the timeout is not necessary
       ; Transfer the remaining from the escrow account to the recipient
       (let* ((escrow (ledger.escrow))

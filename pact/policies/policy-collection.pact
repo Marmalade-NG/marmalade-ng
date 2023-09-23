@@ -96,8 +96,6 @@
       (with-capability (ADD-TO-COLLECTION collection-id token-id)
         (with-read collections collection-id {'max-size:=max-size,
                                               'size:=current-size}
-                                              ;'creator-guard:=cg}
-          ;(enforce-guard cg)
           ; max-size=0 means unlimited collection
           (enforce (or? (= 0) (< current-size) max-size) "Exceeds collection size")
 
