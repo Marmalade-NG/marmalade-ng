@@ -243,7 +243,7 @@
                                  'timeout:=timeout,
                                  'enabled:=enabled}
 
-      (enforce enabled "Sale not active")
+      (enforce enabled "Sale disabled")
       (enforce (is-future timeout) "Sale has ended")
       (currency::enforce-unit new-price)
 
