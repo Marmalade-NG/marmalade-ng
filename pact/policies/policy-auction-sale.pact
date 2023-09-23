@@ -97,10 +97,6 @@
     (let ((ended (sale-ended)))
       (enforce ended "Sale not ended")))
 
-  (defun enforce-sale-not-ended:bool ()
-    (let ((not-ended (sale-not-ended)))
-      (enforce not-ended "Sale not ended")))
-
   (defun check-ledger-account:bool (token-id:string account:string guard:guard)
     @doc "Check an account on the Marmalade legder \
         \   - If it already exist, check that the guard does match \
