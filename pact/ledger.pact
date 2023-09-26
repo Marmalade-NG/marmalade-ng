@@ -466,6 +466,11 @@
                                   (with-capability (POLICY-ENFORCE-OFFER token-info (pact-id) m)
                                     (m::enforce-sale-offer token-info seller amount timeout)))))
 
+        ; We doesn't allow nested pacts =>  A parent Pact could manage a "side-contract" allowing
+        ; the buyer and the seller to bypass fees and royalties
+        ; In a nested pact, the pact-id is different than the Tx Hash
+        (enforce (= (tx-hash) (pact-id)) "Nested pact not allowed")
+
         ; Check that the amount is positive and check the decimals
         (enforce-valid-amount (precision id) amount)
 
