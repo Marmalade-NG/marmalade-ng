@@ -223,6 +223,27 @@ Tokens are sorted by rank.
        "t:Axc6q-aWpN9g1u3NveIXaNMOqJ5n_Wsudw4GDnFiZNM"]
 
 
+list-tokens-of-collections
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+*collection-ids* ``[string]`` *→* ``[string]``
+
+List all token-ids belonging to a list of collections.
+
+The order of the tokens in the result list is undefined.
+
+
+**Important**: Local only function. Do not use in transactions.
+
+.. code:: lisp
+
+  (use marmalade-ng.policy-collection)
+  (list-tokens-of-collections ["c_Dogs_8BRJPRYtqM-2w8ASMYq6Toq4PIvhws-kHh0nbYfT1iY",
+                               "c_Cats_ZMLLJuSq0JoHSR4f_ZgUa2H_p7Rr71CN8CjQ7ZL_hU0"])
+    > ["t:C6KzoW9DSYdSbrZuUOazHzlpdA_vtZyiwFo9WTIUhP8",
+       "t:MkygmZK2iaGHuTTmKnzJMke3HcALz8SgTyxnD5A-VkA",
+       "t:Axc6q-aWpN9g1u3NveIXaNMOqJ5n_Wsudw4GDnFiZNM"]
+
+
 Events
 ^^^^^^
 CREATE-COLLECTION

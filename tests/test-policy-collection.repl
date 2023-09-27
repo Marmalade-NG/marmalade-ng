@@ -192,9 +192,16 @@
 (expect-that "Get collection of Cat0" (compose (at 'id) (= "c_Cats_ZMLLJuSq0JoHSR4f_ZgUa2H_p7Rr71CN8CjQ7ZL_hU0"))
                                       (get-token-collection "t:8UUtZdQJTomKPposMzgKLIyr-kXzwVRbUiRnk6ll1GQ"))
 
+
 (expect-that "Get list of Cats tokens" (and? (contains "t:FiEymgltFYwVdXtWJsVlYp_7h7eg6t6fzwqLjZv1_lM")
-                                        (compose (length) (= 3)))
+                                             (compose (length) (= 3)))
              (list-tokens-of-collection "c_Cats_ZMLLJuSq0JoHSR4f_ZgUa2H_p7Rr71CN8CjQ7ZL_hU0"))
+
+
+(expect-that "Get list of Cats + Dogs tokens" (and? (contains "t:FiEymgltFYwVdXtWJsVlYp_7h7eg6t6fzwqLjZv1_lM")
+                                                    (compose (length) (= 5)))
+             (list-tokens-of-collections ["c_Cats_ZMLLJuSq0JoHSR4f_ZgUa2H_p7Rr71CN8CjQ7ZL_hU0",
+                                          "c_Dogs_8BRJPRYtqM-2w8ASMYq6Toq4PIvhws-kHh0nbYfT1iY"]))
 
 ; Check the ranks of the tokens inside the collection
 (expect "cat1 is rank 1" 1 (get-token-rank-in-collection "t:8UUtZdQJTomKPposMzgKLIyr-kXzwVRbUiRnk6ll1GQ"))
