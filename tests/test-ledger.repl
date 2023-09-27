@@ -304,3 +304,28 @@
 (expect "Balance of alice is still 0.1" 0.1 (get-balance "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "carol"))
 
 (commit-tx)
+
+
+
+;;; -------- Do addtional checks to prevent nested pact
+; We create a wrapper contract containing a "parent" pact and verify that it's
+; not able to call and nest the official ledger pact.
+(begin-tx)
+(namespace 'free)
+(module nested-pacts-mod G
+  (defcap G() true)
+
+  (defpact sale (id:string seller:string amount:decimal timeout:time)
+    (step-with-rollback
+      (marmalade-ng.ledger.sale id seller amount timeout)
+      (continue (marmalade-ng.ledger.sale id seller amount timeout)))
+    (step
+      (continue (marmalade-ng.ledger.sale id seller amount timeout)))
+  )
+)
+(commit-tx)
+
+(begin-tx)
+(expect-failure "No Nested Pacts" "Nested pact not allowed"
+  (free.nested-pacts-mod.sale "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice" 0.1 (time "2023-06-01T00:00:00Z")))
+(commit-tx)
