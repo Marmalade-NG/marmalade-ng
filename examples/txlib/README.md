@@ -44,6 +44,10 @@
 - Create a non fungible token and instant mint it to an user.
 - Needed signatures : ``gas-payer-key``, ``collection-key``, ``tmp-key``
 
+**creation-minting/create-token-polyfungible.tkpl:**
+- Create a a fungible token divided in 10 shares.
+- Needed signatures : ``gas-payer-key``, ``collection-key``, ``tmp-key``
+
 **creation-minting/create-token-only.tkpl:**
 - Only create a token but protect the mint with a guard.
 - Needed signatures : ``gas-payer-key``, ``collection-key``, ``tmp-key``

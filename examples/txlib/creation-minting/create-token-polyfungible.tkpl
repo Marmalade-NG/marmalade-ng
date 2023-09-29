@@ -1,0 +1,82 @@
+# This code creates a token with the following policies:
+# - COLLECTION
+# - FIXED-ISSUANCE
+# - INSTANT-MINT
+# - ROYALTY
+# - FIXED-SALE
+# - AUCTION-SALE
+# - DUTCH-AUCTION-SALE
+#
+# The token is a poly fungible divided in 10 shares.
+# The token is immediately minted in the same transactions with 3 holders:
+#  - 1st: 2 shares
+#  - 2nd: 5 shares
+#  - 3rd: 3 shares
+
+code: |-
+  (use {{namespace}}.ledger)
+  (use {{namespace}}.std-policies)
+
+  (let* ((tmp-guard (read-keyset 'ks-tmp))
+         (token-id (create-token-id tmp-guard "{{uri}}")))
+
+    (create-token token-id 1 "{{uri}}"
+                  (to-policies "COLLECTION FIXED-ISSUANCE INSTANT-MINT ROYALTY FIXED-SALE AUCTION-SALE DUTCH-AUCTION-SALE")
+                  tmp-guard)
+
+    (install-capability (MINT token-id "{{receiver-1}}" 0.2))
+    (install-capability (MINT token-id "{{receiver-2}}" 0.5))
+    (install-capability (MINT token-id "{{receiver-3}}" 0.3))
+
+    (mint token-id "{{receiver-1}}" (read-keyset 'ks-receiver-1) 0.2)
+    (mint token-id "{{receiver-2}}" (read-keyset 'ks-receiver-2) 0.5)
+    (mint token-id "{{receiver-3}}" (read-keyset 'ks-receiver-3) 0.3)
+    token-id
+  )
+data:
+  ks-tmp:
+    - {{tmp-key}}
+  ks-receiver-1:
+    - {{receiver-1-key}}
+  ks-receiver-2:
+    - {{receiver-2-key}}
+  ks-receiver-3:
+    - {{receiver-3-key}}
+
+  marmalade_collection:
+    id: {{collection-id}}
+
+  marmalade_fixed_supply:
+    max_supply:
+      decimal: "1.0"
+    min_mint_amount:
+      decimal: "0.1"
+    precision:
+      int: 1
+
+  marmalade_royalty:
+    creator_acct: {{creator}}
+    creator_guard:
+      pred: keys-all
+      keys:
+        - {{creator-key}}
+    rate: 0.1
+publicMeta:
+  chainId: "{{chain}}"
+  sender: {{gas-payer}}
+  gasLimit: 10000
+  gasPrice: 0.00000001
+  ttl: 7200
+networkId: "{{network}}"
+signers:
+  - public: {{gas-payer-key}}
+    caps:
+      - name: "coin.GAS"
+        args: []
+  - public: {{collection-key}}
+    caps: []
+  - public: {{tmp-key}}
+    caps:
+      - name: "{{namespace}}.ledger.ENFORCE-RESERVED"
+        args: []
+type: exec
