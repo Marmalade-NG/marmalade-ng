@@ -1,0 +1,33 @@
+code: |-
+  ({{namespace}}.ledger. transfer-create "{{_token-id}}"
+                                         "{{from}}"
+                                         "{{to}}" (read-keyset 'to-ks)
+                                         {{amount}})
+
+data:
+  to-ks:
+    pred: keys-all
+    keys:
+      - {{to-ks}}
+  
+publicMeta:
+  chainId: "{{chain}}"
+  sender: {{gas-payer}}
+  gasLimit: 5000
+  gasPrice: 0.00000001
+  ttl: 7200
+networkId: "{{network}}"
+signers:
+  - public: {{gas-payer-key}}
+    caps:
+      - name: "coin.GAS"
+        args: []
+  - public: {{from-key}}
+    caps:
+      - name: "{{namespace}}.ledger.TRANSFER"
+        args:
+          - {{_token-id}}
+          - {{from}}
+          - {{to}}
+          - {{amount}}
+type: exec

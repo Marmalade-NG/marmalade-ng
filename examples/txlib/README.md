@@ -79,3 +79,7 @@
 **auction-sale/complete.tkpl:**
 - Complete and settle an auction sale (after the timeout)
 - Needed signatures : ``gas-payer-key``
+
+**transfer/transfer-ng.tkpl:**
+- Transfer a token using a direct transfer (policies should allow transfer)
+- Needed signatures : ``gas-payer-key``, ``user-XX.key``
