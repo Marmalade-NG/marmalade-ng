@@ -113,7 +113,7 @@
 (expect-failure "Below the starting price" "Price too low"
                (place-bid "utRLLLbDcGyMnBcuPDjo-VaxR_65Wxv2v8EhoD9z4-E" "bob" (read-keyset 'bob-ks) 9.9))
 
-; Now with the ight price
+; Now with the right price
 (place-bid "utRLLLbDcGyMnBcuPDjo-VaxR_65Wxv2v8EhoD9z4-E" "bob" (read-keyset 'bob-ks) 10.0)
 
 ; Verify that bob KDA account has been debited
@@ -138,7 +138,7 @@
 (expect-failure "Below the starting price" "Price too low"
                (place-bid "utRLLLbDcGyMnBcuPDjo-VaxR_65Wxv2v8EhoD9z4-E" "carol" (read-keyset 'carol-ks) 10.99))
 
-; Now with the ight price
+; Now with the right price
 (place-bid "utRLLLbDcGyMnBcuPDjo-VaxR_65Wxv2v8EhoD9z4-E" "carol" (read-keyset 'carol-ks) 11.0)
 
 ; Verify that carol KDA account has been debited
@@ -167,7 +167,7 @@
 (expect-failure "Below the starting price" "Price too low"
                (place-bid "utRLLLbDcGyMnBcuPDjo-VaxR_65Wxv2v8EhoD9z4-E" "bob" (read-keyset 'bob-ks) 12.09))
 
-; Now with the ight price
+; Now with the right price
 (place-bid "utRLLLbDcGyMnBcuPDjo-VaxR_65Wxv2v8EhoD9z4-E" "bob" (read-keyset 'bob-ks) 13.0)
 
 ; Verify that bob KDA account has been debited
