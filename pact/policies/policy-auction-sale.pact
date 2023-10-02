@@ -15,7 +15,7 @@
   ;-----------------------------------------------------------------------------
   ; Capabilities and events
   ;-----------------------------------------------------------------------------
-  (defcap PLACE-BID (sale-id:string buyer:string price:decimal)
+  (defcap PLACE-BID (sale-id:string token-id:string buyer:string price:decimal)
     @doc "Event emitted after an external bid"
     @event
     true)
@@ -274,7 +274,7 @@
     (update auctions sale-id {'current-price:new-price, 'current-buyer:buyer})
 
     ; Emit the event
-    (emit-event (PLACE-BID sale-id buyer new-price))
+    (emit-event (PLACE-BID sale-id token-id buyer new-price))
     ; Return a nice looking string
     (+ "Bid placed for sale: " sale-id))
   )

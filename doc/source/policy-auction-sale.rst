@@ -305,3 +305,11 @@ Return all ended sales:
      "token-id": "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8"
     }
   ]
+
+Events
+^^^^^^
+PLACE-BID
+~~~~~~~~~~~~~~~~
+*sale-id* ``string`` *token-id* ``string`` *buyer* ``string`` *price* ``decimal``
+
+Event emitted when a bid is placed for the sale.

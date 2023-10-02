@@ -3,6 +3,10 @@
 (load "init/init-ledger.repl")
 (load "init/init-policy-auction-sale.repl")
 
+(begin-tx)
+(load "tools/events_analyzer.pact")
+(commit-tx)
+
 (begin-tx "Create a token")
 (env-hash (hash "CreateTx"))
 (use marmalade-ng.ledger)
@@ -114,7 +118,14 @@
                (place-bid "utRLLLbDcGyMnBcuPDjo-VaxR_65Wxv2v8EhoD9z4-E" "bob" (read-keyset 'bob-ks) 9.9))
 
 ; Now with the right price
+(env-events true)
 (place-bid "utRLLLbDcGyMnBcuPDjo-VaxR_65Wxv2v8EhoD9z4-E" "bob" (read-keyset 'bob-ks) 10.0)
+
+; Check the events
+(ev-analyzer.store (env-events true))
+(expect "Bid Event is present" true (ev-analyzer.is-present "PLACE-BID"))
+(expect "Bid params" ["utRLLLbDcGyMnBcuPDjo-VaxR_65Wxv2v8EhoD9z4-E" "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8" "bob" 10.0 ] (ev-analyzer.params "PLACE-BID"))
+
 
 ; Verify that bob KDA account has been debited
 (expect "Balance should be 990" 990.0 (coin.get-balance "bob"))
