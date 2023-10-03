@@ -1,8 +1,5 @@
 code: |-
-  (use {{namespace}}.ledger)
-  (use {{namespace}}.policy-fixed-sale)
-
-  (sale "{{token-id}}" "{{seller}}" 1.0 (time "{{timeout}}"))
+  ({{namespace}}.ledger.sale "{{token-id}}" "{{seller}}" 1.0 (time "{{timeout}}"))
 
 data:
   marmalade_sale:
