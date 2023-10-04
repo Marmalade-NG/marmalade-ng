@@ -9,8 +9,8 @@ Description
 This policy manages an auction sale:
   - The seller of the token puts its token on sale and propose a starting price and a multiplier increment.
   - People proposes bids:
-    - starting with at least the starting price
-    - then by bidding a price that it is at least the last price multiplied by the increment.
+     - starting with at least the starting price
+     - then by bidding a price that it is at least the last price multiplied by the increment.
 
 Since the `(place-bid)` function is executed out of the defpact context, a second escrow account must be used during
 the auctions. The funds from this second escrow account are then transferred to the main Marmalade escrow account before settlement.
