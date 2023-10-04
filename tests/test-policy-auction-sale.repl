@@ -132,6 +132,11 @@
 
 ; Verify that the buyer has been recorded
 (expect-that "Buyer has been recoreded" (compose (at 'current-buyer) (= "bob")) (get-sale "utRLLLbDcGyMnBcuPDjo-VaxR_65Wxv2v8EhoD9z4-E"))
+
+; We are far from triggering the time extension; verify that the timeout didn't move
+(expect-that "Timeout is the same" (compose (at 'timeout) (= (time "2023-06-01T00:00:00Z")))
+             (get-sale "utRLLLbDcGyMnBcuPDjo-VaxR_65Wxv2v8EhoD9z4-E"))
+
 (commit-tx)
 
 
@@ -204,6 +209,30 @@
                 (continue-pact 1 false (hash "auction-sale-1")))
 (commit-tx)
 
+
+;try an extension tomeout
+; Carol will bid just 29 minutes before the end
+(begin-tx "Carol wants to bid just before the end")
+(env-chain-data {"block-time": (time "2023-05-31T23:31:00Z")})
+(use marmalade-ng.policy-auction-sale)
+(env-data {'carol-ks:["carol-key"]})
+
+(env-sigs [ {'key:"carol-key", 'caps:[(coin.TRANSFER "carol" "c:09-juxzBu412pfsgBlM6Au7fOnwvSsX78Er66vnC6sI" 15.0)]}
+           ])
+
+; We check that before the bid, timeout is the original one
+(expect-that "Timeout is the same" (compose (at 'timeout) (= (time "2023-06-01T00:00:00Z")))
+             (get-sale "utRLLLbDcGyMnBcuPDjo-VaxR_65Wxv2v8EhoD9z4-E"))
+
+
+(place-bid "utRLLLbDcGyMnBcuPDjo-VaxR_65Wxv2v8EhoD9z4-E" "carol" (read-keyset 'carol-ks) 15.0)
+
+; Verify that the time has been extended
+(expect-that "Timeout has been extended" (compose (at 'timeout) (= (time "2023-06-01T00:01:00Z")))
+             (get-sale "utRLLLbDcGyMnBcuPDjo-VaxR_65Wxv2v8EhoD9z4-E"))
+
+; Rollback => so that Bob is still the winner
+(rollback-tx)
 
 
 ;Now the auction goes to its end; We close the defpact

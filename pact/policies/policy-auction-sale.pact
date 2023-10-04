@@ -3,7 +3,7 @@
   (use token-policy-ng-v1 [token-info])
   (use util-policies)
   (use ledger [NO-TIMEOUT create-account account-exist account-guard])
-  (use free.util-time [is-past is-future])
+  (use free.util-time [now is-past is-future])
 
   ;-----------------------------------------------------------------------------
   ; Governance
@@ -19,6 +19,13 @@
     @doc "Event emitted after an external bid"
     @event
     true)
+
+  ;-----------------------------------------------------------------------------
+  ; Input data
+  ;-----------------------------------------------------------------------------
+  (defconst EXTENSION-LIMIT:decimal (minutes 30))
+
+  (defconst EXTENSION-TIME:decimal (minutes 30))
 
   ;-----------------------------------------------------------------------------
   ; Schemas and Tables
@@ -270,8 +277,19 @@
             (install-capability (currency::TRANSFER (auction-escrow sale-id) current-buyer current-price))
             (currency::transfer (auction-escrow sale-id) current-buyer current-price))
           "")
-    ; Update the database with the new buyer and new price
-    (update auctions sale-id {'current-price:new-price, 'current-buyer:buyer})
+
+    ; Compute the new timeout
+    ; extension-timeout is the time where a bid must trigger a time extension
+    ; if the time extension is triggered, we calculate the new timeout by adding
+    ;   EXTENSION-TIME to the current time
+    (let* ((extension-timeout (add-time timeout (- EXTENSION-LIMIT)))
+           (new-timeout (if (is-past extension-timeout)
+                            (add-time (now) EXTENSION-TIME)
+                            timeout)))
+      ; Update the database with the new buyer and new price,
+      ;  and extended timeout if necessary
+      (update auctions sale-id {'current-price:new-price, 'current-buyer:buyer,
+                                'timeout: new-timeout}))
 
     ; Emit the event
     (emit-event (PLACE-BID sale-id token-id buyer new-price))
