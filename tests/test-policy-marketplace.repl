@@ -174,7 +174,7 @@
                                     'fee-rate:1.2,
                                     'max-fee:10000.0}
           })
-(expect-failure "Fee rate > 1.0" "Illegal"
+(expect-failure "Fee rate > 1.0" "Rate must be between 0.0 and 1.0"
   (sale "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I" "alice" 1.0 NO-TIMEOUT))
 
 

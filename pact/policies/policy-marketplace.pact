@@ -72,7 +72,7 @@
                     (<= min-fee max-fee)) "Illegal Min/Max fee")
 
       ; Is fee-rate is between 0.0 and 1.0 ?
-      (enforce (between 0.0 1.0 fee-rate) "Illegal fee rate")
+      (enforce-valid-rate fee-rate)
 
       ; Is the payment account OK ?
       (check-fungible-account currency account))
