@@ -23,9 +23,9 @@
   ;-----------------------------------------------------------------------------
   ; Input data
   ;-----------------------------------------------------------------------------
-  (defconst EXTENSION-LIMIT:decimal (minutes 30))
+  (defconst EXTENSION-LIMIT:decimal (minutes 10))
 
-  (defconst EXTENSION-TIME:decimal (minutes 30))
+  (defconst EXTENSION-TIME:decimal (minutes 10))
 
   ;-----------------------------------------------------------------------------
   ; Schemas and Tables

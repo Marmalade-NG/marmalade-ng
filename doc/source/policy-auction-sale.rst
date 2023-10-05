@@ -38,11 +38,11 @@ Timeout extension
 ~~~~~~~~~~~~~~~~~
 To keep auctions fair and avoid sniping and malicious activity: the timeout can be extended.
 
-If a bid occurs less than 30 minutes before the end of the sale, the timeout is extended to 30 minutes after the bid time:
+If a bid occurs less than 10 minutes before the end of the sale, the timeout is extended to 30 minutes after the bid time:
 
 Examples:
-  - The tiemout was previously set to: ``2023-01-03T06:00:00``, a bid arrives at ``2023-01-03T05:25:00`` => The tiemout is not changed.
-  - The tiemout was previously set to: ``2023-01-03T06:00:00``, a bid arrives at ``2023-01-03T05:42:00`` => The tiemout is extended to ``2023-01-03T06:12:00``.
+  - The tiemout was previously set to: ``2023-01-03T06:00:00``, a bid arrives at ``2023-01-03T05:45:00`` => The tiemout is not changed.
+  - The tiemout was previously set to: ``2023-01-03T06:00:00``, a bid arrives at ``2023-01-03T05:56:00`` => The tiemout is extended to ``2023-01-03T06:06:00``.
 
 
 

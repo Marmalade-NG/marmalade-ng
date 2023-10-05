@@ -213,7 +213,7 @@
 ;try an extension tomeout
 ; Carol will bid just 29 minutes before the end
 (begin-tx "Carol wants to bid just before the end")
-(env-chain-data {"block-time": (time "2023-05-31T23:31:00Z")})
+(env-chain-data {"block-time": (time "2023-05-31T23:51:00Z")})
 (use marmalade-ng.policy-auction-sale)
 (env-data {'carol-ks:["carol-key"]})
 
