@@ -79,7 +79,6 @@
         (enforce-valid-account c-a)
         (enforce-valid-rate rate)
         (enforce-valid-fungibles cur)
-        (enforce (< 0 (length cur)) "At least 1 currency must be specified")
         (insert royalty-tokens token-id {'token-id:token-id,
                                          'creator-account:c-a,
                                          'creator-guard:c-g,
