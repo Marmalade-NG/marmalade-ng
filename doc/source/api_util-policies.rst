@@ -63,16 +63,18 @@ check-fungible-account
 *currency* ``module{fungible-v2}`` *acct* ``string`` *→* bool
 
 Check (and enforce) an account again a specific fungible currency.
-- The account name must be valid.
-- The account must exist.
+
+  - The account name must be valid.
+  - The account must exist.
 
 check-price
 ^^^^^^^^^^^
 *currency* ``module{fungible-v2}`` *price* ``decimal`` *→* bool
 
 Check (and enforce) the validity of a price against a specific currency.
-- The price must be positive.
-- The price must must be compliant with the fungible precision.
+
+  - The price must be positive.
+  - The price must must be compliant with the fungible precision.
 
 enforce-valid-rate
 ^^^^^^^^^^^^^^^^^^
