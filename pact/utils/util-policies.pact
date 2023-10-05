@@ -1,6 +1,6 @@
 (module util-policies GOVERNANCE
   (use token-policy-ng-v1 [token-info])
-  (use free.util-math [xEy])
+  (use free.util-math [xEy between])
   (use free.util-fungible [enforce-valid-account])
 
   ;-----------------------------------------------------------------------------
@@ -84,4 +84,11 @@
     (enforce (and? (< 0.0) (>= MAXIMUM-PRICE) price) "Price out of range")
     (currency::enforce-unit price)
   )
+
+  (defun enforce-valid-rate:bool (rate:decimal)
+    @doc "Enforce that a rate is between 0.0 and 1.0"
+    (enforce (between 0.0 1.0 rate) "Rate must be between 0.0 and 1.0")
+  )
+
+
 )

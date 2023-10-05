@@ -5,6 +5,10 @@
 (load "init/init-policy-adjustable-royalty.repl")
 
 (begin-tx)
+(load "stubs/fake-fungible.pact")
+(commit-tx)
+
+(begin-tx)
 (load "tools/events_analyzer.pact")
 (commit-tx)
 
@@ -24,11 +28,43 @@
   (create-token "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw" 1 "http://token-with-royalty"
                 [marmalade-ng.policy-fixed-sale, marmalade-ng.policy-adjustable-royalty] (read-keyset 'create-ks)))
 
+; Try to create with bad royalty data
+;    -> bad account name
+(env-data {'create-ks:["create"],
+           'marmalade_royalty:{'creator_acct:"比特币",
+                               'creator_guard:{'pred:"keys-all", 'keys:["creator-key"]},
+                               'rate:1.5,
+                               'currencies:[coin]}})
+(expect-failure "Bad account name" ": Account does not conform to the charset"
+  (create-token "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw" 1 "http://token-with-royalty"
+                [marmalade-ng.policy-fixed-sale, marmalade-ng.policy-adjustable-royalty] (read-keyset 'create-ks)))
+
+(env-data {'create-ks:["create"],
+           'marmalade_royalty:{'creator_acct:"creator",
+                               'creator_guard:{'pred:"keys-all", 'keys:["creator-key"]},
+                               'rate:1.5,
+                               'currencies:[coin]}})
+(expect-failure "Bad rate" "Rate must be between 0.0 and 1.0"
+  (create-token "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw" 1 "http://token-with-royalty"
+                [marmalade-ng.policy-fixed-sale, marmalade-ng.policy-adjustable-royalty] (read-keyset 'create-ks)))
+
+;    -> bad currencies list
+(env-data {'create-ks:["create"],
+           'marmalade_royalty:{'creator_acct:"creator",
+                               'creator_guard:{'pred:"keys-all", 'keys:["creator-key"]},
+                               'rate:0.1,
+                               'currencies:[]}})
+(expect-failure "Bad currency list" "Incorrect currencies list"
+  (create-token "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw" 1 "http://token-with-royalty"
+                [marmalade-ng.policy-fixed-sale, marmalade-ng.policy-adjustable-royalty] (read-keyset 'create-ks)))
+
+
 ; Now add the data => Royalty = 10 %
 (env-data {'create-ks:["create"],
            'marmalade_royalty:{'creator_acct:"creator",
                                'creator_guard:{'pred:"keys-all", 'keys:["creator-key"]},
-                               'rate:0.1}})
+                               'rate:0.1,
+                               'currencies:[coin]}})
 (create-token "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw" 1 "http://token-with-royalty"
               [marmalade-ng.policy-fixed-sale, marmalade-ng.policy-adjustable-royalty] (read-keyset 'create-ks))
 
@@ -67,6 +103,11 @@
 (expect-failure "No env-data provided" "sale not present in data"
   (sale "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw" "alice" 0.1 (time "2023-06-01T00:00:00Z")))
 
+; try with a bad fungible
+(env-data {'marmalade_sale: {'sale_type:"fixed", 'currency:fake-fungible},
+           'marmalade_fixed_quote: {'recipient:"alice", 'price:5.0 }})
+(expect-failure "Bad fungible" "Currency is not allowed"
+  (sale "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw" "alice" 0.1 (time "2023-06-01T00:00:00Z")))
 
 ; Now try exrything good
 (env-data {'marmalade_sale: {'sale_type:"fixed", 'currency:coin },
@@ -198,5 +239,59 @@
 ; Check the KDA balances
 (expect "Final balance should be 1004.5 + 4.0" 1008.5 (coin.get-balance "alice"))
 (expect "Final balance should be 0.5 + 1.0 = 1.5" 1.5 (coin.get-balance "creator"))
+
+(commit-tx)
+
+;; Test Royalty rotation
+(begin-tx "Rotate creator")
+(use marmalade-ng.policy-adjustable-royalty)
+
+; Try without signature
+(env-data {'new-ks:{'pred:"keys-all", 'keys:["new-creator-key"]}})
+
+(expect-failure "No sigs" "Keyset failure"
+  (rotate "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw" "new-creator" (read-keyset 'new-ks)))
+
+(env-sigs [{'key:"creator-key", 'caps:[(UPDATE-ROYALTY "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw")]}])
+
+; Try with bad name
+(expect-failure "Bad name" "Account name does not conform"
+  (rotate "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw" "X" (read-keyset 'new-ks)))
+
+;; Try evrything good
+(rotate "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw" "new-creator" (read-keyset 'new-ks))
+
+;; Check that the rotation has been applied
+(expect-that "New creator name" (compose (at 'creator-account) (= "new-creator")) (get-royalty-details "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw"))
+(commit-tx)
+
+;; Test update currencies
+(begin-tx "Update currencies")
+(use marmalade-ng.policy-adjustable-royalty)
+
+; Check the list before
+(expect-that "Old fungible list" (compose (at 'currencies) (= [coin])) (get-royalty-details "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw"))
+
+; Try without signature
+(env-sigs [])
+(expect-failure "No sigs" "Keyset failure"
+  (update-allowed-currencies "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw" [fake-fungible]))
+
+; Bad keyset (remind we rotated during the next step)
+(env-sigs [{'key:"creator-key", 'caps:[(UPDATE-ROYALTY "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw")]}])
+
+(expect-failure "No sigs" "Keyset failure"
+  (update-allowed-currencies "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw" [fake-fungible]))
+
+(env-sigs [{'key:"new-creator-key", 'caps:[(UPDATE-ROYALTY "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw")]}])
+; Check with a bad fungible list
+(expect-failure "Bad fungible list" "Incorrect currencies list"
+  (update-allowed-currencies "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw" []))
+
+; Now everything good
+(update-allowed-currencies "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw" [fake-fungible])
+
+; Check that the new list has been apllied
+(expect-that "New fungible list" (compose (at 'currencies) (= [fake-fungible])) (get-royalty-details "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw"))
 
 (commit-tx)

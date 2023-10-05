@@ -73,3 +73,11 @@ check-price
 Check (and enforce) the validity of a price against a specific currency.
 - The price must be positive.
 - The price must must be compliant with the fungible precision.
+
+enforce-valid-rate
+^^^^^^^^^^^^^^^^^^
+*rate* ``decimal`` *→* bool
+
+Utility function to enforce that a rate is valid:
+
+  - between 0.0 and 1.0
