@@ -61,6 +61,15 @@ data:
       keys:
         - {{creator-key}}
     rate: 0.1
+    currencies:
+      - refSpec:
+        - namespace: ~
+          name: fungible-v2
+        refName:
+          namespace: ~
+          name: coin
+
+
 publicMeta:
   chainId: "{{chain}}"
   sender: {{gas-payer}}
