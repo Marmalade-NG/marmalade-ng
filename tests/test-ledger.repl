@@ -73,15 +73,31 @@
 (use marmalade-ng.ledger)
 (use free.util-lists)
 
+(env-events true)
 (mint "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice" (read-keyset 'alice-ks) 0.6)
 
 ; Check the events
 (ev-analyzer.store (env-events true))
+
+(expect "Event MINT has been emitted" true (ev-analyzer.is-present "MINT"))
+(expect "Event MINT -> token-id" "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" (ev-analyzer.param "MINT" 0))
+(expect "Event MINT -> account" "alice" (ev-analyzer.param "MINT" 1))
+(expect "Event MINT -> amount" 0.6 (ev-analyzer.param "MINT" 2))
+
+(expect "Event SUPPLY has been emitted" true (ev-analyzer.is-present "SUPPLY"))
+(expect "Event SUPPLY -> token-id" "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" (ev-analyzer.param "SUPPLY" 0))
+(expect "Event SUPPLY -> amount" 0.6 (ev-analyzer.param "SUPPLY" 1))
+
+(expect "Event RECONCILE has been emitted" true (ev-analyzer.is-present "RECONCILE"))
+(expect "Event RECONCILE -> token-id" "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" (ev-analyzer.param "RECONCILE" 0))
+(expect "Event RECONCILE -> amount" {"account": "alice","current": 0.6,"previous": 0.0}
+                                    (ev-analyzer.param "RECONCILE" 3))
+
 (expect "Policy A has been called" true (ev-analyzer.is-present "EVENT-A"))
 (expect "Policy B has been called" true (ev-analyzer.is-present "EVENT-B"))
 
-(expect "Policy A params" ["mint"] (ev-analyzer.params "EVENT-A"))
-(expect "Policy B params" ["mint"] (ev-analyzer.params "EVENT-B"))
+(expect "Policy A params" "mint" (ev-analyzer.param "EVENT-A" 0))
+(expect "Policy B params" "mint" (ev-analyzer.param "EVENT-B" 0))
 
 (mint "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "bob" (read-keyset 'bob-ks) 0.4)
 
@@ -145,11 +161,25 @@
 
 ; Check the events
 (ev-analyzer.store (env-events true))
+(expect "Event BURN has been emitted" true (ev-analyzer.is-present "BURN"))
+(expect "Event BURN -> token-id" "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I" (ev-analyzer.param "BURN" 0))
+(expect "Event BURN -> account" "alice" (ev-analyzer.param "BURN" 1))
+(expect "Event BURN -> amount" 0.1 (ev-analyzer.param "BURN" 2))
+
+(expect "Event SUPPLY has been emitted" true (ev-analyzer.is-present "SUPPLY"))
+(expect "Event SUPPLY -> amount" 0.9 (ev-analyzer.param "SUPPLY" 1))
+
+(expect "Event RECONCILE has been emitted" true (ev-analyzer.is-present "RECONCILE"))
+(expect "Event RECONCILE -> token-id" "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I" (ev-analyzer.param "RECONCILE" 0))
+(expect "Event RECONCILE -> amount" {"account": "alice","current": 0.9,"previous": 1.0}
+                                    (ev-analyzer.param "RECONCILE" 2))
+
+
 (expect "Policy A has been called" true (ev-analyzer.is-present "EVENT-A"))
 (expect "Policy B has been called" true (ev-analyzer.is-present "EVENT-B"))
 
-(expect "Policy A params" ["burn"] (ev-analyzer.params "EVENT-A"))
-(expect "Policy B params" ["burn"] (ev-analyzer.params "EVENT-B"))
+(expect "Policy A params" "burn" (ev-analyzer.param "EVENT-A" 0))
+(expect "Policy B params" "burn" (ev-analyzer.param "EVENT-B" 0))
 
 ; Check the balance
 (expect "Balance of alice should be 0.9" 0.9 (get-balance "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I" "alice"))
@@ -198,11 +228,23 @@
 (env-events true)
 (transfer-create "t:8XZTuI-LC_Zww0mfCzFa8l7dkbZirdM22KJwRQ5PlRg" "alice" "bob" (read-keyset 'bob-ks) 0.1)
 (ev-analyzer.store (env-events true))
+
+(expect "Event TRANSFER has been emitted" true (ev-analyzer.is-present "TRANSFER"))
+
+(expect "Event SUPPLY has not been emitted" false (ev-analyzer.is-present "SUPPLY"))
+
+(expect "Event RECONCILE has been emitted" true (ev-analyzer.is-present "RECONCILE"))
+(expect "Event RECONCILE -> token-id" "t:8XZTuI-LC_Zww0mfCzFa8l7dkbZirdM22KJwRQ5PlRg" (ev-analyzer.param "RECONCILE" 0))
+(expect "Event RECONCILE -> amount" {"account": "alice","current": 0.9,"previous": 1.0}
+                                    (ev-analyzer.param "RECONCILE" 2))
+(expect "Event RECONCILE -> amount" {"account": "bob","current": 0.1,"previous": 0.0}
+                                    (ev-analyzer.param "RECONCILE" 3))
+
 (expect "Policy A has been called" true (ev-analyzer.is-present "EVENT-A"))
 (expect "Policy B has been called" true (ev-analyzer.is-present "EVENT-B"))
 
-(expect "Policy A params" ["transfer"] (ev-analyzer.params "EVENT-A"))
-(expect "Policy B params" ["transfer"] (ev-analyzer.params "EVENT-B"))
+(expect "Policy A params" "transfer" (ev-analyzer.param "EVENT-A" 0))
+(expect "Policy B params" "transfer" (ev-analyzer.param "EVENT-B" 0))
 
 (expect "Balance of alice should be 0.9" 0.9 (get-balance "t:8XZTuI-LC_Zww0mfCzFa8l7dkbZirdM22KJwRQ5PlRg" "alice"))
 (expect "Balance of bob should be 0.1" 0.1 (get-balance "t:8XZTuI-LC_Zww0mfCzFa8l7dkbZirdM22KJwRQ5PlRg" "bob"))
@@ -240,11 +282,26 @@
 
 ; Check the events
 (ev-analyzer.store (env-events true))
+
+(expect "Event OFFER has been emitted" true (ev-analyzer.is-present "OFFER"))
+(expect "Event SALE has been emitted" true (ev-analyzer.is-present "SALE"))
+(expect "Event SUPPLY has not been emitted" false (ev-analyzer.is-present "SUPPLY"))
+
+(expect "Event SALE -> token_id" "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" (ev-analyzer.param "SALE" 0))
+(expect "Event SALE -> seller" "alice" (ev-analyzer.param "SALE" 1))
+(expect "Event SALE -> amount" 0.1 (ev-analyzer.param "SALE" 2))
+
+(expect "Event RECONCILE has been emitted" true (ev-analyzer.is-present "RECONCILE"))
+(expect "Event RECONCILE -> token-id" "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" (ev-analyzer.param "RECONCILE" 0))
+(expect "Event RECONCILE -> amount" {"account": "alice","current": 0.5,"previous": 0.6}
+                                    (ev-analyzer.param "RECONCILE" 2))
+
+
 (expect "Policy A has been called" true (ev-analyzer.is-present "EVENT-A"))
 (expect "Policy B has been called" true (ev-analyzer.is-present "EVENT-B"))
 
-(expect "Policy A params" ["sale-offer"] (ev-analyzer.params "EVENT-A"))
-(expect "Policy B params" ["sale-offer"] (ev-analyzer.params "EVENT-B"))
+(expect "Policy A params" "sale-offer" (ev-analyzer.param "EVENT-A" 0))
+(expect "Policy B params" "sale-offer" (ev-analyzer.param "EVENT-B" 0))
 
 (expect "Balance of alice is now 0.5" 0.5 (get-balance "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice"))
 
@@ -259,11 +316,20 @@
 
 ; Check the events
 (ev-analyzer.store (env-events true))
+
+(expect "Event SUPPLY has not been emitted" false (ev-analyzer.is-present "SUPPLY"))
+
+(expect "Event RECONCILE has been emitted" true (ev-analyzer.is-present "RECONCILE"))
+(expect "Event RECONCILE -> token-id" "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" (ev-analyzer.param "RECONCILE" 0))
+(expect "Event RECONCILE -> amount" {"account": "alice","current": 0.6,"previous": 0.5}
+                                    (ev-analyzer.param "RECONCILE" 3))
+
+
 (expect "Policy A has been called" true (ev-analyzer.is-present "EVENT-A"))
 (expect "Policy B has been called" true (ev-analyzer.is-present "EVENT-B"))
 
-(expect "Policy A params" ["sale-withdraw"] (ev-analyzer.params "EVENT-A"))
-(expect "Policy B params" ["sale-withdraw"] (ev-analyzer.params "EVENT-B"))
+(expect "Policy A params" "sale-withdraw" (ev-analyzer.param "EVENT-A" 0))
+(expect "Policy B params" "sale-withdraw" (ev-analyzer.param "EVENT-B" 0))
 
 (expect "Balance of alice is now back 0.6" 0.6 (get-balance "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice"))
 (rollback-tx)
@@ -279,16 +345,22 @@
 
 ; Check the events
 (ev-analyzer.store (env-events true))
+
+(expect "Event RECONCILE has been emitted" true (ev-analyzer.is-present "RECONCILE"))
+(expect "Event RECONCILE -> token-id" "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" (ev-analyzer.param "RECONCILE" 0))
+(expect "Event RECONCILE -> amount" {"account": "carol","current": 0.1,"previous": 0.0}
+                                    (ev-analyzer.param "RECONCILE" 3))
+
 (expect "Policy A has been called" true (ev-analyzer.is-present "EVENT-A"))
 (expect "Policy B has been called" true (ev-analyzer.is-present "EVENT-B"))
 
-(expect "Policy A params" ["sale-buy"] (ev-analyzer.params "EVENT-A"))
-(expect "Policy B params" ["sale-buy"] (ev-analyzer.params "EVENT-B"))
+(expect "Policy A params" "sale-buy" (ev-analyzer.param "EVENT-A" 0))
+(expect "Policy B params" "sale-buy" (ev-analyzer.param "EVENT-B" 0))
 
 (expect "Balance of alice is still 0.5" 0.5 (get-balance "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice"))
 
 ; But carol got the NFT
-(expect "Balance of alice is still 0.1" 0.1 (get-balance "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "carol"))
+(expect "Balance of carol is now 0.1" 0.1 (get-balance "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "carol"))
 
 (commit-tx)
 
