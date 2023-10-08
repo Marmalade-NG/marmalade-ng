@@ -26,16 +26,13 @@
               [marmalade-ng.policy-non-fungible] (read-keyset 'create-ks))
 
 ; try to mint an amount of 2.0
-(env-sigs [{'key:"nobody", 'caps:[(MINT "t:vHKxwYAQoWIjGw3WP7piLyGtLhQnfvW5u-OLHuKIVdw" "alice" 2.0)]}])
 (expect-failure "Try to mint 2.0 is not allowed" "amount can only be 1"
                 (mint "t:vHKxwYAQoWIjGw3WP7piLyGtLhQnfvW5u-OLHuKIVdw" "alice" (read-keyset 'alice-ks) 2.0))
 
 ; Now it should be ok
-(env-sigs [{'key:"nobody", 'caps:[(MINT "t:vHKxwYAQoWIjGw3WP7piLyGtLhQnfvW5u-OLHuKIVdw" "alice" 1.0)]}])
 (mint "t:vHKxwYAQoWIjGw3WP7piLyGtLhQnfvW5u-OLHuKIVdw" "alice" (read-keyset 'alice-ks) 1.0)
 
 ; try to mint a second time for bob
-(env-sigs [{'key:"nobody", 'caps:[(MINT "t:vHKxwYAQoWIjGw3WP7piLyGtLhQnfvW5u-OLHuKIVdw" "bob" 1.0)]}])
 (expect-failure "Try to mint again is not allowed" "Only one mint allowed"
                 (mint "t:vHKxwYAQoWIjGw3WP7piLyGtLhQnfvW5u-OLHuKIVdw" "bob" (read-keyset 'bob-ks) 1.0))
 

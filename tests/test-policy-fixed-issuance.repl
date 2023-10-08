@@ -102,28 +102,21 @@
             'carol-ks:["carol-key"]})
 
 ; Try to mint less than the minium
-(env-sigs [{'key:"nobody", 'caps:[(MINT "t:2Q74RY998p-_uKdehMLFKeLN6erO5GRTkTS3vAWdzhg" "alice" 0.1)]}])
-
-
 (expect-failure "Mint less than min" "Mint amount must be higher"
                 (mint "t:2Q74RY998p-_uKdehMLFKeLN6erO5GRTkTS3vAWdzhg" "alice" (read-keyset 'alice-ks) 0.1))
 
 ; Now mint the right amount
-(env-sigs [{'key:"nobody", 'caps:[(MINT "t:2Q74RY998p-_uKdehMLFKeLN6erO5GRTkTS3vAWdzhg" "alice" 0.2)]}])
 (mint "t:2Q74RY998p-_uKdehMLFKeLN6erO5GRTkTS3vAWdzhg" "alice" (read-keyset 'alice-ks) 0.2)
 
 
 ; Mint for bob as well => > We got now 3.8
-(env-sigs [{'key:"nobody", 'caps:[(MINT "t:2Q74RY998p-_uKdehMLFKeLN6erO5GRTkTS3vAWdzhg" "bob" 3.6)]}])
 (mint "t:2Q74RY998p-_uKdehMLFKeLN6erO5GRTkTS3vAWdzhg" "bob" (read-keyset 'bob-ks) 3.6)
 
 ; Mint now 0.4 for carol should not work => We go over 4.0
-(env-sigs [{'key:"nobody", 'caps:[(MINT "t:2Q74RY998p-_uKdehMLFKeLN6erO5GRTkTS3vAWdzhg" "carol" 0.4)]}])
 (expect-failure "Over max-supply" "Exceeds max supply"
   (mint "t:2Q74RY998p-_uKdehMLFKeLN6erO5GRTkTS3vAWdzhg" "carol" (read-keyset 'bob-ks) 0.4))
 
 ; But if we try 0.2 => Should be ok => We are = to ythe amx supply
-(env-sigs [{'key:"nobody", 'caps:[(MINT "t:2Q74RY998p-_uKdehMLFKeLN6erO5GRTkTS3vAWdzhg" "carol" 0.2)]}])
 (mint "t:2Q74RY998p-_uKdehMLFKeLN6erO5GRTkTS3vAWdzhg" "carol" (read-keyset 'bob-ks) 0.2)
 
 ; Sanity check => verify the tootal supply in the ledger

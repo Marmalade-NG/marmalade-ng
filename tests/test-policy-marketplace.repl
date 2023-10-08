@@ -32,10 +32,7 @@
 (create-token "t:9Dh2pSjMjXLPERZnbE-aDuXQuquuOkgxSOgS-hYYX7Q" 0 "http://token-4"
               [marmalade-ng.policy-fixed-sale, marmalade-ng.policy-marketplace] (read-keyset 'create-ks))
 
-(env-sigs [ {'key:"nobody", 'caps:[(MINT "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice" 1.0),
-                                   (MINT "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I" "alice" 1.0),
-                                   (MINT "t:L3JH94fXZQvUZ_IGNKMXAX5HwSZc_X0H7OwbnY_lsHA" "alice" 1.0),
-                                   (MINT "t:9Dh2pSjMjXLPERZnbE-aDuXQuquuOkgxSOgS-hYYX7Q" "alice" 1.0)]}])
+(env-sigs [])
 (env-data {'alice-ks:["alice-key"]})
 
 (mint "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice" (read-keyset 'alice-ks) 1.0)

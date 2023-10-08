@@ -20,7 +20,6 @@ code: |-
                   (to-policies "COLLECTION NON-FUNGIBLE INSTANT-MINT ROYALTY DISABLE-TRANSFER FIXED-SALE AUCTION-SALE")
                   tmp-guard)
 
-    (install-capability (MINT token-id "{{receiver}}" 1.0))
     (mint token-id "{{receiver}}" (read-keyset 'ks-receiver) 1.0)
     token-id
   )

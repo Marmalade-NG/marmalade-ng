@@ -22,11 +22,6 @@ signers:
         args: []
   - public: {{creator-key}}
     caps:
-      - name: "{{namespace}}.ledger.MINT"
-        args:
-          - {{token-id}}
-          - {{receiver}}
-          - 1.0
       - name: "{{namespace}}.policy-guards.MINT"
         args:
           - {{token-id}}

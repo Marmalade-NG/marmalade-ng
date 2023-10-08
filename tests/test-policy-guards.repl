@@ -38,15 +38,12 @@
 (env-data {'alice-ks:["alice-key"]})
 
 ; Try to mint without the guard
-(env-sigs [{'key:"nobody", 'caps:[(MINT "t:0Ro8f7yTkJMBrAWlw0z6IFwCKVJwl4NUk03-YfB_w38" "alice" 1.0)]}
-          ])
+(env-sigs [])
 (expect-failure "Without the gaurd" "Keyset failure"
                  (mint "t:0Ro8f7yTkJMBrAWlw0z6IFwCKVJwl4NUk03-YfB_w38" "alice" (read-keyset 'alice-ks) 1.0))
 
 ;now with the guard
-(env-sigs [{'key:"nobody", 'caps:[(MINT "t:0Ro8f7yTkJMBrAWlw0z6IFwCKVJwl4NUk03-YfB_w38" "alice" 1.0)]},
-           {'key:"g-mint-key", 'caps:[(marmalade-ng.policy-guards.MINT "t:0Ro8f7yTkJMBrAWlw0z6IFwCKVJwl4NUk03-YfB_w38")]}
-          ])
+(env-sigs [{'key:"g-mint-key", 'caps:[(marmalade-ng.policy-guards.MINT "t:0Ro8f7yTkJMBrAWlw0z6IFwCKVJwl4NUk03-YfB_w38")]}])
 (mint "t:0Ro8f7yTkJMBrAWlw0z6IFwCKVJwl4NUk03-YfB_w38" "alice" (read-keyset 'alice-ks) 1.0)
 (commit-tx)
 

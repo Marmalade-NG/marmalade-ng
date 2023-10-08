@@ -23,11 +23,7 @@
          })
 
 
-(env-sigs [{'key:"create", 'caps:[(ENFORCE-RESERVED)]},
-           {'key:"nobody", 'caps:[(MINT "t:EgYRAWXSd4zZlch3B0cLHTSEt4sgYVg5cwKgvP1CoUs" "alice" 1.0),
-                                  (MINT "t:jQ84xa7TcJGa6kJqrMgF0l9wzpEnl8uD_-OpIAhfqko" "alice" 1.0)]}
-
-          ])
+(env-sigs [{'key:"create", 'caps:[(ENFORCE-RESERVED)]}])
 
 
 (create-token "t:EgYRAWXSd4zZlch3B0cLHTSEt4sgYVg5cwKgvP1CoUs" 1 "http://token-blacklistable-1"
@@ -99,10 +95,6 @@
 (env-data {'alice-ks:["alice-key"],
            'carol-ks:["carol-key"]})
 
-(env-sigs [{'key:"nobody", 'caps:[(MINT "t:EgYRAWXSd4zZlch3B0cLHTSEt4sgYVg5cwKgvP1CoUs" "alice" 1.0),
-                                  (MINT "t:EgYRAWXSd4zZlch3B0cLHTSEt4sgYVg5cwKgvP1CoUs" "carol" 1.0),
-                                  (MINT "t:jQ84xa7TcJGa6kJqrMgF0l9wzpEnl8uD_-OpIAhfqko" "alice" 1.0)]}
-          ])
 (expect-failure "Blacklisted" "Account in blacklist"
           (mint "t:EgYRAWXSd4zZlch3B0cLHTSEt4sgYVg5cwKgvP1CoUs" "alice" (read-keyset 'alice-ks) 1.0))
 

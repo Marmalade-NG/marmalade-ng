@@ -68,8 +68,6 @@
 (create-token "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw" 1 "http://token-with-royalty"
               [marmalade-ng.policy-fixed-sale, marmalade-ng.policy-royalty] (read-keyset 'create-ks))
 
-
-(env-sigs [ {'key:"nobody", 'caps:[(MINT "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw" "alice" 0.6)]}])
 (env-data {'alice-ks:["alice-key"]})
 
 (mint "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw" "alice" (read-keyset 'alice-ks) 0.6)

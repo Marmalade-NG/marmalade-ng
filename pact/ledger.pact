@@ -87,7 +87,7 @@
 
   (defcap MINT (id:string account:string amount:decimal)
     @doc "Managed capability which must be installed externally to allow minting"
-    @managed
+    @event
     (compose-capability (CREDIT id account))
     (compose-capability (UPDATE_SUPPLY id))
   )

@@ -73,15 +73,6 @@
 (use marmalade-ng.ledger)
 (use free.util-lists)
 
-; First try without the managed cap
-(expect-failure "Managed capability not installed" "not installed"
-                (mint "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice" (read-keyset 'alice-ks) 0.6))
-
-; Now sign with the right caps
-(env-sigs [ {'key:"nobody", 'caps:[(MINT "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice" 0.6),
-                                   (MINT "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "bob" 0.4)]}
-          ])
-
 (mint "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice" (read-keyset 'alice-ks) 0.6)
 
 ; Check the events
@@ -116,9 +107,7 @@
 (env-data {'create-ks:["create"],
           'alice-ks:["alice-key"]})
 
-(env-sigs [{'key:"create", 'caps:[(ENFORCE-RESERVED)]},
-           {'key:"nobody", 'caps:[(MINT "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I" "alice" 1.0)]}
-          ])
+(env-sigs [{'key:"create", 'caps:[(ENFORCE-RESERVED)]}])
 
 (print (+ "Token-2: => " (create-token-id (read-keyset 'create-ks) "http://token-2" )))
 (create-token "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I" 1 "http://token-2"
@@ -181,9 +170,7 @@
 
 (print (+ "Token-3: => " (create-token-id (read-keyset 'create-ks) "http://token-3-test-transfer" )))
 
-(env-sigs [{'key:"create", 'caps:[(ENFORCE-RESERVED)]},
-           {'key:"nobody", 'caps:[(MINT "t:8XZTuI-LC_Zww0mfCzFa8l7dkbZirdM22KJwRQ5PlRg" "alice" 1.0)]}
-          ])
+(env-sigs [{'key:"create", 'caps:[(ENFORCE-RESERVED)]}])
 
 (create-token "t:8XZTuI-LC_Zww0mfCzFa8l7dkbZirdM22KJwRQ5PlRg" 1 "http://token-3-test-transfer"
               [marmalade-ng.policy-events-A, marmalade-ng.policy-events-B] (read-keyset 'create-ks))

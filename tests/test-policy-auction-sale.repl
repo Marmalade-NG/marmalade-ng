@@ -15,9 +15,7 @@
 
 (print (+ "Token ID: => " (create-token-id (read-keyset 'create-ks) "http://token-1-auction" )))
 
-(env-sigs [{'key:"create", 'caps:[(ENFORCE-RESERVED)]}
-           {'key:"nobody", 'caps:[(MINT "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8" "alice" 0.6)]},
-          ])
+(env-sigs [{'key:"create", 'caps:[(ENFORCE-RESERVED)]}])
 
 (create-token "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8" 1 "http://token-1-auction"
               [marmalade-ng.policy-auction-sale] (read-keyset 'create-ks))

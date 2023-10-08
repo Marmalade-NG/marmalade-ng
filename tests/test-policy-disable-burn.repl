@@ -10,10 +10,7 @@
 
 (print (+ "Token ID: => " (create-token-id (read-keyset 'create-ks) "http://token-not-burnable" )))
 
-(env-sigs [{'key:"create", 'caps:[(ENFORCE-RESERVED)]},
-           {'key:"nobody", 'caps:[(MINT "t:YAEqyzR87hi3kDqAS3pnA80kg2kBkgUnyKJEf9RFzP4" "alice" 1.0)]}
-          ])
-
+(env-sigs [{'key:"create", 'caps:[(ENFORCE-RESERVED)]}])
 
 (create-token "t:YAEqyzR87hi3kDqAS3pnA80kg2kBkgUnyKJEf9RFzP4" 1 "http://token-not-burnable"
               [marmalade-ng.policy-disable-burn] (read-keyset 'create-ks))

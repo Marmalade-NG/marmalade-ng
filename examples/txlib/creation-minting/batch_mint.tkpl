@@ -21,9 +21,6 @@ code: |-
     ; Create tokens
     (zip (lambda (id uri) (create-token id 0 uri policies tmp-guard)) token-ids uris)
 
-    ; Install map capabilities
-    (map (lambda (id) (install-capability (MINT id receiver 1.0))) token-ids)
-
     ; Mint
     (map (lambda (id) (mint id receiver receiver-guard 1.0)) token-ids)
 

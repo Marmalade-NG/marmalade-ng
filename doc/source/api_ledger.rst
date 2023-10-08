@@ -235,8 +235,6 @@ The token must have been created previously.
 
 The function calls the hooks ``(enforce-mint)`` from all policies associated with the token.
 
-The managed capability ``(MINT id account amount)`` must be installed.
-
 .. code:: lisp
 
   (mint "t:_yTD6obGrZk07HIEDaZ9pTwKce2Swv4NMN7DhjzjCbI" "r:user.pascal"

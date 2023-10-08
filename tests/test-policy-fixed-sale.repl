@@ -12,7 +12,6 @@
 (create-token "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" 1 "http://token-1"
               [marmalade-ng.policy-fixed-sale] (read-keyset 'create-ks))
 
-(env-sigs [ {'key:"nobody", 'caps:[(MINT "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice" 0.6)]}])
 (env-data {'alice-ks:["alice-key"]})
 
 (mint "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice" (read-keyset 'alice-ks) 0.6)

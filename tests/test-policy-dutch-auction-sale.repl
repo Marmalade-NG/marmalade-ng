@@ -15,7 +15,6 @@
 (create-token "t:jH6cLnR-L_tehD874FGubaGQ0zx9BTxzlh8ENcXqWxc" 1 "http://token-to-sell"
               [marmalade-ng.policy-dutch-auction-sale] (read-keyset 'create-ks))
 
-(env-sigs [ {'key:"nobody", 'caps:[(MINT "t:jH6cLnR-L_tehD874FGubaGQ0zx9BTxzlh8ENcXqWxc" "alice" 0.6)]}])
 (env-data {'alice-ks:["alice-key"]})
 
 (mint "t:jH6cLnR-L_tehD874FGubaGQ0zx9BTxzlh8ENcXqWxc" "alice" (read-keyset 'alice-ks) 0.6)

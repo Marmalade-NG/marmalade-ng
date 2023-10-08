@@ -24,10 +24,6 @@ code: |-
                   (to-policies "COLLECTION FIXED-ISSUANCE INSTANT-MINT ROYALTY FIXED-SALE AUCTION-SALE DUTCH-AUCTION-SALE")
                   tmp-guard)
 
-    (install-capability (MINT token-id "{{receiver-1}}" 0.2))
-    (install-capability (MINT token-id "{{receiver-2}}" 0.5))
-    (install-capability (MINT token-id "{{receiver-3}}" 0.3))
-
     (mint token-id "{{receiver-1}}" (read-keyset 'ks-receiver-1) 0.2)
     (mint token-id "{{receiver-2}}" (read-keyset 'ks-receiver-2) 0.5)
     (mint token-id "{{receiver-3}}" (read-keyset 'ks-receiver-3) 0.3)

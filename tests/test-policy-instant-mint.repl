@@ -12,7 +12,6 @@
 (create-token "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" 1 "http://token-1"
               [marmalade-ng.policy-instant-mint] (read-keyset 'create-ks))
 
-(env-sigs [ {'key:"nobody", 'caps:[(MINT "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice" 0.6)]}])
 (env-data {'alice-ks:["alice"]})
 
 (mint "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice" (read-keyset 'alice-ks) 0.6)
@@ -23,7 +22,6 @@
 (env-hash (hash "MintTx"))
 (use marmalade-ng.ledger)
 
-(env-sigs [ {'key:"nobody", 'caps:[(MINT "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice" 0.6)]}])
 (env-data {'alice-ks:["alice"]})
 (expect-failure "Minting is locked" "must be minted in the same transaction"
   (mint "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice" (read-keyset 'alice-ks) 0.6))

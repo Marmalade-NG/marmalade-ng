@@ -12,7 +12,6 @@
 (print (+ "Token ID: => " (create-token-id (read-keyset 'create-ks) "http://token-not-transferable" )))
 
 (env-sigs [{'key:"create", 'caps:[(ENFORCE-RESERVED)]},
-           {'key:"nobody", 'caps:[(MINT "t:m5PRDNMXHfzC2FKeEZW_okpIp7c30Pwrv4gEuSQQoiA" "alice" 1.0)]},
            {'key:"alice-key", 'caps:[(TRANSFER "t:m5PRDNMXHfzC2FKeEZW_okpIp7c30Pwrv4gEuSQQoiA" "alice" "bob" 0.1)]}
           ])
 
