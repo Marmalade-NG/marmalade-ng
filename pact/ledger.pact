@@ -50,7 +50,7 @@
     @event
     true)
 
-  (defcap TOKEN-CREATE:bool (id:string uri:string precision:integer policies:[module{token-policy-ng-v1}])
+  (defcap TOKEN-CREATE:bool (id:string uri:string precision:integer policies:[string])
     @doc "Emitted when a token is created"
     @event
     true)
@@ -321,7 +321,7 @@
                          'supply: 0.0,
                          'policies: _policies})
       ; And emit the corresponding event
-      (emit-event (TOKEN-CREATE id uri precision _policies)))
+      (emit-event (TOKEN-CREATE id uri precision (map (to-string) _policies))))
   )
 
   ;-----------------------------------------------------------------------------

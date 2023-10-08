@@ -38,11 +38,19 @@
 
 ; Check the events
 (ev-analyzer.store (env-events true))
+(expect "Event TOKEN-CREATE has been emitted" true (ev-analyzer.is-present "TOKEN-CREATE"))
+(expect "Event TOKEN-CREATE -> token_id" "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" (ev-analyzer.param "TOKEN-CREATE" 0))
+(expect "Event TOKEN-CREATE -> token_id" "http://token-1" (ev-analyzer.param "TOKEN-CREATE" 1))
+(expect "Event TOKEN-CREATE -> prec" 1 (ev-analyzer.param "TOKEN-CREATE" 2))
+(expect-that "Event TOKEN-CREATE -> policies" (contains "marmalade-ng.policy-events-A") (ev-analyzer.param "TOKEN-CREATE" 3))
+(expect-that "Event TOKEN-CREATE -> policies" (contains "marmalade-ng.policy-events-B") (ev-analyzer.param "TOKEN-CREATE" 3))
+
+
 (expect "Policy A has been called" true (ev-analyzer.is-present "EVENT-A"))
 (expect "Policy B has been called" true (ev-analyzer.is-present "EVENT-B"))
 
-(expect "Policy A params" ["init"] (ev-analyzer.params "EVENT-A"))
-(expect "Policy B params" ["init"] (ev-analyzer.params "EVENT-B"))
+(expect "Policy A params" "init" (ev-analyzer.param "EVENT-A" 0))
+(expect "Policy B params" "init" (ev-analyzer.param "EVENT-B" 0))
 
 (expect "Policy B called beofre A " true (< (ev-analyzer.position "EVENT-B")
                                             (ev-analyzer.position "EVENT-A")))
