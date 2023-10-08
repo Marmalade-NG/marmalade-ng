@@ -1,0 +1,32 @@
+# This code rotates a the royalty of a token
+# Please comment on uncomment the right (use ...) line and the caps name
+# Depending on the policy used
+
+code: |-
+  (use {{namespace}}.policy-royalty)
+  ;(use {{namespace}}.policy-adjustable-royalty)
+
+  (rotate "{{token_id}}" "{{new_account}}" (read-keyset 'ks))
+
+data:
+  ks:
+    - {{new_key}}
+publicMeta:
+  chainId: "{{chain}}"
+  sender: {{gas-payer}}
+  gasLimit: 1000
+  gasPrice: 0.00000001
+  ttl: 7200
+networkId: "{{network}}"
+signers:
+  - public: {{gas-payer-key}}
+    caps:
+      - name: "coin.GAS"
+        args: []
+  - public: {{old_key}}
+    caps:
+      - name: "{{namespace}}.policy-royalty.UPDATE-ROYALTY"
+#      - name: "{{namespace}}.policy-adjustable-royalty.UPDATE-ROYALTY"
+        args:
+          - {{token_id}}
+type: exec

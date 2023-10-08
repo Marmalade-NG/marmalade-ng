@@ -83,3 +83,15 @@
 **transfer/transfer-ng.tkpl:**
 - Transfer a token using a direct transfer (policies should allow transfer)
 - Needed signatures : ``gas-payer-key``, ``user-XX.key``
+
+**royalties/rotate.tkpl:**
+- Rotate the account and keys of a royalty receiver
+- Needed signatures : ``gas-payer-key``, ``creator-key``
+
+**royalties/update_currencies.tkpl:**
+- Change the currencies allowed for royalty payment
+- Needed signatures : ``gas-payer-key``, ``creator-key``
+
+**royalties/update_rate.tkpl:**
+- Update the rate of a royalty only for an adjustable royalty policy
+- Needed signatures : ``gas-payer-key``, ``creator-key`
