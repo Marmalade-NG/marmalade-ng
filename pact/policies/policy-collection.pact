@@ -164,8 +164,8 @@
 
   (defun list-tokens-of-collections:[string] (collections-ids:[string])
     @doc "Return the list of tokens that belong to a list of collections"
-    (let ((is-in-list (lambda (x) (contains x collections-ids))))
-      (map (at 'token-id) 
+    (let ((is-in-list (lambda (x:string) (contains x collections-ids))))
+      (map (at 'token-id)
            (select tokens ['token-id]
                    (where 'collection-id (is-in-list)))))
   )
