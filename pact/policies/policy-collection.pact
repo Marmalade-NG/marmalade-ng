@@ -151,7 +151,7 @@
     @doc "Return the list of all collections"
     (keys collections))
 
-  (defun get-collections-by-creator:[{collection-sch}] (creator:string)
+  (defun get-collections-by-creator:[object{collection-sch}] (creator:string)
       @doc "Return the list of all collection objects owned by a creator"
       (select collections (where 'creator (= creator))))
 
