@@ -3,6 +3,10 @@
 (load "init/init-ledger.repl")
 (load "init/init-policy-dutch-auction-sale.repl")
 
+(begin-tx)
+(load "tools/events_analyzer.pact")
+(commit-tx)
+
 (begin-tx "Create a token")
 (env-hash (hash "CreateTx"))
 (use marmalade-ng.ledger)
@@ -83,8 +87,14 @@
 (env-data {'marmalade_sale: {'sale_type:"dutch_auction", 'currency:coin },
            'marmalade_dutch_quote: {'recipient:"alice", 'start_price:100.0, 'end_price:1.0, 'end_time:(time "2023-01-05T00:00:00Z")  }})
 
-
+(env-events true)
 (sale "t:jH6cLnR-L_tehD874FGubaGQ0zx9BTxzlh8ENcXqWxc" "alice" 0.1 (time "2023-06-01T00:00:00Z"))
+
+(ev-analyzer.store (env-events true))
+(expect "Event DUTCH-AUCTION-SALE-OFFER has been emitted" true (ev-analyzer.is-present "DUTCH-AUCTION-SALE-OFFER"))
+(expect "Event DUTCH-AUCTION-SALE-OFFER -> sale_id" (hash "fixed-sale-1") (ev-analyzer.param "DUTCH-AUCTION-SALE-OFFER" 0))
+(expect "Event DUTCH-AUCTION-SALE-OFFER -> token_id" "t:jH6cLnR-L_tehD874FGubaGQ0zx9BTxzlh8ENcXqWxc" (ev-analyzer.param "DUTCH-AUCTION-SALE-OFFER" 1))
+(expect "Event DUTCH-AUCTION-SALE-OFFER -> price" 100.0 (ev-analyzer.param "DUTCH-AUCTION-SALE-OFFER" 2))
 
 
 
@@ -113,7 +123,14 @@
 
 ; After end date
 (env-chain-data {"block-time": (time "2023-06-02T00:00:00Z")})
+
+(env-events true)
 (continue-pact 0 true (hash "fixed-sale-1"))
+
+(ev-analyzer.store (env-events true))
+(expect "Event DUTCH-AUCTION-SALE-WITHDRAWN has been emitted" true (ev-analyzer.is-present "DUTCH-AUCTION-SALE-WITHDRAWN"))
+(expect "Event DUTCH-AUCTION-SALE-WITHDRAWN -> sale_id" (hash "fixed-sale-1") (ev-analyzer.param "DUTCH-AUCTION-SALE-WITHDRAWN" 0))
+(expect "Event DUTCH-AUCTION-SALE-WITHDRAWN -> token_id" "t:jH6cLnR-L_tehD874FGubaGQ0zx9BTxzlh8ENcXqWxc" (ev-analyzer.param "DUTCH-AUCTION-SALE-WITHDRAWN" 1))
 
 (expect-that "It should exist 0 active sale" (compose (length) (= 0)) (get-all-active-sales))
 
@@ -170,6 +187,11 @@
 (env-chain-data {"block-time": (time "2023-01-03T00:00:00Z")})
 (continue-pact 1 false (hash  "fixed-sale-1"))
 
+(ev-analyzer.store (env-events true))
+(expect "Event DUTCH-AUCTION-SALE-BOUGHT has been emitted" true (ev-analyzer.is-present "DUTCH-AUCTION-SALE-BOUGHT"))
+(expect "Event DUTCH-AUCTION-SALE-BOUGHT -> sale_id" (hash "fixed-sale-1") (ev-analyzer.param "DUTCH-AUCTION-SALE-BOUGHT" 0))
+(expect "Event DUTCH-AUCTION-SALE-BOUGHT -> token_id" "t:jH6cLnR-L_tehD874FGubaGQ0zx9BTxzlh8ENcXqWxc" (ev-analyzer.param "DUTCH-AUCTION-SALE-BOUGHT" 1))
+(expect-that "Event DUTCH-AUCTION-SALE-BOUGHT -> price" (between 9.99 10.1) (ev-analyzer.param "DUTCH-AUCTION-SALE-BOUGHT" 2))
 
 ; Check the KDA balances
 (expect-that "Final balance should be 1005" (between 1009.99 1010.01) (coin.get-balance "alice"))

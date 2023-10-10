@@ -321,8 +321,29 @@ Return all ended sales:
 
 Events
 ^^^^^^
+AUCTION-SALE-OFFER
+~~~~~~~~~~~~~~~~~~
+sale-id* ``string`` *token-id* ``string`` *start-price* ``decimal``
+
+Event sent when an auction is started
+
+
 PLACE-BID
 ~~~~~~~~~~~~~~~~
 *sale-id* ``string`` *token-id* ``string`` *buyer* ``string`` *price* ``decimal``
 
 Event emitted when a bid is placed for the sale.
+
+
+AUCTION-SALE-BOUGHT
+~~~~~~~~~~~~~~~~~~~
+sale-id* ``string`` *token-id* ``string`` *buy-price* ``decimal``
+
+Event sent when an auction has ended
+
+
+AUCTION-SALE-WITHDRAWN
+~~~~~~~~~~~~~~~~~~~~~~
+sale-id* ``string`` *token-id* ``string``
+
+Event sent when an auction has been withdrawn because there is no bid

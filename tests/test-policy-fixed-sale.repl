@@ -3,6 +3,10 @@
 (load "init/init-ledger.repl")
 (load "init/init-policy-fixed-sale.repl")
 
+(begin-tx)
+(load "tools/events_analyzer.pact")
+(commit-tx)
+
 (begin-tx "Create a token")
 (env-hash (hash "CreateTx"))
 (use marmalade-ng.ledger)
@@ -73,8 +77,14 @@
 (env-data {'marmalade_sale: {'sale_type:"fixed", 'currency:coin },
            'marmalade_fixed_quote: {'recipient:"alice", 'price:5.0 }})
 
-
+(env-events true)
 (sale "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice" 0.1 (time "2023-06-01T00:00:00Z"))
+
+(ev-analyzer.store (env-events true))
+(expect "Event FIXED-SALE-OFFER has been emitted" true (ev-analyzer.is-present "FIXED-SALE-OFFER"))
+(expect "Event FIXED-SALE-OFFER -> sale_id" (hash "fixed-sale-1") (ev-analyzer.param "FIXED-SALE-OFFER" 0))
+(expect "Event FIXED-SALE-OFFER -> token_id" "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" (ev-analyzer.param "FIXED-SALE-OFFER" 1))
+(expect "Event FIXED-SALE-OFFER -> price" 5.0 (ev-analyzer.param "FIXED-SALE-OFFER" 2))
 
 (expect-that "It should exist 1 active sale" (compose (length) (= 1)) (get-all-active-sales))
 (expect-that "It should exist 1 active sale" (compose (length) (= 1)) (get-sales-for-token "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM"))
@@ -102,7 +112,17 @@
 
 ; After end date
 (env-chain-data {"block-time": (time "2023-06-02T00:00:00Z")})
+
+(env-events true)
 (continue-pact 0 true (hash "fixed-sale-1"))
+
+(ev-analyzer.store (env-events true))
+
+(expect "Event FIXED-SALE-WITHDRAWN has been emitted" true (ev-analyzer.is-present "FIXED-SALE-WITHDRAWN"))
+(expect "Event FIXED-SALE-WITHDRAWN -> sale_id" (hash "fixed-sale-1") (ev-analyzer.param "FIXED-SALE-WITHDRAWN" 0))
+(expect "Event FIXED-SALE-WITHDRAWN -> token_id" "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" (ev-analyzer.param "FIXED-SALE-WITHDRAWN" 1))
+
+
 
 (expect-that "It should exist 0 active sale" (compose (length) (= 0)) (get-all-active-sales))
 
@@ -133,7 +153,14 @@
 ; Now it shoudl work
 (env-sigs [{'key:"bob-key", 'caps:[(coin.TRANSFER "bob" "c:uZK0n0opPMtEMAOctKX2S-nNa3KCotC9TBQCnXPOYeY" 5.0)]}])
 (env-chain-data {"block-time": (time "2023-05-01T00:00:00Z")})
+
+(env-events true)
 (continue-pact 1 false (hash  "fixed-sale-1"))
+
+(ev-analyzer.store (env-events true))
+(expect "Event FIXED-SALE-BOUGHT has been emitted" true (ev-analyzer.is-present "FIXED-SALE-BOUGHT"))
+(expect "Event FIXED-SALE-BOUGHT -> sale_id" (hash "fixed-sale-1") (ev-analyzer.param "FIXED-SALE-BOUGHT" 0))
+(expect "Event FIXED-SALE-BOUGHT -> token_id" "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" (ev-analyzer.param "FIXED-SALE-BOUGHT" 1))
 
 
 ; Check the KDA balances
