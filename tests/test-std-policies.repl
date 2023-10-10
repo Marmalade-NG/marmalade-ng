@@ -50,8 +50,9 @@
 
 (expect "Policy -> Single String" "GUARDS" (from-policy marmalade-ng.policy-guards))
 
-(expect-that "Unkwon Policy -> Single String" (and? (starts-with* "UNKNOWN")
-                                                    (compose (take -6) (is-hex-digit)))
+(expect-that "Unkwon Policy -> Single String" (and? (starts-with* "UNKNOWN_")
+                                                    (compose (drop 8)
+                                                             (and? (compose (length) (= 16)) (is-hex-digit))))
               (from-policy marmalade-ng.policy-events-A))
 
 (expect "Policies -> List of strings" ["GUARDS", "FIXED-SALE", "DISABLE-BURN"] (policies-to-list [marmalade-ng.policy-guards,

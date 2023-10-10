@@ -51,8 +51,8 @@ from-policy
 
 Convert a policy name to the corresponding policy modref.
 
-In case of a non standard policy, the string `UNKNOWN_xxxxxx` is returned.
-where xxxxxx is an unique 6 hexadecimals characters derived from the hash of the policy
+In case of a non standard policy, the string `UNKNOWN_xxxxxxxxxxxxxxxx` is returned.
+where *xxxxxxxxxxxxxxxx* is an unique 16 hexadecimals characters derived from the hash of the policy
 
 
 .. code:: lisp
@@ -62,7 +62,7 @@ where xxxxxx is an unique 6 hexadecimals characters derived from the hash of the
     > "INSTANT MINT"
 
   (from-policy private-ns.my-own-policy)
-    > "UNKNOWN_AB147D"
+    > "UNKNOWN_AB147ECB247D648"
 
 
 .. _STD-POLICIES-POLICIES-TO-LIST:

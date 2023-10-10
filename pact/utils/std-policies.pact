@@ -33,7 +33,7 @@
 
 
   (defun default-name:string (pol:module{token-policy-ng-v1})
-    (+ "UNKNOWN_" (take 6 (int-to-str 16 (str-to-int 64 (hash pol))))))
+    (+ "UNKNOWN_" (take 16 (int-to-str 16 (str-to-int 64 (hash pol))))))
 
   (defun to-policy:module{token-policy-ng-v1} (name:string)
     @doc "Convert a name to a policy"
