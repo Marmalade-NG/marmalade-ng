@@ -3,8 +3,8 @@
   (use token-policy-ng-v1 [token-info])
   (use util-policies)
   (use ledger [NO-TIMEOUT account-guard])
+  (use free.util-math [max])
   (use free.util-time [is-past is-future now])
-  (use free.util-math)
 
   ;-----------------------------------------------------------------------------
   ; Governance

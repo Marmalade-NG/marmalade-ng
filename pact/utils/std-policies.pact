@@ -1,7 +1,7 @@
 (module std-policies GOVERNANCE
   (use token-policy-ng-v1 [token-info])
-  (use free.util-lists)
-  (use free.util-strings)
+  (use free.util-lists [first])
+  (use free.util-strings [join split])
 
   ;-----------------------------------------------------------------------------
   ; Governance
