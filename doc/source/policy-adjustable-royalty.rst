@@ -183,6 +183,21 @@ Return the details of the royalties for a token for a given creator account.
     "token-id": "t:9Dh2pSjMjXLPERZnbE-aDuXQuquuOkgxSOgS-hYYX7Q"}
   ]
 
+get-sale-rate
+~~~~~~~~~~~~~
+*sale-id* ``string`` *→* ``string``
+
+Return the royalty rate for a given sale.
+
+Usually the rate is the same as the one returned by `get-royalty-details`.
+But if the creator has changed the rate after the sale being started, the old
+rate returned by this function is still applied.
+
+.. code:: lisp
+
+  (use marmalade-ng.policy-adjustable-roayalty)
+  (get-sale-rate "Lya0Fz-Sl7IuNYp3DOPPtMGU7VFDFZG0mpYd-NneHIs")
+    > 0.1
 
 Events
 ^^^^^^

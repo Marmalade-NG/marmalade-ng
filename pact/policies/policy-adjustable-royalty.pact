@@ -200,6 +200,11 @@
     @doc "Return the details of the royalty spec for a token-id"
     (read royalty-tokens token-id))
 
+  (defun get-sale-rate:decimal (sale-id:string)
+    @doc "Return the royalty rate for a given sale"
+    (with-read royalty-sales sale-id {'sale-rate:=rate}
+      rate))
+
   ;-----------------------------------------------------------------------------
   ; View functions (local only)
   ;-----------------------------------------------------------------------------
