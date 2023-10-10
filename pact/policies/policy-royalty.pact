@@ -107,7 +107,7 @@
         ;   until this one will be fixed, we have to compare by stringified versions
         (enforce (contains (to-string currency) (map (to-string) allowed-currencies))
                  "Currency is not allowed"))
-                 
+
       ;Store the currency for this sale-id => This will be needed during (enforce-settle)
       (insert royalty-sales (pact-id) {'currency: currency}))
     false ; We always return false because the royalty policy does not handle a sale

@@ -1,5 +1,4 @@
 (module ledger GOVERNANCE
-
   (implements kip.poly-fungible-v3)
   (use kip.poly-fungible-v3 [account-details sender-balance-change receiver-balance-change])
 
