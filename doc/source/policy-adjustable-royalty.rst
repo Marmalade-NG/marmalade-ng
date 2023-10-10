@@ -75,10 +75,10 @@ Handled by ``(enforce-sale-init)``
 .. code:: lisp
 
   (defschema royalty-init-msg-sch
-    creator_acct:string
-    creator_guard:guard
-    rate:decimal
-    currencies:[module{fungible-v2}]
+    creator_acct:string ; Creator account: recipient of the royalty
+    creator_guard:guard ; Creator account: recipient of the royalty
+    rate:decimal ; Royalty rate
+    currencies:[module{fungible-v2}] ; List of currencies allowed for royalty payment
   )
 
 

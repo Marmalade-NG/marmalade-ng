@@ -54,10 +54,10 @@
   ; Input data
   ;-----------------------------------------------------------------------------
   (defschema royalty-init-msg-sch
-    creator_acct:string
-    creator_guard:guard
-    rate:decimal
-    currencies:[module{fungible-v2}]
+    creator_acct:string ; Creator account: recipient of the royalty
+    creator_guard:guard ; Creator account: recipient of the royalty
+    rate:decimal ; Royalty rate
+    currencies:[module{fungible-v2}] ; List of currencies allowed for royalty payment
   )
 
   (defun read-royalty-init-msg:object{royalty-init-msg-sch} (token:object{token-info})
@@ -65,7 +65,7 @@
 
   ; -----------
   (defschema royalty-sale-msg-sch
-    maximum_royalty:decimal
+    maximum_royalty:decimal ; Maximum royalty for a sale
   )
 
   (defconst ROYALTY-SALE-MSG-DEFAULT:object{royalty-sale-msg-sch}
