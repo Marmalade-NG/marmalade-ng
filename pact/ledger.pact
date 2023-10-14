@@ -3,7 +3,7 @@
   (use kip.poly-fungible-v3 [account-details sender-balance-change receiver-balance-change])
   (use token-policy-ng-v1 [token-info])
   (use free.util-strings [to-string starts-with])
-  (use free.util-time [is-future])
+  (use free.util-time [time-between now])
   (use free.util-fungible [enforce-precision enforce-reserved enforce-valid-account enforce-valid-transfer enforce-valid-amount])
 
   ;-----------------------------------------------------------------------------
@@ -39,6 +39,9 @@
 
   ; Constant used for sales, that represents a no timeout
   (defconst NO-TIMEOUT:time (time "0000-01-01T00:00:00Z"))
+
+  ; Maximum tiemeout in days => 10 years
+  (defconst MAXIMUM-TIMEOUT:decimal (days (* 10.0 365.25)))
 
   ;-----------------------------------------------------------------------------
   ; Events
@@ -468,7 +471,8 @@
 
         ; Check that the timeout is NO-TIMEOUT or in the future
         ; A policy may do additional checks on this timeout
-        (enforce (or? (is-future) (= NO-TIMEOUT) timeout) "Timeout must be in future")
+        (enforce (or? (time-between (now) (add-time (now) MAXIMUM-TIMEOUT))
+                      (= NO-TIMEOUT) timeout) "Invalid timeout")
 
         ; Call the policies => All the returns values are ORed using fold.
         ; This ensures that at least one policy has handled the sale.
