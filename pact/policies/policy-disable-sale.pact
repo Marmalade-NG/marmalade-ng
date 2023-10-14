@@ -18,14 +18,11 @@
   (defun enforce-init:bool (token:object{token-info})
     true)
 
-
   (defun enforce-mint:bool (token:object{token-info} account:string amount:decimal)
     true)
 
-
   (defun enforce-burn:bool (token:object{token-info} account:string amount:decimal)
     true)
-
 
   (defun enforce-transfer:bool (token:object{token-info} sender:string receiver:string amount:decimal)
     true)

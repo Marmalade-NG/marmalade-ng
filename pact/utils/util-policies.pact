@@ -89,6 +89,4 @@
     @doc "Enforce that a rate is between 0.0 and 1.0"
     (enforce (between 0.0 1.0 rate) "Rate must be between 0.0 and 1.0")
   )
-
-
 )

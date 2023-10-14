@@ -169,5 +169,4 @@
            (select tokens ['token-id]
                    (where 'collection-id (is-in-list)))))
   )
-
 )

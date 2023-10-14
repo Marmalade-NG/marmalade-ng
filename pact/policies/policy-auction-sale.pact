@@ -25,13 +25,13 @@
     @event
     true)
 
-  (defcap AUCTION-SALE-BOUGHT (sale-id:string token-id:string end-price:decimal)
+  (defcap AUCTION-SALE-BOUGHT (sale-id:string token-id:string buy-price:decimal)
     @doc "Event sent when an auction has ended"
     @event
     true)
 
   (defcap AUCTION-SALE-WITHDRAWN (sale-id:string token-id:string)
-    @doc "Event sent when an auction is withdrawn because there is no bid "
+    @doc "Event sent when an auction has been withdrawn because there is no bid"
     @event
     true)
 

@@ -117,12 +117,9 @@
 (continue-pact 0 true (hash "fixed-sale-1"))
 
 (ev-analyzer.store (env-events true))
-
 (expect "Event FIXED-SALE-WITHDRAWN has been emitted" true (ev-analyzer.is-present "FIXED-SALE-WITHDRAWN"))
 (expect "Event FIXED-SALE-WITHDRAWN -> sale_id" (hash "fixed-sale-1") (ev-analyzer.param "FIXED-SALE-WITHDRAWN" 0))
 (expect "Event FIXED-SALE-WITHDRAWN -> token_id" "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" (ev-analyzer.param "FIXED-SALE-WITHDRAWN" 1))
-
-
 
 (expect-that "It should exist 0 active sale" (compose (length) (= 0)) (get-all-active-sales))
 

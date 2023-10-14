@@ -451,8 +451,6 @@
     ;@managed
     true)
 
-
-
   (defpact sale:bool (id:string seller:string amount:decimal timeout:time)
     (step-with-rollback
       ;; Step 0: offer
