@@ -291,11 +291,10 @@
     ;         |-> Sort by 'r
     ;             |-> Extract 'p from the object
     (let ((zip-rank (lambda (pol:module{token-policy-ng-v1}) {'r:(pol::rank), 'p:pol})))
-      (compose (compose (distinct)
-                        (map (zip-rank)))
-               (compose (sort ['r, 'p])
-                        (map (at 'p)))
-               in))
+      (map (at 'p)
+           (sort ['r, 'p]
+                 (map (zip-rank)
+                      (distinct in)))))
   )
 
 
