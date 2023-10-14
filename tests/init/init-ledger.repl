@@ -1,4 +1,4 @@
-(enforce-pact-version "4.8")
+(enforce-pact-version "4.9")
 (begin-tx)
 (use basic-guards)
 (define-namespace 'marmalade-ng GUARD_SUCCESS GUARD_SUCCESS)
