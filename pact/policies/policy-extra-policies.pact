@@ -9,7 +9,7 @@
   ;-----------------------------------------------------------------------------
   (defconst ADMIN-KEYSET:string (read-string "admin_keyset"))
 
-  (defconst EXTRA-POLICIES-KEYSET:string (read-string "extra_policies_keyset"))
+  (defconst EXTRA-POLICIES-KEYSET:string (read-string "extra_policies_admin_keyset"))
 
   (defcap GOVERNANCE ()
     (enforce-keyset ADMIN-KEYSET))
