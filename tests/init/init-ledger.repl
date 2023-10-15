@@ -5,7 +5,7 @@
 (print "====> Deploy ledger")
 
 (env-data {'admin_keyset:"marmalade-ng.admin",
-           'extra_policies_keyset:"marmalade-ng.extra_admin",
+           'extra_policies_admin_keyset:"marmalade-ng.extra_admin",
            'ks-extra:["extra_adm"],
            'ks:["adm"]})
 

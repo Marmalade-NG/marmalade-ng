@@ -2,7 +2,7 @@
 (load "kadena_repl_sandbox/kda-env/init.repl")
 
 (env-data {'admin_keyset:"marmalade-ng.admin",
-           'extra_policies_keyset:"marmalade-ng.extra-admin"})
+           'extra_policies_admin_keyset:"marmalade-ng.extra-admin"})
 (namespace 'kip)
 (load "../pact/kip/poly-fungible-v3.pact")
 
