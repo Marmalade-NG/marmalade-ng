@@ -5,6 +5,8 @@
 (print "====> Deploy ledger")
 
 (env-data {'admin_keyset:"marmalade-ng.admin",
+           'extra_policies_keyset:"marmalade-ng.extra_admin",
+           'ks-extra:["extra_adm"],
            'ks:["adm"]})
 
 
@@ -15,6 +17,7 @@
 (namespace 'marmalade-ng)
 (env-sigs [{'key:"adm", 'caps:[]}])
 (define-keyset "marmalade-ng.admin" (read-keyset 'ks))
+(define-keyset "marmalade-ng.extra_admin" (read-keyset 'ks-extra))
 (load "../../pact/policies/token-policy-ng-v1.pact")
 (load "../../pact/utils/util-policies.pact")
 (load "../../pact/ledger.pact")

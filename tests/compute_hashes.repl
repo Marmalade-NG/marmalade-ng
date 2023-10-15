@@ -21,6 +21,7 @@
 (load "../pact/policies/policy-disable-sale.pact")
 (load "../pact/policies/policy-disable-transfer.pact")
 (load "../pact/policies/policy-dutch-auction-sale.pact")
+(load "../pact/policies/policy-extra-policies.pact")
 (load "../pact/policies/policy-fixed-issuance.pact")
 (load "../pact/policies/policy-fixed-sale.pact")
 (load "../pact/policies/policy-guards.pact")

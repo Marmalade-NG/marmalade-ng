@@ -17,6 +17,7 @@ REPL_SCRIPTS="./test-ledger.repl
               ./test-policy-collection.repl
               ./test-policy-disable-burn.repl
               ./test-policy-disable-transfer.repl
+              ./test-policy-extra-policies.repl
               ./test-policy-dutch-auction-sale.repl
               ./test-policy-instant-mint.repl
               ./test-policy-fixed-issuance.repl
