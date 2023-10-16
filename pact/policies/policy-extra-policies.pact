@@ -52,7 +52,7 @@
   ; Input data
   ;-----------------------------------------------------------------------------
   (defschema extra-policies-msg-sch
-    guard:guard
+    guard:guard ; Owned by the creator: used to protect blacklists
   )
 
   (defun read-extra-policies-msg:object{extra-policies-msg-sch} (token:object{token-info})
@@ -62,12 +62,15 @@
   ; Util functions
   ;-----------------------------------------------------------------------------
   (defun filter-from-list:[module{token-policy-ng-v1}] (in to-remove)
+    @doc "Utility function to return elements of in, not present in to-remove"
     (if (is-empty to-remove) in
         (filter (compose (contains* to-remove) (not)) in))
   )
 
 
   (defun policies-list-for-token-id:[module{token-policy-ng-v1}]  (token-id:string)
+  @doc "Return the list of policies associted to a given token-id \
+      \ Global policies  - blacklisted policies"
     ; We read the global list
     ;   then the blacklisted list for the given token
     ;     -> And we filter the global list from the blacklisted tokens
@@ -77,19 +80,25 @@
   )
 
   (defun policies-list-for-token:[module{token-policy-ng-v1}] (token:object{token-info})
+    @doc "Return the list of policies associted to a given token \
+        \ Global policies  - blacklisted policies"
     (policies-list-for-token-id (at 'id token)))
 
   (defun policies-list-for-sale:[module{token-policy-ng-v1}] ()
+    @doc "Return the list of policies associted to the current sale \
+        \ Global policies  - blacklisted policies"
     (with-read global "" {'policies:=pols-list}
       (with-default-read sales (pact-id) {'blacklist:[]} {'blacklist:=blacklist}
         (filter-from-list pols-list blacklist)))
   )
 
   (defun get-guard-by-id:guard (token-id:string)
+    @doc "Return the guard assiocated to a token-id"
     (with-default-read tokens token-id {'guard:=g}
       g))
 
   (defun get-guard:guard (token:object{token-info})
+    @doc "Return the guard assiocated to a token"
     (get-guard-by-id (at 'id token)))
 
   ;-----------------------------------------------------------------------------
@@ -237,6 +246,7 @@
   )
 
   (defun list-policies:[module{token-policy-ng-v1}] ()
+    @doc "List all global policies"
     (with-read global "" {'policies:=pols}
       pols)
   )
