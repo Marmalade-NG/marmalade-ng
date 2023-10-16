@@ -6,6 +6,7 @@
 # - FIXED-SALE
 # - AUCTION-SALE
 # - DUTCH-AUCTION-SALE
+# - EXTRA-POLICIES
 #
 # The token is a poly fungible divided in 10 shares.
 # The token is immediately minted in the same transactions with 3 holders:
@@ -21,7 +22,7 @@ code: |-
          (token-id (create-token-id tmp-guard "{{uri}}")))
 
     (create-token token-id 1 "{{uri}}"
-                  (to-policies "COLLECTION FIXED-ISSUANCE INSTANT-MINT ROYALTY FIXED-SALE AUCTION-SALE DUTCH-AUCTION-SALE")
+                  (to-policies "COLLECTION FIXED-ISSUANCE INSTANT-MINT ROYALTY FIXED-SALE AUCTION-SALE DUTCH-AUCTION-SALE EXTRA-POLICIES")
                   tmp-guard)
 
     (mint token-id "{{receiver-1}}" (read-keyset 'ks-receiver-1) 0.2)
@@ -49,6 +50,12 @@ data:
       decimal: "0.1"
     precision:
       int: 1
+
+  marmalade_extra_policies:
+    guard:
+      pred: keys-all
+      keys:
+        - {{creator-key}}
 
   marmalade_royalty:
     creator_acct: {{creator}}
