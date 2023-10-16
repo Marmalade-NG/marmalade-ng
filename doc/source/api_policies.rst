@@ -11,6 +11,7 @@ Standard policies: Reference and API
    policy-disable-transfer.rst
    policy-disable-sale.rst
    policy-dutch-auction-sale.rst
+   policy-extra-policies.rst
    policy-fixed-issuance.rst
    policy-fixed-sale.rst
    policy-guards.rst
