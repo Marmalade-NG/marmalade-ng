@@ -90,7 +90,7 @@
       (enforce not-ended "Sale ended")))
 
   (defun enforce-seller-guard:bool ()
-    @doc "Enforce the seller in case of a no-tiemout sale"
+    @doc "Enforce the seller in case of a NO-TIMEOUT sale"
     (with-read quotes (pact-id) {'seller-guard:=seller-g, 'timeout:=tmout}
       (with-capability (FORCE-WITHDRAW (pact-id))
         (enforce-one "Seller must sign forced-withdrawal"
