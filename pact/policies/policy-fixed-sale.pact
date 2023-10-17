@@ -178,17 +178,16 @@
 
   (defun --enforce-sale-settle:bool (token:object{token-info})
     (require-capability (ledger.POLICY-ENFORCE-SETTLE token (pact-id) policy-fixed-sale))
-    (with-read quotes (pact-id) {'amount:=amount,
-                                 'currency:=currency:module{fungible-v2},
+    (with-read quotes (pact-id) {'currency:=currency:module{fungible-v2},
                                  'recipient:=recipient}
       ; The (enforce-settle) handler is called in the same transaction
       ; as the (enforce-buy) handler
       ; => Checking the timeout is not necessary
       ; Transfer the remaining from the escrow account to the recipient
       (let* ((escrow (ledger.escrow))
-             (amount (currency::get-balance escrow)))
-        (install-capability (currency::TRANSFER escrow recipient amount))
-        (currency::transfer escrow recipient amount)))
+             (escrow-total-bal (currency::get-balance escrow)))
+        (install-capability (currency::TRANSFER escrow recipient escrow-total-bal))
+        (currency::transfer escrow recipient escrow-total-bal)))
     ; Disable the sale
     (update quotes (pact-id) {'enabled: false})
     true
