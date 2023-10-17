@@ -31,6 +31,8 @@ If the policy only does enforcement, and does not manage sales or fees, ``0`` is
 If the policy is involved in a sale, another value between 10 and 30 has to be chosen, depending on how the
 policy must be prioritized within the sale process vs *policy-marketplace*, *policy-royalty*, *policy-xxx-sale*, ...
 
+Some constants are defined in ``util-policies``: :ref:`API_UTILS_POLICIES_RANK`
+
 3 - Ledger capabilities requirements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 In the template, each function starts with ``(require-capability (ledger.``.

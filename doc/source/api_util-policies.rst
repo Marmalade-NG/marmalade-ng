@@ -5,6 +5,25 @@ This module is intended to be only used by policies developers.
 It contains some utilities functions to make policies creation more easy
 and compliant.
 
+.. _API_UTILS_POLICIES_RANK:
+
+Rank constants
+--------------
+Constants defined for standardizing ranks management in policies
+
+.. code-block:: lisp
+
+  (defconst RANK-HIGH-PRIORITY:integer 0)
+
+  (defconst RANK-SELLER-FEE:integer 10)
+
+  (defconst RANK-ROYALTY:integer 20)
+
+  (defconst RANK-SALE:integer 30)
+
+  (defconst RANK-LOG-PRIORITY:integer 99)
+
+
 Message utils
 -------------
 These functions are helpers to read the data messages
