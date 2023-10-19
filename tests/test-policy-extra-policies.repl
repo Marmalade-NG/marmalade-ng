@@ -31,6 +31,10 @@
 
 (create-token "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10" 1 "http://token-extra-1"
               [marmalade-ng.policy-extra-policies, marmalade-ng.policy-events-A, marmalade-ng.policy-events-B] (read-keyset 'create-ks))
+
+(env-data {'ref-guard: ["creator-key"] })
+(expect-that "get-guard should retrieve the right guard" (= (read-keyset 'ref-guard))
+             (marmalade-ng.policy-extra-policies.get-guard-by-id "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10"))
 (commit-tx)
 
 ;------------------------------------------------------------------
