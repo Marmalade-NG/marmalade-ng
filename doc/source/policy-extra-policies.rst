@@ -61,13 +61,13 @@ get-guard
 ~~~~~~~~~~
 *token* ``object{token-info}`` *→* ``guard``
 
-Return the guard assiocated to a token
+Return the guard associated to a token
 
 get-guard-by-id
 ~~~~~~~~~~~~~~~
 *token-id* ``string`` *→* ``guard``
 
-Return the guard assiocated to a token-id
+Return the guard associated to a token-id
 
 add-to-blacklist
 ~~~~~~~~~~~~~~~~
@@ -75,7 +75,7 @@ add-to-blacklist
 
 Add a new policy to the blacklist for the given token-id.
 
-Must be signed by the creator's guard. The signature can be scopped
+Must be signed by the creator's guard. The signature can be scoped
 by ``(UPDATE-EXTRA-POLICIES token-id)``.
 
 .. code:: lisp
@@ -89,7 +89,7 @@ remove-from-blacklist
 
 Remove of policy from the blacklist for the given token-id.
 
-Must be signed by the creator's guard. The signature can be scopped
+Must be signed by the creator's guard. The signature can be scoped
 by ``(UPDATE-EXTRA-POLICIES token-id)``.
 
 .. code:: lisp
@@ -104,7 +104,7 @@ rotate
 
 Rotate the extra policy guard for the given token-id.
 
-Must be signed by the creator's guard. The signature can be scopped
+Must be signed by the creator's guard. The signature can be scoped
 by ``(UPDATE-EXTRA-POLICIES token-id)``.
 
 .. code:: lisp
@@ -119,7 +119,7 @@ list-registered-policies
 ~~~~~~~~~~~~~~~~~~~~~~~~
 *→* ``[module{token-policy-ng-v1}]``
 
-List all global policies.
+List all global registered-policies.
 
 .. code:: lisp
 
@@ -131,7 +131,7 @@ get-blacklist
 ~~~~~~~~~~~~~
 *token-id* ``string`` *→* ``[module{token-policy-ng-v1}]``
 
-List all global policies.
+List the blacklisted policies of a given token.
 
 .. code:: lisp
 
@@ -151,7 +151,7 @@ register-policy
 Admin function to add a policy to the global extra-policies list.
 
 The transaction must be signed by the extra-policy governance keyset.
-The signature can be scopped by ``(EXTRA-POLICIES-GOVERNANCE)``.
+The signature can be scoped by ``(EXTRA-POLICIES-GOVERNANCE)``.
 
 .. code:: lisp
 
@@ -164,7 +164,7 @@ unregister-policy
 *policy* ``module{token-policy-ng-v1}`` *→* ``string``
 
 Admin function to remove a policy from the global extra-policies list.
-The signature can be scopped by ``(EXTRA-POLICIES-GOVERNANCE)``.
+The signature can be scoped by ``(EXTRA-POLICIES-GOVERNANCE)``.
 
 .. code:: lisp
 
