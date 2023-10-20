@@ -115,8 +115,8 @@ by ``(UPDATE-EXTRA-POLICIES token-id)``.
 
 View functions
 ^^^^^^^^^^^^^^
-list-policies
-~~~~~~~~~~~~~
+list-registered-policies
+~~~~~~~~~~~~~~~~~~~~~~~~
 *→* ``[module{token-policy-ng-v1}]``
 
 List all global policies.
@@ -124,7 +124,7 @@ List all global policies.
 .. code:: lisp
 
   (use marmalade-ng.policy-extra-policies)
-  (list-policies)
+  (list-registered-policies)
     > [marmalade-ng-extra.my-policy, marmalade-ng-extra.new-sale-policy]
 
 get-blacklist
@@ -144,8 +144,8 @@ List all global policies.
 
 Administrative functions
 ^^^^^^^^^^^^^^^^^^^^^^^^
-add-policy
-~~~~~~~~~~
+register-policy
+~~~~~~~~~~~~~~~
 *policy* ``module{token-policy-ng-v1}`` *→* ``string``
 
 Admin function to add a policy to the global extra-policies list.
@@ -156,11 +156,11 @@ The signature can be scopped by ``(EXTRA-POLICIES-GOVERNANCE)``.
 .. code:: lisp
 
   (use marmalade-ng.policy-extra-policies)
-  (add-policy marmalade-ng-extra.my-policy)
+  (register-policy marmalade-ng-extra.my-policy)
 
 
-remove-policy
-~~~~~~~~~~~~~
+unregister-policy
+~~~~~~~~~~~~~~~~~
 *policy* ``module{token-policy-ng-v1}`` *→* ``string``
 
 Admin function to remove a policy from the global extra-policies list.
@@ -169,4 +169,4 @@ The signature can be scopped by ``(EXTRA-POLICIES-GOVERNANCE)``.
 .. code:: lisp
 
   (use marmalade-ng.policy-extra-policies)
-  (remove-policy marmalade-ng-extra.my-policy)
+  (unregister-policy marmalade-ng-extra.my-policy)

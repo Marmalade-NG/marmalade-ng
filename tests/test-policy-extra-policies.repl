@@ -67,12 +67,12 @@
 ; Without signature
 (env-sigs [])
 (expect-failure "No signature" "Keyset failure"
-                (add-policy marmalade-ng.policy-events-extra-C))
+                (register-policy marmalade-ng.policy-events-extra-C))
 
 
 (env-sigs [{'key:"extra_adm", 'caps:[(EXTRA-POLICIES-GOVERNANCE)]}])
-(add-policy marmalade-ng.policy-events-extra-C)
-(add-policy marmalade-ng.policy-events-extra-D)
+(register-policy marmalade-ng.policy-events-extra-C)
+(register-policy marmalade-ng.policy-events-extra-D)
 (commit-tx)
 
 
@@ -119,11 +119,11 @@
 ; Without signature
 (env-sigs [])
 (expect-failure "No signature" "Keyset failure"
-                (remove-policy marmalade-ng.policy-events-extra-D))
+                (unregister-policy marmalade-ng.policy-events-extra-D))
 
 
 (env-sigs [{'key:"extra_adm", 'caps:[(EXTRA-POLICIES-GOVERNANCE)]}])
-(remove-policy marmalade-ng.policy-events-extra-D)
+(unregister-policy marmalade-ng.policy-events-extra-D)
 (commit-tx)
 
 
@@ -165,7 +165,7 @@
 (use marmalade-ng.policy-extra-policies)
 
 (env-sigs [{'key:"extra_adm", 'caps:[(EXTRA-POLICIES-GOVERNANCE)]}])
-(add-policy marmalade-ng.policy-events-extra-D)
+(register-policy marmalade-ng.policy-events-extra-D)
 (commit-tx)
 
 ; And mint again
