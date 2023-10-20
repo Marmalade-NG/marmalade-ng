@@ -140,6 +140,18 @@ List the blacklisted policies of a given token.
     > [marmalade-ng-extra.my-policy]
 
 
+policies-list-for-token-id
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+*token-id* ``string`` *→* ``[module{token-policy-ng-v1}]``
+
+Return the lists of policies applicable for a specific token.
+If the token doesn't implement the ``policy-extra-policies``, empty list is returned.
+
+.. code:: lisp
+
+  (use marmalade-ng.policy-extra-policies)
+  (policies-list-for-token-id "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10")
+    > [ marmalade-ng-extra.new-sale-policy]
 
 
 Administrative functions
