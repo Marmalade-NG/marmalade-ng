@@ -108,7 +108,8 @@
   ;-----------------------------------------------------------------------------
   ; Policy hooks
   ;---------------------------------------------------------------------------
-  (defun rank:integer () 25)
+  (defun rank:integer ()
+    (/ (+ RANK-ROYALTY RANK-SALE) 2))
 
   (defun enforce-init:bool (token:object{token-info})
     ; Since the extra-policy can be added after init, there is no sense of calling
