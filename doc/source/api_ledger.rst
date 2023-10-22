@@ -132,6 +132,16 @@ The result is a list of object with the 2 fields ``account`` and ``balance``.
 
 Accounts management
 --------------------
+
+Note about accounts
+~~~~~~~~~~~~~~~~~~~
+* Non principal accounts are accepted but definitively **NOT recommended**.
+
+* Principal accounts are validated against their guard.
+
+* Guard rotation is not possible. A possible workarounds is to use ``r:`` accounts.
+
+
 create-account
 ~~~~~~~~~~~~~~
 *id* ``string`` *account* ``string`` **guard** ``guard`` *→* ``bool``

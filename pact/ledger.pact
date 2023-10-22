@@ -559,15 +559,20 @@
     @doc "Credit AMOUNT to ACCOUNT balance"
     (enforce-reserved account guard)
     (require-capability (CREDIT id account))
-    (with-default-read ledger (key id account) {'balance:-1.0}
-                                               {'balance:=old-bal}
-      (let* ((is-new (= old-bal -1.0))
-             (old-bal (if is-new 0.0 old-bal))
-             (new-bal  (+ old-bal amount)))
+    (with-default-read ledger (key id account) {'balance:0.0, 'guard:guard}
+                                               {'balance:=old-bal, 'guard:=current-guard}
+      (enforce (= guard current-guard) "Existing guard doesn't match")
+      (let ((new-bal (+ old-bal amount)))
         (write ledger (key id account) {'balance:new-bal,
                                         'guard:guard,
                                         'id:id,
                                         'account:account})
         {'account: account, 'previous: old-bal, 'current: new-bal}))
-    )
+  )
+
+  ;; Note regarding accounts rotation
+  ;;---------------------------------
+  ; Guard rotation is intentionally not possible.
+  ; Some fetatures in policies rely on the accounts immutability.
+  ; Please do not try to restore a rotate function.
 )
