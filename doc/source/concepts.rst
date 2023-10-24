@@ -71,6 +71,15 @@ Especially these two critical cases are considered:
   - tokens creation
   - collections creation
 
+URI
+~~~
+Each token is associated with a URI pointing to a metadata object that can include
+often the description, name, traits, link to the hosted image, and several other information
+This object is stored off-chain.
+The Marmalade-NG smart-contracts are agnostic to this object format. However for a better interoperability
+between ledgers, marketplaces and other Dapp, tokens metadata is expected to follow the
+following standard: :ref:`METADATA`
+
 
 Token IDs
 ---------
