@@ -1,0 +1,21 @@
+code: |-
+  ({{namespace}}.policy-extra-policies.unregister-policy {{policy-module}})
+
+data:
+publicMeta:
+  chainId: "{{chain}}"
+  sender: {{gas-payer}}
+  gasLimit: 1000
+  gasPrice: 0.00000001
+  ttl: 7200
+networkId: "{{network}}"
+signers:
+  - public: {{gas-payer-key}}
+    caps:
+      - name: "coin.GAS"
+        args: []
+  - public: {{admin-key}}
+    caps:
+      - name: "{{namespace}}.policy-extra-policies.EXTRA-POLICIES-GOVERNANCE"
+        args: []
+type: exec

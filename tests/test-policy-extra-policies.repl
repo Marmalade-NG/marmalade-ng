@@ -1,0 +1,610 @@
+(env-data {"disable-marmalade":true})
+;
+(load "kadena_repl_sandbox/kda-env/init.repl")
+(load "init/init-ledger.repl")
+(load "init/init-policy-extra-policies.repl")
+
+(begin-tx)
+(load "tools/events_analyzer.pact")
+(commit-tx)
+
+(begin-tx)
+(namespace 'marmalade-ng)
+(load "stubs/policy-events-A.pact")
+(load "stubs/policy-events-B.pact")
+(load "stubs/policy-events-extra-C.pact")
+(load "stubs/policy-events-extra-D.pact")
+(commit-tx)
+
+
+(begin-tx "Create a token")
+(use marmalade-ng.ledger)
+(use marmalade-ng.policy-extra-policies)
+(use free.util-lists)
+(env-data {'create-ks:["create"]})
+
+(print (+ "Token-1: => " (create-token-id (read-keyset 'create-ks) "http://token-extra-1" )))
+
+(env-sigs [{'key:"create", 'caps:[(ENFORCE-RESERVED)]}])
+
+(env-data {'create-ks:["create"],
+           "marmalade_extra_policies_t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10":{'guard:{'pred:"keys-all", 'keys:["creator-key"]}}
+          })
+
+(create-token "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10" 1 "http://token-extra-1"
+              [marmalade-ng.policy-extra-policies, marmalade-ng.policy-events-A, marmalade-ng.policy-events-B] (read-keyset 'create-ks))
+
+(env-data {'ref-guard: ["creator-key"] })
+(expect-that "get-guard should retrieve the right guard" (= (read-keyset 'ref-guard))
+             (marmalade-ng.policy-extra-policies.get-guard-by-id "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10"))
+
+(expect-that "get-policies-for-token-id should be empty (no policies registerd)" (is-empty)
+             (policies-list-for-token-id "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10"))
+
+(commit-tx)
+
+;------------------------------------------------------------------
+; Sanity check, we are going to mint without extra policies for now
+(begin-tx "Mint 1")
+(use marmalade-ng.ledger)
+
+(env-data {'alice-ks:["alice"]})
+
+(env-events true)
+(mint "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10" "alice" (read-keyset 'alice-ks) 0.1)
+
+; Check the events
+(ev-analyzer.store (env-events true))
+(expect "Policy A has been called" true (ev-analyzer.is-present "EVENT-A"))
+(expect "Policy B has been called" true (ev-analyzer.is-present "EVENT-B"))
+
+(expect "Policy A params" "mint" (ev-analyzer.param "EVENT-A" 0))
+(expect "Policy B params" "mint" (ev-analyzer.param "EVENT-B" 0))
+(expect "Policy B called before A " true (< (ev-analyzer.position "EVENT-B")
+                                            (ev-analyzer.position "EVENT-A")))
+(commit-tx)
+
+
+;------------------------------------------------------------------
+; We are going to add 2 new policy to the extra-polcies
+(begin-tx "Add extra-policy")
+(use marmalade-ng.policy-extra-policies)
+(use free.util-lists)
+
+; Without signature
+(env-sigs [])
+(expect-failure "No signature" "Keyset failure"
+                (register-policy marmalade-ng.policy-events-extra-C))
+
+
+(env-sigs [{'key:"extra_adm", 'caps:[(EXTRA-POLICIES-GOVERNANCE)]}])
+(register-policy marmalade-ng.policy-events-extra-C)
+(register-policy marmalade-ng.policy-events-extra-D)
+
+(expect-that "get-policies-for-token id should have a length of 2" (compose (length) (= 2))
+             (policies-list-for-token-id "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10"))
+
+(expect-that "get-policies-for-token id should contains boh policies" (and? (contains marmalade-ng.policy-events-extra-C)
+                                                                            (contains marmalade-ng.policy-events-extra-D))
+             (policies-list-for-token-id "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10"))
+
+
+(commit-tx)
+
+; And mint again
+(begin-tx "Mint 2")
+(use marmalade-ng.ledger)
+
+(env-data {'alice-ks:["alice"]})
+
+(env-events true)
+(mint "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10" "alice" (read-keyset 'alice-ks) 0.1)
+
+; Check the events
+(ev-analyzer.store (env-events true))
+
+;;;Order of calls should be B -> C -> D -> A
+
+(expect "Policy A has been called" true (ev-analyzer.is-present "EVENT-A"))
+(expect "Policy B has been called" true (ev-analyzer.is-present "EVENT-B"))
+(expect "Policy C has been called" true (ev-analyzer.is-present "EVENT-C"))
+(expect "Policy D has been called" true (ev-analyzer.is-present "EVENT-D"))
+
+(expect "Policy A params" "mint" (ev-analyzer.param "EVENT-A" 0))
+(expect "Policy B params" "mint" (ev-analyzer.param "EVENT-B" 0))
+(expect "Policy C params" "mint" (ev-analyzer.param "EVENT-C" 0))
+(expect "Policy D params" "mint" (ev-analyzer.param "EVENT-D" 0))
+(expect "Policy B called before C " true (< (ev-analyzer.position "EVENT-B")
+                                            (ev-analyzer.position "EVENT-C")))
+
+(expect "Policy C called before D " true (< (ev-analyzer.position "EVENT-C")
+                                            (ev-analyzer.position "EVENT-D")))
+
+(expect "Policy C called before A " true (< (ev-analyzer.position "EVENT-D")
+                                            (ev-analyzer.position "EVENT-A")))
+
+(commit-tx)
+
+
+;------------------------------------------------------------------
+; Remove D from extra policies
+(begin-tx "Add extra-policy")
+(use marmalade-ng.policy-extra-policies)
+
+; Without signature
+(env-sigs [])
+(expect-failure "No signature" "Keyset failure"
+                (unregister-policy marmalade-ng.policy-events-extra-D))
+
+
+(env-sigs [{'key:"extra_adm", 'caps:[(EXTRA-POLICIES-GOVERNANCE)]}])
+(unregister-policy marmalade-ng.policy-events-extra-D)
+
+(expect-that "get-policies-for-token id should have a length of 2" (compose (length) (= 1))
+             (policies-list-for-token-id "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10"))
+
+(expect-that "get-policies-for-token id should contains boh policies" (and? (contains marmalade-ng.policy-events-extra-C)
+                                                                            (compose (contains marmalade-ng.policy-events-extra-D) (not)))
+             (policies-list-for-token-id "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10"))
+
+(commit-tx)
+
+
+
+; And mint again
+(begin-tx "Mint 3")
+(use marmalade-ng.ledger)
+
+(env-data {'alice-ks:["alice"]})
+
+(env-events true)
+(mint "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10" "alice" (read-keyset 'alice-ks) 0.1)
+
+; Check the events
+(ev-analyzer.store (env-events true))
+
+;;;Order of calls should be B -> C -> A
+
+(expect "Policy A has been called" true (ev-analyzer.is-present "EVENT-A"))
+(expect "Policy B has been called" true (ev-analyzer.is-present "EVENT-B"))
+(expect "Policy C has been called" true (ev-analyzer.is-present "EVENT-C"))
+(expect "Policy D has been called" false (ev-analyzer.is-present "EVENT-D"))
+
+(expect "Policy A params" "mint" (ev-analyzer.param "EVENT-A" 0))
+(expect "Policy B params" "mint" (ev-analyzer.param "EVENT-B" 0))
+(expect "Policy C params" "mint" (ev-analyzer.param "EVENT-C" 0))
+
+(expect "Policy B called before C " true (< (ev-analyzer.position "EVENT-B")
+                                            (ev-analyzer.position "EVENT-C")))
+
+
+(expect "Policy C called before A " true (< (ev-analyzer.position "EVENT-C")
+                                            (ev-analyzer.position "EVENT-A")))
+(commit-tx)
+
+;------------------------------------------------------------------
+; Add D again
+(begin-tx "Add extra-policy")
+(use marmalade-ng.policy-extra-policies)
+
+(env-sigs [{'key:"extra_adm", 'caps:[(EXTRA-POLICIES-GOVERNANCE)]}])
+(register-policy marmalade-ng.policy-events-extra-D)
+(commit-tx)
+
+; And mint again
+(begin-tx "Mint 4")
+(use marmalade-ng.ledger)
+
+(env-data {'alice-ks:["alice"]})
+
+(env-events true)
+(mint "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10" "alice" (read-keyset 'alice-ks) 0.1)
+
+; Check the events
+(ev-analyzer.store (env-events true))
+
+;;;Order of calls should be B -> C -> D -> A
+
+(expect "Policy A has been called" true (ev-analyzer.is-present "EVENT-A"))
+(expect "Policy B has been called" true (ev-analyzer.is-present "EVENT-B"))
+(expect "Policy C has been called" true (ev-analyzer.is-present "EVENT-C"))
+(expect "Policy D has been called" true (ev-analyzer.is-present "EVENT-D"))
+
+(expect "Policy A params" "mint" (ev-analyzer.param "EVENT-A" 0))
+(expect "Policy B params" "mint" (ev-analyzer.param "EVENT-B" 0))
+(expect "Policy C params" "mint" (ev-analyzer.param "EVENT-C" 0))
+(expect "Policy D params" "mint" (ev-analyzer.param "EVENT-D" 0))
+(expect "Policy B called before C " true (< (ev-analyzer.position "EVENT-B")
+                                            (ev-analyzer.position "EVENT-C")))
+
+(expect "Policy C called before D " true (< (ev-analyzer.position "EVENT-C")
+                                            (ev-analyzer.position "EVENT-D")))
+
+(expect "Policy C called before A " true (< (ev-analyzer.position "EVENT-D")
+                                            (ev-analyzer.position "EVENT-A")))
+
+(commit-tx)
+
+
+;;;; Blacklist
+(begin-tx "Add to blacklist")
+(use marmalade-ng.policy-extra-policies)
+
+; without signature
+(env-sigs [])
+
+(expect-failure "No signature" "Keyset failure"
+                (add-to-blacklist "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10" marmalade-ng.policy-events-extra-C))
+
+(env-sigs [{'key:"creator-key", 'caps:[(UPDATE-EXTRA-POLICIES "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10")]}])
+(add-to-blacklist "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10" marmalade-ng.policy-events-extra-C)
+(commit-tx)
+
+
+; And mint again
+(begin-tx "Mint 5")
+(use marmalade-ng.ledger)
+
+(env-data {'alice-ks:["alice"]})
+
+(env-events true)
+(mint "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10" "alice" (read-keyset 'alice-ks) 0.1)
+
+; Check the events
+(ev-analyzer.store (env-events true))
+
+;;;Order of calls should be B -> C -> A
+(expect "Policy A has been called" true (ev-analyzer.is-present "EVENT-A"))
+(expect "Policy B has been called" true (ev-analyzer.is-present "EVENT-B"))
+(expect "Policy C has NOT been called" false (ev-analyzer.is-present "EVENT-C"))
+(expect "Policy D has been called" true  (ev-analyzer.is-present "EVENT-D"))
+
+
+(expect "Policy B called before D " true (< (ev-analyzer.position "EVENT-B")
+                                            (ev-analyzer.position "EVENT-D")))
+
+(expect "Policy A called before A " true (< (ev-analyzer.position "EVENT-D")
+                                            (ev-analyzer.position "EVENT-A")))
+(commit-tx)
+
+
+;;;; Blacklist D
+(begin-tx "Add to blacklist D")
+(use marmalade-ng.policy-extra-policies)
+
+(env-sigs [{'key:"creator-key", 'caps:[(UPDATE-EXTRA-POLICIES "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10")]}])
+(add-to-blacklist "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10" marmalade-ng.policy-events-extra-D)
+(commit-tx)
+
+
+; And mint again
+(begin-tx "Mint 6")
+(use marmalade-ng.ledger)
+
+(env-data {'alice-ks:["alice"]})
+
+(env-events true)
+(mint "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10" "alice" (read-keyset 'alice-ks) 0.1)
+
+; Check the events
+(ev-analyzer.store (env-events true))
+(expect "Policy A has been called" true (ev-analyzer.is-present "EVENT-A"))
+(expect "Policy B has been called" true (ev-analyzer.is-present "EVENT-B"))
+(expect "Policy C has NOT been called" false (ev-analyzer.is-present "EVENT-C"))
+(expect "Policy D has NOT been called" false  (ev-analyzer.is-present "EVENT-D"))
+(commit-tx)
+
+
+;;;; Remove from blacklist C
+(begin-tx "Remove from blacklist")
+(use marmalade-ng.policy-extra-policies)
+
+; without signature
+(env-sigs [])
+
+(expect-failure "No signature" "Keyset failure"
+                (remove-from-blacklist "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10" marmalade-ng.policy-events-extra-C))
+
+(env-sigs [{'key:"creator-key", 'caps:[(UPDATE-EXTRA-POLICIES "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10")]}])
+(remove-from-blacklist "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10" marmalade-ng.policy-events-extra-C)
+(commit-tx)
+
+; And mint again
+(begin-tx "Mint 7")
+(use marmalade-ng.ledger)
+
+(env-data {'alice-ks:["alice"]})
+
+(env-events true)
+(mint "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10" "alice" (read-keyset 'alice-ks) 0.1)
+
+; Check the events
+(ev-analyzer.store (env-events true))
+(expect "Policy A has been called" true (ev-analyzer.is-present "EVENT-A"))
+(expect "Policy B has been called" true (ev-analyzer.is-present "EVENT-B"))
+(expect "Policy C has been called" true (ev-analyzer.is-present "EVENT-C"))
+(expect "Policy D has NOT been called" false  (ev-analyzer.is-present "EVENT-D"))
+(commit-tx)
+
+
+
+; Burn
+(begin-tx "Burn")
+(use marmalade-ng.ledger)
+
+(env-data {})
+(env-sigs [{'key:"alice", 'caps:[(BURN "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10" "alice" 0.1)]}])
+
+(env-events true)
+(burn "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10" "alice" 0.1)
+
+; Check the events
+(ev-analyzer.store (env-events true))
+(expect "Policy A has been called" true (ev-analyzer.is-present "EVENT-A"))
+(expect "Policy B has been called" true (ev-analyzer.is-present "EVENT-B"))
+(expect "Policy C has been called" true (ev-analyzer.is-present "EVENT-C"))
+
+(expect "Policy A params" "burn" (ev-analyzer.param "EVENT-A" 0))
+(expect "Policy B params" "burn" (ev-analyzer.param "EVENT-B" 0))
+(expect "Policy C params" "burn" (ev-analyzer.param "EVENT-C" 0))
+(commit-tx)
+
+; Transfer
+(begin-tx "transfer")
+(use marmalade-ng.ledger)
+
+(env-data {'bob-ks:["bob"]})
+(env-sigs [{'key:"alice", 'caps:[(TRANSFER "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10" "alice" "bob" 0.1)]}])
+
+(env-events true)
+(transfer-create "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10" "alice" "bob" (read-keyset 'bob-ks) 0.1)
+
+; Check the events
+(ev-analyzer.store (env-events true))
+(expect "Policy A has been called" true (ev-analyzer.is-present "EVENT-A"))
+(expect "Policy B has been called" true (ev-analyzer.is-present "EVENT-B"))
+(expect "Policy C has been called" true (ev-analyzer.is-present "EVENT-C"))
+
+(expect "Policy A params" "transfer" (ev-analyzer.param "EVENT-A" 0))
+(expect "Policy B params" "transfer" (ev-analyzer.param "EVENT-B" 0))
+(expect "Policy C params" "transfer" (ev-analyzer.param "EVENT-C" 0))
+(commit-tx)
+
+
+
+; Policy D is already blacklisted
+(begin-tx "sale")
+(use marmalade-ng.ledger)
+(env-hash (hash "sale 1"))
+(print (format "Sale ID 1: => {}" [(tx-hash)]))
+
+(env-sigs [ {'key:"alice", 'caps:[(OFFER "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10" "alice" 0.1)]}
+           ])
+
+(env-events true)
+(sale "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10" "alice" 0.1 NO-TIMEOUT)
+
+; Check the events
+(ev-analyzer.store (env-events true))
+(expect "Policy A has been called" true (ev-analyzer.is-present "EVENT-A"))
+(expect "Policy B has been called" true (ev-analyzer.is-present "EVENT-B"))
+(expect "Policy C has been called" true (ev-analyzer.is-present "EVENT-C"))
+(expect "Policy D has NOT been called" false (ev-analyzer.is-present "EVENT-D"))
+
+(expect "Policy A params" "sale-offer" (ev-analyzer.param "EVENT-A" 0))
+(expect "Policy B params" "sale-offer" (ev-analyzer.param "EVENT-B" 0))
+(expect "Policy C params" "sale-offer" (ev-analyzer.param "EVENT-C" 0))
+(commit-tx)
+
+; Policy D is already blacklisted
+(begin-tx "withdraw")
+(env-sigs [])
+
+(env-events true)
+(continue-pact 0 true (hash "sale 1"))
+
+(ev-analyzer.store (env-events true))
+(expect "Policy A has been called" true (ev-analyzer.is-present "EVENT-A"))
+(expect "Policy B has been called" true (ev-analyzer.is-present "EVENT-B"))
+(expect "Policy C has been called" true (ev-analyzer.is-present "EVENT-C"))
+(expect "Policy D has NOT been called" false (ev-analyzer.is-present "EVENT-D"))
+
+(expect "Policy A params" "sale-withdraw" (ev-analyzer.param "EVENT-A" 0))
+(expect "Policy B params" "sale-withdraw" (ev-analyzer.param "EVENT-B" 0))
+(expect "Policy C params" "sale-withdraw" (ev-analyzer.param "EVENT-C" 0))
+
+(rollback-tx)
+
+;{]
+; Policy D is already blacklisted
+(begin-tx "buy")
+(env-data {'buyer: "carol", 'buyer-guard: {'pred:"keys-all", 'keys:["carol-key"]}})
+
+(env-events true)
+(continue-pact 1 false (hash "sale 1"))
+
+(ev-analyzer.store (env-events true))
+(expect "Policy A has been called" true (ev-analyzer.is-present "EVENT-A"))
+(expect "Policy B has been called" true (ev-analyzer.is-present "EVENT-B"))
+(expect "Policy C has been called" true (ev-analyzer.is-present "EVENT-C"))
+(expect "Policy D has NOT been called" false (ev-analyzer.is-present "EVENT-D"))
+(expect "Policy C has been called" true (ev-analyzer.is-present "EVENT-SETTLE-C"))
+(expect "Policy D has NOT been called" false (ev-analyzer.is-present "EVENT-SETTLE-D"))
+
+(expect "Policy A params" "sale-buy" (ev-analyzer.param "EVENT-A" 0))
+(expect "Policy B params" "sale-buy" (ev-analyzer.param "EVENT-B" 0))
+(expect "Policy C params" "sale-buy" (ev-analyzer.param "EVENT-C" 0))
+
+(rollback-tx)
+
+;; We will add C to blacklist and verify that C is still called
+(begin-tx "Add to blacklist D")
+(use marmalade-ng.policy-extra-policies)
+(env-sigs [{'key:"creator-key", 'caps:[(UPDATE-EXTRA-POLICIES "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10")]}])
+(add-to-blacklist "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10" marmalade-ng.policy-events-extra-C)
+(expect-that "C in active list" (compose (length) (= 0)) (policies-list-for-token-id "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10"))
+(commit-tx)
+
+
+(begin-tx "withdraw-2")
+(env-sigs [])
+
+(env-events true)
+(continue-pact 0 true (hash "sale 1"))
+
+(ev-analyzer.store (env-events true))
+(expect "Policy C has been called" true (ev-analyzer.is-present "EVENT-C"))
+(expect "Policy D has been called" false (ev-analyzer.is-present "EVENT-D"))
+(rollback-tx)
+
+
+(begin-tx "buy")
+(env-data {'buyer: "carol", 'buyer-guard: {'pred:"keys-all", 'keys:["carol-key"]}})
+
+(env-events true)
+(continue-pact 1 false (hash "sale 1"))
+
+(ev-analyzer.store (env-events true))
+
+(expect "Policy C has been called" true (ev-analyzer.is-present "EVENT-C"))
+(expect "Policy D has been called" false (ev-analyzer.is-present "EVENT-D"))
+(rollback-tx)
+
+
+;; We will remove all policies from blacklist => Same policies must be called
+(begin-tx "Add to blacklist D")
+(use marmalade-ng.policy-extra-policies)
+(env-sigs [{'key:"creator-key", 'caps:[(UPDATE-EXTRA-POLICIES "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10")]}])
+(remove-from-blacklist "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10" marmalade-ng.policy-events-extra-C)
+(remove-from-blacklist "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10" marmalade-ng.policy-events-extra-D)
+(expect-that "C in active list" (compose (length) (= 2)) (policies-list-for-token-id "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10"))
+
+(commit-tx)
+
+
+(begin-tx "withdraw-3")
+(env-sigs [])
+
+(env-events true)
+(continue-pact 0 true (hash "sale 1"))
+
+(ev-analyzer.store (env-events true))
+(expect "Policy C has been called" true (ev-analyzer.is-present "EVENT-C"))
+(expect "Policy D has NOT been called" false (ev-analyzer.is-present "EVENT-D"))
+(rollback-tx)
+
+
+(begin-tx "buy-3")
+(env-data {'buyer: "carol", 'buyer-guard: {'pred:"keys-all", 'keys:["carol-key"]}})
+
+(env-events true)
+(continue-pact 1 false (hash "sale 1"))
+
+(ev-analyzer.store (env-events true))
+(expect "Policy C has been called" true (ev-analyzer.is-present "EVENT-C"))
+(expect "Policy D has NOT been called" false (ev-analyzer.is-present "EVENT-D"))
+(rollback-tx)
+
+;;; -------------------------------------
+; We know do exactly the same but starting with an empty blacklist
+(begin-tx "sale-2")
+(use marmalade-ng.ledger)
+(use marmalade-ng.policy-extra-policies)
+(env-hash (hash "sale 2"))
+(print (format "Sale ID 2: => {}" [(tx-hash)]))
+(expect-that "C in active list" (compose (length) (= 2)) (policies-list-for-token-id "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10"))
+
+(env-sigs [ {'key:"alice", 'caps:[(OFFER "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10" "alice" 0.1)]}
+          ])
+
+(env-events true)
+(sale "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10" "alice" 0.1 NO-TIMEOUT)
+
+; Check the events
+(ev-analyzer.store (env-events true))
+(expect "Policy C has been called" true (ev-analyzer.is-present "EVENT-C"))
+(expect "Policy D has been called" true (ev-analyzer.is-present "EVENT-D"))
+(commit-tx)
+
+
+(begin-tx "withdraw 2-1")
+(env-sigs [])
+
+(env-events true)
+(continue-pact 0 true (hash "sale 2"))
+
+(ev-analyzer.store (env-events true))
+(expect "Policy C has been called" true (ev-analyzer.is-present "EVENT-C"))
+(expect "Policy D has been called" true (ev-analyzer.is-present "EVENT-D"))
+(rollback-tx)
+
+
+(begin-tx "buy 2-1")
+(env-data {'buyer: "carol", 'buyer-guard: {'pred:"keys-all", 'keys:["carol-key"]}})
+
+(env-events true)
+(continue-pact 1 false (hash "sale 2"))
+
+(ev-analyzer.store (env-events true))
+(expect "Policy C has been called" true (ev-analyzer.is-present "EVENT-C"))
+(expect "Policy D has been called" true (ev-analyzer.is-present "EVENT-D"))
+(expect "Policy C has been called" true (ev-analyzer.is-present "EVENT-SETTLE-C"))
+(expect "Policy D has been called" true (ev-analyzer.is-present "EVENT-SETTLE-D"))
+(rollback-tx)
+
+;; Now we blacklist
+(begin-tx "Add to blacklist D")
+(use marmalade-ng.policy-extra-policies)
+(env-sigs [{'key:"creator-key", 'caps:[(UPDATE-EXTRA-POLICIES "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10")]}])
+(add-to-blacklist "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10" marmalade-ng.policy-events-extra-C)
+(expect-that "C in active list" (compose (length) (= 1)) (policies-list-for-token-id "t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10"))
+(commit-tx)
+
+;; And we expect the same events being called
+(begin-tx "withdraw 2-1")
+(env-sigs [])
+
+(env-events true)
+(continue-pact 0 true (hash "sale 2"))
+
+(ev-analyzer.store (env-events true))
+(expect "Policy C has been called" true (ev-analyzer.is-present "EVENT-C"))
+(expect "Policy D has been called" true (ev-analyzer.is-present "EVENT-D"))
+(rollback-tx)
+
+
+(begin-tx "buy 2-1")
+(env-data {'buyer: "carol", 'buyer-guard: {'pred:"keys-all", 'keys:["carol-key"]}})
+
+(env-events true)
+(continue-pact 1 false (hash "sale 2"))
+
+(ev-analyzer.store (env-events true))
+(expect "Policy C has been called" true (ev-analyzer.is-present "EVENT-C"))
+(expect "Policy D has been called" true (ev-analyzer.is-present "EVENT-D"))
+(expect "Policy C has been called" true (ev-analyzer.is-present "EVENT-SETTLE-C"))
+(expect "Policy D has been called" true (ev-analyzer.is-present "EVENT-SETTLE-D"))
+(rollback-tx)
+
+;; Test a token that doesn't implement extra-policies
+(begin-tx "Create a non extratoken")
+(use marmalade-ng.ledger)
+(use marmalade-ng.policy-extra-policies)
+(use free.util-lists)
+(env-data {'create-ks:["create"]})
+
+(print (+ "Token-2: => " (create-token-id (read-keyset 'create-ks) "http://token-no-extra-1" )))
+
+(env-sigs [{'key:"create", 'caps:[(ENFORCE-RESERVED)]}])
+
+(env-data {'create-ks:["create"],
+           "marmalade_extra_policies_t:fFyEf-Tu_b_DKe9RJDbwvMPX2-sFe2lMNuDcH4UGJ10":{'guard:{'pred:"keys-all", 'keys:["creator-key"]}}
+          })
+
+(create-token "t:uOF3uNRsxfgQTYu4kRU9elFUqn1pmOZrsxLKJ7p7aXo" 1 "http://token-no-extra-1"
+              [marmalade-ng.policy-events-A, marmalade-ng.policy-events-B] (read-keyset 'create-ks))
+
+(expect-that "get-policies-for-token id shouldn't throw an error and return empty" (is-empty)
+             (policies-list-for-token-id "t:uOF3uNRsxfgQTYu4kRU9elFUqn1pmOZrsxLKJ7p7aXo"))
+
+(commit-tx)

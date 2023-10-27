@@ -24,6 +24,10 @@ use cases. Removing the requirement for most token creator to create a custom a 
      - GUARDS
      - Allow to protect a token by a set of guards
 
+   * - :ref:`POLICY-EXTRA-POLICIES`
+     - EXTRA-POLICIES
+     - Allow to use the extra-policies of Marmalade NG
+
 
 
 .. list-table:: Minting restrictions policies

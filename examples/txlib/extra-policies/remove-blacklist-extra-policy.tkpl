@@ -1,0 +1,22 @@
+code: |-
+  ({{namespace}}.policy-extra-policies.remove-from-blacklist "{{token_id}}" {{policy-module}})
+
+data:
+publicMeta:
+  chainId: "{{chain}}"
+  sender: {{gas-payer}}
+  gasLimit: 1000
+  gasPrice: 0.00000001
+  ttl: 7200
+networkId: "{{network}}"
+signers:
+  - public: {{gas-payer-key}}
+    caps:
+      - name: "coin.GAS"
+        args: []
+  - public: {{creator-key}}
+    caps:
+      - name: "{{namespace}}.policy-extra-policies.UPDATE-EXTRA-POLICIES"
+        args:
+          - {{token_id}}
+type: exec
