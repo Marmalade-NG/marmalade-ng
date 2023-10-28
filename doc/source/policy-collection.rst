@@ -39,6 +39,17 @@ Each token when created inside a collection is given automatically a rank.
 Ranks start with #1 and are immutable.
 
 
+Collection sizes and maximum tokens
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Each collection has a defined size limit. This size is defined during the collection
+creation and is then immutable.
+
+This protects owners and potential buyers. They can be sure that the value of their token
+won't be diluted in a larger collection than they expect.
+
+The special value: ``UNLIMITED-SIZE`` (currently defined to ``0``) can be used to
+create unlimited collection.
+
 
 Implemented hooks
 ^^^^^^^^^^^^^^^^^
@@ -88,7 +99,7 @@ Create and register a collection.
 The creator guard will be enforced.
 
 *size* is the maximum number of tokens that can be contained in the collection.
-If *size* is 0, the collection is unlimited.
+If *size* is ``UNLIMITED-SIZE`` (currently defined to ``0``), the collection is unlimited.
 
 .. code:: lisp
 

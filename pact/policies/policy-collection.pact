@@ -55,7 +55,12 @@
   ;-----------------------------------------------------------------------------
   ; Constants
   ;-----------------------------------------------------------------------------
+  ; Maximum size of collections allowed by the contract
   (defconst MAXIMUM-SIZE:integer 10000000)
+
+  ; Special size value to indicate that the collection can have an unlimited count
+  ; of tokens.
+  (defconst UNLIMITED-SIZE:integer 0)
 
   ;-----------------------------------------------------------------------------
   ; Collection creation
@@ -64,7 +69,8 @@
     (format "c_{}_{}" [name, (hash {'n:name, 'g:creator-guard})]))
 
   (defun create-collection:bool (id:string name:string size:integer creator:string creator-guard:guard)
-    (enforce (and? (<= 0) (>= MAXIMUM-SIZE) size)
+    (enforce (or? (= UNLIMITED-SIZE)
+                  (and? (< 0) (>= MAXIMUM-SIZE)) size)
              (format "Collection size must be positive and less than {}" [MAXIMUM-SIZE]))
     ; Validate the creator name if it's a principal
     (enforce-reserved creator creator-guard)
@@ -97,8 +103,10 @@
       (with-capability (ADD-TO-COLLECTION collection-id token-id)
         (with-read collections collection-id {'max-size:=max-size,
                                               'size:=current-size}
-          ; max-size=0 means unlimited collection
-          (enforce (or? (= 0) (< current-size) max-size) "Exceeds collection size")
+          ; Check that either:
+          ;   - The collection is unlimited
+          ;   - The current count of collections is less than the maximum size
+          (enforce (or? (= UNLIMITED-SIZE) (< current-size) max-size) "Exceeds collection size")
 
           (update collections collection-id {'size:(++ current-size)})
           (insert tokens token-id {'token-id:token-id,
