@@ -1,0 +1,302 @@
+(env-data {"disable-marmalade":true})
+(load "kadena_repl_sandbox/kda-env/init.repl")
+(load "init/init-ledger.repl")
+(load "init/init-policy-fixed-sale.repl")
+(load "init/init-policy-trusted-custody.repl")
+
+;-------------------------------------------------------------------------------
+;-------------------------------------------------------------------------------
+(begin-tx "Define some trusted custodians accounts")
+(env-data {'custodian-ks:["custodian-key"],
+           'unknown-ks:["unknown-key"]})
+
+(namespace "user")
+(define-keyset "user.custodian-one" (read-keyset 'custodian-ks))
+(define-keyset "user.custodian-two" (read-keyset 'custodian-ks))
+(define-keyset "user.unknown" (read-keyset 'unknown-ks))
+(commit-tx)
+
+;-------------------------------------------------------------------------------
+;-------------------------------------------------------------------------------
+; We create three tokens
+;   - 2 will be minted to alice
+;   -  the third not be minted for now
+(begin-tx "Custody tests")
+(use marmalade-ng.ledger)
+(use marmalade-ng.policy-trusted-custody)
+(use free.util-lists)
+(env-data {'create-ks:["create"]})
+
+(print (+ "Token ID 1: => " (create-token-id (read-keyset 'create-ks) "http://custody-1" )))
+(print (+ "Token ID 2: => " (create-token-id (read-keyset 'create-ks) "http://custody-2" )))
+(print (+ "Token ID 3: => " (create-token-id (read-keyset 'create-ks) "http://custody-3" )))
+
+(env-data {'create-ks:["create"],
+           'alice-ks:["alice-key"],
+           "marmalade_trusted_custody_t:4tHYL_cb3AxDCQD6lLh2tIOlhdfZLgJXoa8VpeY2DNA":{'guard:{'pred:"keys-all", 'keys:["creator-key"]},
+                                                                                      'custodians:["r:user.custodian-"]},
+           "marmalade_trusted_custody_t:HkFSP8XdXxRJ3kW2G6nZuTHcAzhojGjRKODVQEpyzCk":{'guard:{'pred:"keys-all", 'keys:["creator-key"]},
+                                                                                      'custodians:[]},
+           "marmalade_trusted_custody_t:l_kZOCzCDa4C7ScMs8po93-XSGjksAPmtchMYOAu4GA":{'guard:{'pred:"keys-all", 'keys:["creator-key"]},
+                                                                                     'custodians:["r:user.custodian-one"]}
+         })
+
+
+(env-sigs [{'key:"create", 'caps:[(ENFORCE-RESERVED)]}])
+
+
+(create-token "t:4tHYL_cb3AxDCQD6lLh2tIOlhdfZLgJXoa8VpeY2DNA" 1 "http://custody-1"
+              [marmalade-ng.policy-trusted-custody] (read-keyset 'create-ks))
+
+(mint "t:4tHYL_cb3AxDCQD6lLh2tIOlhdfZLgJXoa8VpeY2DNA" "alice" (read-keyset 'alice-ks) 1.0)
+
+(create-token "t:HkFSP8XdXxRJ3kW2G6nZuTHcAzhojGjRKODVQEpyzCk" 1 "http://custody-2"
+              [marmalade-ng.policy-trusted-custody] (read-keyset 'create-ks))
+
+(mint "t:HkFSP8XdXxRJ3kW2G6nZuTHcAzhojGjRKODVQEpyzCk" "alice" (read-keyset 'alice-ks) 1.0)
+
+; Check the function get custodian list
+(expect-that "Custodian list of token 1 should be SIZE=1" (is-singleton)
+             (get-custodians-list "t:4tHYL_cb3AxDCQD6lLh2tIOlhdfZLgJXoa8VpeY2DNA"))
+
+(expect-that "Custodian list of token 1 should contain user.custodian" (contains "r:user.custodian-")
+             (get-custodians-list "t:4tHYL_cb3AxDCQD6lLh2tIOlhdfZLgJXoa8VpeY2DNA"))
+
+(expect-that "Custodian list of token 2 should be SIZE=0" (is-empty)
+             (get-custodians-list "t:HkFSP8XdXxRJ3kW2G6nZuTHcAzhojGjRKODVQEpyzCk"))
+
+
+(create-token "t:l_kZOCzCDa4C7ScMs8po93-XSGjksAPmtchMYOAu4GA" 1 "http://custody-3"
+              [marmalade-ng.policy-trusted-custody marmalade-ng.policy-fixed-sale] (read-keyset 'create-ks))
+
+
+; Verify the custodian balance => Should be all equal to 0
+(expect "Custodian balance should be 0.0" 0.0
+        (custodian-balance "t:4tHYL_cb3AxDCQD6lLh2tIOlhdfZLgJXoa8VpeY2DNA" "r:user.custodian-one"))
+(expect "Custodian balance should be 0.0" 0.0
+        (custodian-balance "t:4tHYL_cb3AxDCQD6lLh2tIOlhdfZLgJXoa8VpeY2DNA" "r:user.custodian-two"))
+(expect "Custodian balance should be 0.0" 0.0
+        (custodian-balance "t:HkFSP8XdXxRJ3kW2G6nZuTHcAzhojGjRKODVQEpyzCk" "r:user.custodian-one"))
+(expect "Custodian balance should be 0.0" 0.0
+        (custodian-balance "t:HkFSP8XdXxRJ3kW2G6nZuTHcAzhojGjRKODVQEpyzCk" "r:user.custodian-two"))
+(expect "Custodian balance should be 0.0" 0.0
+        (custodian-balance "t:l_kZOCzCDa4C7ScMs8po93-XSGjksAPmtchMYOAu4GA" "r:user.custodian-one"))
+(expect "Custodian balance should be 0.0" 0.0
+        (custodian-balance "t:l_kZOCzCDa4C7ScMs8po93-XSGjksAPmtchMYOAu4GA" "r:user.custodian-two"))
+
+(commit-tx)
+
+;-------------------------------------------------------------------------------
+;-------------------------------------------------------------------------------
+(begin-tx "Test some transfers")
+(use marmalade-ng.ledger)
+(use marmalade-ng.policy-trusted-custody)
+
+; try to transfer to unknown
+(env-sigs [{'key:"alice-key", 'caps:[(marmalade-ng.ledger.TRANSFER "t:4tHYL_cb3AxDCQD6lLh2tIOlhdfZLgJXoa8VpeY2DNA" "alice" "r:user.unknown" 1.0)]}])
+
+(expect-failure "Token 4tH does not allow unknown" "Transfer not allowed"
+                (transfer-create "t:4tHYL_cb3AxDCQD6lLh2tIOlhdfZLgJXoa8VpeY2DNA"
+                                 "alice" "r:user.unknown" (keyset-ref-guard "user.unknown")
+                                 1.0))
+
+; Second token has no custodian address set
+(env-sigs [{'key:"alice-key", 'caps:[(marmalade-ng.ledger.TRANSFER "t:HkFSP8XdXxRJ3kW2G6nZuTHcAzhojGjRKODVQEpyzCk" "alice" "r:user.custodian-one" 1.0)]}])
+
+(expect-failure "Token 4tH does not allow unknown" "Transfer not allowed"
+                (transfer-create "t:HkFSP8XdXxRJ3kW2G6nZuTHcAzhojGjRKODVQEpyzCk"
+                                 "alice" "r:user.custodian-one" (keyset-ref-guard "user.custodian-one")
+                                 1.0))
+
+
+; Transfer to a custodian address should work
+(env-sigs [{'key:"alice-key", 'caps:[(marmalade-ng.ledger.TRANSFER "t:4tHYL_cb3AxDCQD6lLh2tIOlhdfZLgJXoa8VpeY2DNA" "alice" "r:user.custodian-one" 1.0)]}])
+
+(transfer-create "t:4tHYL_cb3AxDCQD6lLh2tIOlhdfZLgJXoa8VpeY2DNA"
+                 "alice" "r:user.custodian-one" (keyset-ref-guard "user.custodian-one")
+                 1.0)
+
+; Verify the custodian balance
+(expect "Custodian balance should be 1.0" 1.0
+        (custodian-balance "t:4tHYL_cb3AxDCQD6lLh2tIOlhdfZLgJXoa8VpeY2DNA" "r:user.custodian-one"))
+
+(commit-tx)
+
+;-------------------------------------------------------------------------------
+;-------------------------------------------------------------------------------
+(begin-tx "Test transfer to bob")
+(use marmalade-ng.ledger)
+(use marmalade-ng.policy-trusted-custody)
+
+; Now we should able to transfer the token1 to anybody (for example bob) since it's now in custody
+(env-sigs [{'key:"custodian-key", 'caps:[(marmalade-ng.ledger.TRANSFER "t:4tHYL_cb3AxDCQD6lLh2tIOlhdfZLgJXoa8VpeY2DNA" "r:user.custodian-one" "bob" 1.0)]}])
+(env-data {'bob-ks:["bob-key"]})
+(transfer-create "t:4tHYL_cb3AxDCQD6lLh2tIOlhdfZLgJXoa8VpeY2DNA"
+                 "r:user.custodian-one" "bob" (read-keyset 'bob-ks)
+                 1.0)
+
+; Verify the custodian balance should be back to 0.0
+(expect "Custodian balance should be 0.0" 0.0
+        (custodian-balance "t:4tHYL_cb3AxDCQD6lLh2tIOlhdfZLgJXoa8VpeY2DNA" "r:user.custodian-one"))
+(commit-tx)
+
+;-------------------------------------------------------------------------------
+;-------------------------------------------------------------------------------
+(begin-tx "Test transfer from bob to alice")
+(use marmalade-ng.ledger)
+(use marmalade-ng.policy-trusted-custody)
+
+; Transfer from bob to alice shouldn't work
+(env-sigs [{'key:"bob-key", 'caps:[(marmalade-ng.ledger.TRANSFER "t:4tHYL_cb3AxDCQD6lLh2tIOlhdfZLgJXoa8VpeY2DNA" "bob" "alice" 1.0)]}])
+(env-data {'alice-ks:["alice-key"]})
+(expect-failure "Token 4tH does not allow bob->alice" "Transfer not allowed"
+                (transfer-create "t:HkFSP8XdXxRJ3kW2G6nZuTHcAzhojGjRKODVQEpyzCk"
+                                 "bob" "alice" (read-keyset 'alice-ks)
+                                 1.0))
+(rollback-tx)
+
+;-------------------------------------------------------------------------------
+;-------------------------------------------------------------------------------
+; We will change the list of custodians
+(begin-tx "Empty the list of token 1")
+(use marmalade-ng.policy-trusted-custody)
+(use free.util-lists)
+
+; First without signature
+(env-sigs [])
+(expect-failure "Not signed" "Keyset failure"
+                (remove-custodian "t:4tHYL_cb3AxDCQD6lLh2tIOlhdfZLgJXoa8VpeY2DNA" "r:user.custodian-"))
+
+; Now with the right signature
+(env-sigs [ {'key:"creator-key", 'caps:[(UPDATE-CUSTODIAN "t:4tHYL_cb3AxDCQD6lLh2tIOlhdfZLgJXoa8VpeY2DNA")]}])
+
+(remove-custodian "t:4tHYL_cb3AxDCQD6lLh2tIOlhdfZLgJXoa8VpeY2DNA" "r:user.custodian-")
+
+(expect-that "Custodian list of token 1 should be SIZE=0" (is-empty)
+             (get-custodians-list "t:4tHYL_cb3AxDCQD6lLh2tIOlhdfZLgJXoa8VpeY2DNA"))
+(commit-tx)
+
+;-------------------------------------------------------------------------------
+;-------------------------------------------------------------------------------
+; No we try to send to custodian
+(begin-tx "Send token 1 to non trusted custodian")
+(use marmalade-ng.ledger)
+(env-sigs [{'key:"bob-key", 'caps:[(marmalade-ng.ledger.TRANSFER "t:HkFSP8XdXxRJ3kW2G6nZuTHcAzhojGjRKODVQEpyzCk" "bob" "r:user.custodian-one" 1.0)]}])
+
+(expect-failure "Token 4tH does not custodian anymore" "Transfer not allowed"
+                (transfer-create "t:HkFSP8XdXxRJ3kW2G6nZuTHcAzhojGjRKODVQEpyzCk"
+                                 "bob" "r:user.custodian-one" (keyset-ref-guard "user.custodian-one")
+                                 1.0))
+(rollback-tx)
+
+;-------------------------------------------------------------------------------
+;-------------------------------------------------------------------------------
+; Now add a custodian to the token 2
+(begin-tx "Add custodian-one to token-2")
+(use marmalade-ng.policy-trusted-custody)
+(use free.util-lists)
+
+; First without signature
+(env-sigs [])
+(expect-failure "Not signed" "Keyset failure"
+                (add-custodian "t:HkFSP8XdXxRJ3kW2G6nZuTHcAzhojGjRKODVQEpyzCk" "r:user.custodian-one"))
+
+; Now with the right signature
+(env-sigs [ {'key:"creator-key", 'caps:[(UPDATE-CUSTODIAN "t:HkFSP8XdXxRJ3kW2G6nZuTHcAzhojGjRKODVQEpyzCk")]}])
+
+(add-custodian "t:HkFSP8XdXxRJ3kW2G6nZuTHcAzhojGjRKODVQEpyzCk" "r:user.custodian-one")
+
+(expect-that "Custodian list of token 2 should be SIZE=1" (is-singleton)
+             (get-custodians-list "t:HkFSP8XdXxRJ3kW2G6nZuTHcAzhojGjRKODVQEpyzCk"))
+(commit-tx)
+
+;-------------------------------------------------------------------------------
+;-------------------------------------------------------------------------------
+(begin-tx "Transfer token 2 to custodian")
+(use marmalade-ng.policy-trusted-custody)
+(use marmalade-ng.ledger)
+; try to transfer to custodian-2 (should not work)
+(env-sigs [{'key:"alice-key", 'caps:[(marmalade-ng.ledger.TRANSFER "t:HkFSP8XdXxRJ3kW2G6nZuTHcAzhojGjRKODVQEpyzCk" "alice" "r:user.custodian-two" 1.0)]}])
+
+(expect-failure "Token 2 does not allow custodian-two" "Transfer not allowed"
+                (transfer-create "t:HkFSP8XdXxRJ3kW2G6nZuTHcAzhojGjRKODVQEpyzCk"
+                                 "alice" "r:user.custodian-two" (keyset-ref-guard "user.custodian-two")
+                                 1.0))
+
+; But allow custodian-one
+(env-sigs [{'key:"alice-key", 'caps:[(marmalade-ng.ledger.TRANSFER "t:HkFSP8XdXxRJ3kW2G6nZuTHcAzhojGjRKODVQEpyzCk" "alice" "r:user.custodian-one" 1.0)]}])
+(transfer-create "t:HkFSP8XdXxRJ3kW2G6nZuTHcAzhojGjRKODVQEpyzCk"
+                 "alice" "r:user.custodian-one" (keyset-ref-guard "user.custodian-one")
+                 1.0)
+
+; Verify the custodian balance
+(expect "Custodian balance should be 1.0" 1.0
+        (custodian-balance "t:HkFSP8XdXxRJ3kW2G6nZuTHcAzhojGjRKODVQEpyzCk" "r:user.custodian-one"))
+(commit-tx)
+
+
+;-------------------------------------------------------------------------------
+;-------------------------------------------------------------------------------
+; Now we will remove the custodian from the list and see whether the transfer is still allowed
+(begin-tx "Empty the list of token 2")
+(use marmalade-ng.policy-trusted-custody)
+(use free.util-lists)
+
+(env-sigs [ {'key:"creator-key", 'caps:[(UPDATE-CUSTODIAN "t:HkFSP8XdXxRJ3kW2G6nZuTHcAzhojGjRKODVQEpyzCk")]}])
+
+(remove-custodian "t:HkFSP8XdXxRJ3kW2G6nZuTHcAzhojGjRKODVQEpyzCk" "r:user.custodian-one")
+
+(expect-that "Custodian list of token 2 should be SIZE=0" (is-empty)
+             (get-custodians-list "t:HkFSP8XdXxRJ3kW2G6nZuTHcAzhojGjRKODVQEpyzCk"))
+(commit-tx)
+
+;-------------------------------------------------------------------------------
+;-------------------------------------------------------------------------------
+(begin-tx "Test transfer to bob")
+(use marmalade-ng.ledger)
+(use marmalade-ng.policy-trusted-custody)
+
+; Now we should able to transfer the token1 to anybody (for example bob) since it's now in custody
+(env-sigs [{'key:"custodian-key", 'caps:[(marmalade-ng.ledger.TRANSFER "t:HkFSP8XdXxRJ3kW2G6nZuTHcAzhojGjRKODVQEpyzCk" "r:user.custodian-one" "bob" 1.0)]}])
+(env-data {'bob-ks:["bob-key"]})
+(transfer-create "t:HkFSP8XdXxRJ3kW2G6nZuTHcAzhojGjRKODVQEpyzCk"
+                 "r:user.custodian-one" "bob" (read-keyset 'bob-ks)
+                 1.0)
+
+; Verify the custodian balance should be back to 0.0
+(expect "Custodian balance should be 0.0" 0.0
+        (custodian-balance "t:4tHYL_cb3AxDCQD6lLh2tIOlhdfZLgJXoa8VpeY2DNA" "r:user.custodian-one"))
+(commit-tx)
+
+
+;-------------------------------------------------------------------------------
+;-------------------------------------------------------------------------------
+; We're going to check when minting to a custodian works (we use the 3rd token for that)
+(begin-tx "Minting tests")
+(use marmalade-ng.ledger)
+(use marmalade-ng.policy-trusted-custody)
+(mint "t:l_kZOCzCDa4C7ScMs8po93-XSGjksAPmtchMYOAu4GA" "r:user.custodian-one" (keyset-ref-guard "user.custodian-one") 1.0)
+
+; Verify the custodian balance
+(expect "Custodian balance should be 1.0" 1.0
+        (custodian-balance "t:l_kZOCzCDa4C7ScMs8po93-XSGjksAPmtchMYOAu4GA" "r:user.custodian-one"))
+(commit-tx)
+
+;-------------------------------------------------------------------------------
+;-------------------------------------------------------------------------------
+; Transferring to alice shoudl work sicne the token is in custody
+(begin-tx "Test transfer to alice")
+(use marmalade-ng.ledger)
+(use marmalade-ng.policy-trusted-custody)
+
+; Now we should able to transfer the token1 to anybody (for example bob) since it's now in custody
+(env-sigs [{'key:"custodian-key", 'caps:[(marmalade-ng.ledger.TRANSFER "t:l_kZOCzCDa4C7ScMs8po93-XSGjksAPmtchMYOAu4GA" "r:user.custodian-one" "alice" 1.0)]}])
+(env-data {'alice-ks:["alice-key"]})
+(transfer-create "t:l_kZOCzCDa4C7ScMs8po93-XSGjksAPmtchMYOAu4GA"
+                 "r:user.custodian-one" "alice" (read-keyset 'alice-ks)
+                 1.0)
+
+; Verify the custodian balance should be back to 0.0
+(expect "Custodian balance should be 0.0" 0.0
+        (custodian-balance "t:l_kZOCzCDa4C7ScMs8po93-XSGjksAPmtchMYOAu4GA" "r:user.custodian-one"))
+(commit-tx)

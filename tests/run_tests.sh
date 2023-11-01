@@ -25,7 +25,8 @@ REPL_SCRIPTS="./test-ledger.repl
               ./test-policy-marketplace.repl
               ./test-policy-non-fungible.repl
               ./test-policy-guards.repl
-              ./test-policy-royalty.repl "
+              ./test-policy-royalty.repl
+              ./test-policy-trusted-custody.repl "
 
 for repl in $REPL_SCRIPTS
   do echo "============================================================"

@@ -30,6 +30,7 @@
 (load "../pact/policies/policy-marketplace.pact")
 (load "../pact/policies/policy-non-fungible.pact")
 (load "../pact/policies/policy-royalty.pact")
+(load "../pact/policies/policy-trusted-custody.pact")
 (load "../pact/utils/std-policies.pact")
 (commit-tx)
 

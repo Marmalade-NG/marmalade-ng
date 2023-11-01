@@ -26,7 +26,7 @@ jobs:
         run: |
           cd tests
           PACT_BIN=../.bin/pact ./run_tests.sh | tee out.txt
-          if [ "$(grep "Load successful" out.txt|wc -l )" -eq 18 ]; then echo "OK"; exit 0; else echo "Fail";exit 1; fi
+          if [ "$(grep "Load successful" out.txt|wc -l )" -eq 19 ]; then echo "OK"; exit 0; else echo "Fail";exit 1; fi
           cd ..
 
       - name: Print hashes
