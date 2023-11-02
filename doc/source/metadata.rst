@@ -6,6 +6,9 @@ The URI of a token (as retrieved by :ref:`LEDGER-GET-URI`) must point to a JSON 
 
 Ideally the Object is stored on ipfs. (``ipfs://CID``).
 
+Specification
+~~~~~~~~~~~~~
+
 A token metadata has the following format:
 
 .. list-table:: JSON Metadata
@@ -75,3 +78,16 @@ A token metadata has the following format:
     - object
     - | An object with a *name* field specifying the name of the collection, and a
       | *family* field specifying the larger category or group to which the collection belongs.
+
+
+JSON Schema
+~~~~~~~~~~~
+
+.. literalinclude:: ../../metadata/meta-schema-v1.json
+   :language: json
+
+Example
+~~~~~~~
+
+.. literalinclude:: ../../examples/metadata/meta_example.json
+   :language: json

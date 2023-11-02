@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://marmalade-ng/meta-schema-v1.json",
+  "title": "Marmalade NG Metadata",
+  "description": "Schema for Marmalade-NG polyfungible  metadata.",
+  "type": "object",
+  "required": [
+    "name",
+    "description",
+    "image"
+  ],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Identifies the asset to which this NFT represents."
+    },
+    "description": {
+      "type": "string",
+      "description": "Describes the asset to which this NFT represents."
+    },
+    "image": {
+      "type": "string",
+      "format": "uri",
+      "description": "A URI pointing to a resource with mime type image/* representing the asset to which this NFT represents. Consider making any images at a width between 320 and 1080 pixels and aspect ratio between 1.91:1 and 4:5 inclusive."
+    },
+    "attributes": {
+      "type": "array",
+      "description": "An array of objects, each representing a characteristic or trait of the NFT",
+      "items": {
+        "type": "object",
+        "required": [
+          "trait_type",
+          "value"
+        ],
+        "properties": {
+          "trait_type": {
+            "type": "string",
+            "description": "Trait's name"
+          },
+          "value": {
+            "description": "Traits'value"
+          }
+        }
+      }
+    },
+    "properties": {
+      "type": "object",
+      "description": "Arbitrary properties. Values may be strings, numbers, object or arrays",
+      "properties": {
+        "external_url": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to an external application or website where users can also view the asset."
+        },
+        "animation_url": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to a multimedia attachment of the asset. The supported file formats are MP4 and MOV for video, MP3, FLAC and WAV for audio, GLB for AR/3D assets, and HTML for HTML pages. You may use the ?ext={file_extension} query to provide information on the file type."
+        },
+        "authors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "description": "An array of authors who created or contributed to the asset.",
+            "required": [
+              "name"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The author's name."
+              }
+            }
+          }
+        },
+        "collection": {
+          "type": "object",
+          "required": [
+            "name",
+            "family"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "The name of the collection."
+            },
+            "family": {
+              "type": "string",
+              "description": "specifying the larger category or group to which the collection belongs"
+            }
+          }
+        }
+      }
+    }
+  }
+}
