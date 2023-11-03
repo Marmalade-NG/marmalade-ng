@@ -25,7 +25,7 @@ This mechanism is very similar to the concept of fixing a minimum output amount 
 
 The policy works whatever the sale scheme.
 
-*Important note*: It's highly recommended to use :ref:`POLICY-DISABLE-TRANSFER` in conjunction with this policy.
+*Important note*: It's highly recommended to use :ref:`POLICY-DISABLE-TRANSFER` or :ref:`POLICY-TRUSTED-CUSTODY` in conjunction with this policy.
 Otherwise, the royalty could be bypassed by OTC sales.
 
 Implemented hooks
