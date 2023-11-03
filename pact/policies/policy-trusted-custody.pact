@@ -153,18 +153,18 @@
   ;-----------------------------------------------------------------------------
   ; Edit functions
   ;-----------------------------------------------------------------------------
-  (defun add-custodian (token-id:string custodian:string)
-    (enforce-valid-account custodian)
+  (defun add-custodian:string (token-id:string custodian-prefix:string)
+    (enforce-valid-account custodian-prefix)
     (with-capability (UPDATE-CUSTODIAN token-id)
       (with-read tokens-custody token-id {'custodians:=current}
         (enforce (< (length current) MAX-CUSTODIANS-COUNT) "Too many custodians")
-        (update tokens-custody token-id {'custodians: (distinct (append-last current custodian))})))
+        (update tokens-custody token-id {'custodians: (distinct (append-last current custodian-prefix))})))
   )
 
-  (defun remove-custodian (token-id:string custodian:string)
+  (defun remove-custodian:string (token-id:string custodian-prefix:string)
     (with-capability (UPDATE-CUSTODIAN token-id)
       (with-read tokens-custody token-id {'custodians:=current}
-        (update tokens-custody token-id {'custodians: (remove-item current custodian)})))
+        (update tokens-custody token-id {'custodians: (remove-item current custodian-prefix)})))
   )
 
   ;-----------------------------------------------------------------------------
@@ -175,8 +175,8 @@
       custodians)
   )
 
-  (defun custodian-balance:decimal (token-id:string account:string)
-    (with-default-read accounts-custody (key token-id account)
+  (defun custodian-balance:decimal (token-id:string custodian-account:string)
+    (with-default-read accounts-custody (key token-id custodian-account)
                        {'balance:0.0} {'balance:=balance}
       balance)
   )
