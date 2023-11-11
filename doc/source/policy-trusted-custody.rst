@@ -36,7 +36,7 @@ Intentionally, the outbound balance will be accounted:
 - At transfers
 - At mint (allowing to mint a collection to a special initial account)
 - But **NOT** at burn and sales. (burning or selling won't decrement the outbound balance, and receiving
-  a token by sale won't increment the outbounjd balance)
+  a token by sale won't increment the outbound balance)
 
 
 
