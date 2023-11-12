@@ -79,6 +79,11 @@ add-custodian
 
 Add an allowed custodian prefix to the given *token-id*.
 
+The transaction must be signed by the creator guard (defined at token creation).
+
+The signature can be scoped with the ``(UPDATE-CUSTODIAN token-id)`` capability.
+
+
 .. code:: lisp
 
   (use marmalade-ng.policy-trusted-policy)
@@ -90,6 +95,10 @@ remove-custodian
 *token-id* ``string`` *custodian-prefix* ``string`` *→* ``string``
 
 Remove a previously allowed custodian prefix from the given *token-id*.
+
+The transaction must be signed by the creator guard (defined at token creation).
+
+The signature can be scoped with the ``(UPDATE-CUSTODIAN token-id)`` capability.
 
 .. code:: lisp
 
@@ -117,7 +126,7 @@ custodian-balance
 ~~~~~~~~~~~~~~~~~
 *token-id* ``string`` *custodian-account* ``string`` *→* ``decimal``
 
-Return the outbound balance of a custiodian account for a given  *token-id*.
+Return the outbound balance of a custodian account for a given  *token-id*.
 
 .. code:: lisp
 
