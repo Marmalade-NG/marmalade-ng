@@ -29,7 +29,7 @@ TRANSACTION_FILES = interface-poly-fungible \
                     policy-marketplace \
                     policy-non-fungible \
                     policy-royalty \
-										policy-trusted-custody \
+                    policy-trusted-custody \
                     std-policies
 
 
