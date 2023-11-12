@@ -1,0 +1,7 @@
+(begin-tx)
+(print "====> Deploy policy-trusted-custody")
+(namespace 'marmalade-ng)
+(load "../../pact/policies/policy-trusted-custody.pact")
+(create-table tokens-custody)
+(create-table accounts-custody)
+(commit-tx)

@@ -22,7 +22,7 @@ This policy is triggered during the ``sale-offer`` (by the detection of the comm
 
 The policy works whatever the sale scheme.
 
-*Important note*: It's highly recommended to use :ref:`POLICY-DISABLE-TRANSFER` in conjunction with this policy.
+*Important note*: It's highly recommended to use :ref:`POLICY-DISABLE-TRANSFER` or :ref:`POLICY-TRUSTED-CUSTODY` in conjunction with this policy.
 Otherwise, the royalty could be bypassed by OTC sales.
 
 

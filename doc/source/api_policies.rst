@@ -19,3 +19,4 @@ Standard policies: Reference and API
    policy-marketplace.rst
    policy-non-fungible.rst
    policy-royalty.rst
+   policy-trusted-custody.rst

@@ -67,6 +67,10 @@ use cases. Removing the requirement for most token creator to create a custom a 
      - DISABLE-TRANSFER
      - Disable transfer
 
+   * - :ref:`POLICY-TRUSTED-CUSTODY`
+     - TRUSTED-CUSTODY
+     - Allow the creator to declare a list of trusted custodials
+
 .. list-table:: Sales policies
    :widths: 25 25 50
    :header-rows: 1
