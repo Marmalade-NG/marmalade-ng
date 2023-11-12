@@ -1,0 +1,71 @@
+# This code creates a token with the following policies:
+# - COLLECTION
+# - NON-FUNGIBLE
+# - INSTANT-MINT
+# - FIXED-SALE
+# - AUCTION-SALE
+# - EXTRA-POLICIES
+# - TRUSTED-CUSTODY
+#
+# The token is sent to the receiver immediately since it is an instant-mint token.
+# The token is instantiated with the following trusted custodians
+#   - u:free.my-trusted-company
+#   - u:n_d4861d5fedff5e2e5fdc56dc1b3abf0e3000eddb.nft_vaults.vault
+code: |-
+  (use {{namespace}}.ledger)
+  (use {{namespace}}.std-policies)
+
+  (let* ((tmp-guard (read-keyset 'ks-tmp))
+         (token-id (create-token-id tmp-guard "{{uri}}")))
+
+    (create-token token-id 0 "{{uri}}"
+                  (to-policies "COLLECTION NON-FUNGIBLE INSTANT-MINT FIXED-SALE AUCTION-SALE EXTRA-POLICIES TRUSTED-CUSTODY")
+                  tmp-guard)
+
+    (mint token-id "{{receiver}}" (read-keyset 'ks-receiver) 1.0)
+    token-id
+  )
+data:
+  ks-tmp:
+    - {{tmp-key}}
+  ks-receiver:
+    - {{receiver-key}}
+
+  marmalade_collection:
+    id: {{collection-id}}
+
+  marmalade_extra_policies:
+    guard:
+      pred: keys-all
+      keys:
+        - {{creator-key}}
+
+  marmalade_trusted_custody:
+    guard:
+      pred: keys-all
+      keys:
+        - {{creator-key}}
+    custodians:
+      - u:free.my-trusted-company
+      - u:n_d4861d5fedff5e2e5fdc56dc1b3abf0e3000eddb.nft_vaults.vault
+
+
+publicMeta:
+  chainId: "{{chain}}"
+  sender: {{gas-payer}}
+  gasLimit: 10000
+  gasPrice: 0.00000001
+  ttl: 7200
+networkId: "{{network}}"
+signers:
+  - public: {{gas-payer-key}}
+    caps:
+      - name: "coin.GAS"
+        args: []
+  - public: {{collection-key}}
+    caps: []
+  - public: {{tmp-key}}
+    caps:
+      - name: "{{namespace}}.ledger.ENFORCE-RESERVED"
+        args: []
+type: exec

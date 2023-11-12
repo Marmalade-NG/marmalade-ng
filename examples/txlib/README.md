@@ -111,3 +111,15 @@
 **extra-policies/remove-blacklist-extra-policy.tkpl:**
 - Remove from blacklist an extra policy (for a specific token)
 - Needed signatures : ``gas-payer-key``, ``creator-key``
+
+**trusted-custody/create-token-with-trusted-custody.tkpl:**
+- Create a non fungible token with trusted custody enabled and instant mint it to an user.
+- Needed signatures : ``gas-payer-key``, ``collection-key``, ``tmp-key``
+
+**trusted-custody/add-custodian.tkpl:**
+- Add a custodian to the trusted policy
+- Needed signatures : ``gas-payer-key``, ``creator-key``,
+
+**trusted-custody/remove-custodian.tkpl:**
+- Remove a custodian from the trusted policy
+- Needed signatures : ``gas-payer-key``, ``creator-key``,
