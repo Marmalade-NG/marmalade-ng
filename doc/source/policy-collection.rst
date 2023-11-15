@@ -16,7 +16,7 @@ where:
   - ${name} is the human-readable name of the collection.
   - ${hash} is a hash derived from the collection guard and name.
 
-The collection ID is protected from from-running and unauthorized use or declaration.
+The collection ID is protected from front-running and unauthorized use or declaration.
 However, the collection-human readable name has no protection and can be reused by anybody else.
 As such, wallets, market-places should only rely on the collection ID.
 
