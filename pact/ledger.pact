@@ -1,6 +1,6 @@
 (module ledger GOVERNANCE
-  (implements kip.poly-fungible-v3)
-  (use kip.poly-fungible-v3 [account-details sender-balance-change receiver-balance-change])
+  (implements kip.ng-poly-fungible-v1)
+  (use kip.ng-poly-fungible-v1 [account-details sender-balance-change receiver-balance-change])
   (use token-policy-ng-v1 [token-info])
   (use free.util-strings [to-string starts-with])
   (use free.util-time [time-between now from-now])

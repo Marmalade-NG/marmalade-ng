@@ -1,4 +1,4 @@
-(interface poly-fungible-v3
+(interface ng-poly-fungible-v1
 
   ;-----------------------------------------------------------------------------
   ; Schemas used in the API
