@@ -40,18 +40,6 @@
     @managed amount TRANSFER-mgr
   )
 
-  (defcap XTRANSFER:bool
-    ( id:string
-      sender:string
-      receiver:string
-      target-chain:string
-      amount:decimal
-    )
-    " Manage cross-chain transferring AMOUNT of ID from SENDER to RECEIVER \
-    \ on TARGET-CHAIN."
-    @managed amount TRANSFER-mgr
-  )
-
   (defun TRANSFER-mgr:decimal
     ( managed:decimal
       requested:decimal
@@ -62,12 +50,6 @@
 
   (defcap SUPPLY:bool (id:string supply:decimal)
     @doc " Emitted when SUPPLY is updated, if supported."
-    @event
-  )
-
-
-  (defcap ACCOUNT_GUARD:bool (id:string account:string guard:guard)
-    @doc " Emitted when ACCOUNT guard is updated."
     @event
   )
 
@@ -192,27 +174,6 @@
         (property (!= sender ""))
         (property (!= receiver ""))
         (property (!= sender receiver))
-      ]
-  )
-
-  (defpact transfer-crosschain:bool
-    ( id:string
-      sender:string
-      receiver:string
-      receiver-guard:guard
-      target-chain:string
-      amount:decimal
-    )
-    @doc
-      " Transfer AMOUNT of ID between accounts SENDER on source chain \
-      \ and RECEIVER on TARGET-CHAIN. If RECEIVER exists, RECEIVER-GUARD \
-      \ must match existing guard. If RECEIVER does not exist, account is created."
-    @model
-      [ (property (> amount 0.0))
-        (property (!= id ""))
-        (property (!= sender ""))
-        (property (!= receiver ""))
-        (property (!= target-chain ""))
       ]
   )
 
