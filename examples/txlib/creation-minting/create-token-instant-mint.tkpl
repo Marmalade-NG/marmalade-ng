@@ -6,6 +6,7 @@
 # - DISABLE-TRANSFER
 # - FIXED-SALE
 # - AUCTION-SALE
+# - EXTRA-POLICIES
 #
 # The token is sent to the receiver immediately since it is an instant-mint token.
 
@@ -17,7 +18,7 @@ code: |-
          (token-id (create-token-id tmp-guard "{{uri}}")))
 
     (create-token token-id 0 "{{uri}}"
-                  (to-policies "COLLECTION NON-FUNGIBLE INSTANT-MINT ROYALTY DISABLE-TRANSFER FIXED-SALE AUCTION-SALE")
+                  (to-policies "COLLECTION NON-FUNGIBLE INSTANT-MINT ROYALTY DISABLE-TRANSFER FIXED-SALE AUCTION-SALE EXTRA-POLICIES")
                   tmp-guard)
 
     (mint token-id "{{receiver}}" (read-keyset 'ks-receiver) 1.0)
@@ -31,6 +32,12 @@ data:
 
   marmalade_collection:
     id: {{collection-id}}
+
+  marmalade_extra_policies:
+    guard:
+      pred: keys-all
+      keys:
+        - {{creator-key}}
 
   marmalade_royalty:
     creator_acct: {{creator}}

@@ -1,5 +1,5 @@
 NAMESPACE = "n_442d3e11cfe0d39859878e5b1520cd8b8c36e5db"
-KIP_NAMESPACE = "n_442d3e11cfe0d39859878e5b1520cd8b8c36e5db"
+KIP_NAMESPACE = "n_5caec7ffe20c6e09fd632fb1ee04468848966332"
 
 DATA_FILE = testnet_data.yaml
 
@@ -21,6 +21,7 @@ TRANSACTION_FILES = interface-poly-fungible \
                     policy-disable-sale \
                     policy-disable-transfer \
                     policy-dutch-auction-sale \
+                    policy-extra-policies \
                     policy-fixed-issuance \
                     policy-fixed-sale \
                     policy-guards \
@@ -28,6 +29,7 @@ TRANSACTION_FILES = interface-poly-fungible \
                     policy-marketplace \
                     policy-non-fungible \
                     policy-royalty \
+                    policy-trusted-custody \
                     std-policies
 
 

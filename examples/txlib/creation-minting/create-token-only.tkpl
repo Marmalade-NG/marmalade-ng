@@ -6,6 +6,7 @@
 # - DISABLE-TRANSFER
 # - FIXED-SALE
 # - AUCTION-SALE
+# - EXTRA-POLICIES
 #
 # The token is not minted but guard is used to protect further mint
 
@@ -17,7 +18,7 @@ code: |-
          (token-id (create-token-id tmp-guard "{{uri}}")))
 
     (create-token token-id 0 "{{uri}}"
-                  (to-policies "COLLECTION GUARDS NON-FUNGIBLE ROYALTY DISABLE-TRANSFER FIXED-SALE AUCTION-SALE")
+                  (to-policies "COLLECTION GUARDS NON-FUNGIBLE ROYALTY DISABLE-TRANSFER FIXED-SALE AUCTION-SALE EXTRA-POLICIES")
                   tmp-guard)
     token-id
   )
@@ -25,6 +26,12 @@ code: |-
 data:
   ks-tmp:
     - {{tmp-key}}
+
+  marmalade_extra_policies:
+    guard:
+      pred: keys-all
+      keys:
+        - {{creator-key}}
 
   marmalade_guards:
     mint:

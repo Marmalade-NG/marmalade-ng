@@ -138,6 +138,10 @@
 
 ; Berify that it worked:
 (expect-that "New rate should be 0.2" (compose (at 'rate) (= 0.2)) (get-royalty-details "t:422uU9AJHLeLr6iPGHCkUA_eIvTboKKp5dXaUmctCAw"))
+
+; But rate for the current sale should unchanged
+(expect "Rate for current rate must still be 0.1" 0.1 (get-sale-rate (hash  "fixed-sale-1")))
+
 (commit-tx)
 
 

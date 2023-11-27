@@ -22,7 +22,7 @@ This policy is triggered during the ``sale-offer`` (by the detection of the comm
 
 The policy works whatever the sale scheme.
 
-*Important note*: It's highly recommended to use :ref:`POLICY-DISABLE-TRANSFER` in conjunction with this policy.
+*Important note*: It's highly recommended to use :ref:`POLICY-DISABLE-TRANSFER` or :ref:`POLICY-TRUSTED-CUSTODY` in conjunction with this policy.
 Otherwise, the royalty could be bypassed by OTC sales.
 
 
@@ -60,10 +60,10 @@ Handled by ``(enforce-sale-init)``
 .. code:: lisp
 
   (defschema royalty-init-msg-sch
-    creator_acct:string
-    creator_guard:guard
-    rate:decimal
-    currencies:[module{fungible-v2}]
+    creator_acct:string ; Creator account: recipient of the royalty
+    creator_guard:guard ; Creator account: recipient of the royalty
+    rate:decimal ; Royalty rate
+    currencies:[module{fungible-v2}] ; List of currencies allowed for royalty payment
   )
 
 

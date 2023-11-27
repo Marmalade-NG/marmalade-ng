@@ -94,4 +94,32 @@
 
 **royalties/update_rate.tkpl:**
 - Update the rate of a royalty only for an adjustable royalty policy
-- Needed signatures : ``gas-payer-key``, ``creator-key`
+- Needed signatures : ``gas-payer-key``, ``creator-key``
+
+**extra-policies/register-extra-policy.tkpl:**
+- Register a new extra policy (only for admin)
+- Needed signatures : ``gas-payer-key``, ``admin-key``
+
+**extra-policies/unregister-extra-policy.tkpl:**
+- Unregister an extra policy (only for admin)
+- Needed signatures : ``gas-payer-key``, ``admin-key``
+
+**extra-policies/blacklist-extra-policy.tkpl:**
+- Blacklist an extra policy (for a specific token)
+- Needed signatures : ``gas-payer-key``, ``creator-key``
+
+**extra-policies/remove-blacklist-extra-policy.tkpl:**
+- Remove from blacklist an extra policy (for a specific token)
+- Needed signatures : ``gas-payer-key``, ``creator-key``
+
+**trusted-custody/create-token-with-trusted-custody.tkpl:**
+- Create a non fungible token with trusted custody enabled and instant mint it to an user.
+- Needed signatures : ``gas-payer-key``, ``collection-key``, ``tmp-key``
+
+**trusted-custody/add-custodian.tkpl:**
+- Add a custodian to the trusted policy
+- Needed signatures : ``gas-payer-key``, ``creator-key``,
+
+**trusted-custody/remove-custodian.tkpl:**
+- Remove a custodian from the trusted policy
+- Needed signatures : ``gas-payer-key``, ``creator-key``,

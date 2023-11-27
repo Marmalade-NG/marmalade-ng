@@ -9,7 +9,7 @@
     true)
 
   (defun rank:integer ()
-    20)
+    30)
 
   (defun enforce-init:bool (token:object{token-info})
     (require-capability (ledger.POLICY-ENFORCE-INIT token policy-events-A))

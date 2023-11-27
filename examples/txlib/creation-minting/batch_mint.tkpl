@@ -43,6 +43,7 @@ data:
     - DUTCH-AUCTION-SALE
     - AUCTION-SALE
     - MARKETPLACE
+    - EXTRA-POLICIES
 
   uris:
     - ipfs://bafybeih7zjcmnig2hka52qtdpgtmczqqrgcg2zahim33trxkb6hza2qkvy #1
@@ -69,6 +70,12 @@ data:
 
   marmalade_collection:
     id: {{collection-id}}
+
+  marmalade_extra_policies:
+    guard:
+      pred: keys-all
+      keys:
+        - {{creator-key}}
 
   marmalade_royalty:
     creator_acct: {{creator}}

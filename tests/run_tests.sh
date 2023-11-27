@@ -17,6 +17,7 @@ REPL_SCRIPTS="./test-ledger.repl
               ./test-policy-collection.repl
               ./test-policy-disable-burn.repl
               ./test-policy-disable-transfer.repl
+              ./test-policy-extra-policies.repl
               ./test-policy-dutch-auction-sale.repl
               ./test-policy-instant-mint.repl
               ./test-policy-fixed-issuance.repl
@@ -24,7 +25,8 @@ REPL_SCRIPTS="./test-ledger.repl
               ./test-policy-marketplace.repl
               ./test-policy-non-fungible.repl
               ./test-policy-guards.repl
-              ./test-policy-royalty.repl "
+              ./test-policy-royalty.repl
+              ./test-policy-trusted-custody.repl "
 
 for repl in $REPL_SCRIPTS
   do echo "============================================================"

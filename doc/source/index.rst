@@ -12,6 +12,7 @@ Welcome to Marmalade NG's documentation!
 
    features.rst
    concepts.rst
+   metadata.rst
    how-to.rst
    core_modules_api.rst
    api_policies.rst

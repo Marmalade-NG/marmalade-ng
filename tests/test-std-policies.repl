@@ -13,6 +13,7 @@
 (load "../pact/policies/policy-disable-sale.pact")
 (load "../pact/policies/policy-disable-transfer.pact")
 (load "../pact/policies/policy-dutch-auction-sale.pact")
+(load "../pact/policies/policy-extra-policies.pact")
 (load "../pact/policies/policy-fixed-sale.pact")
 (load "../pact/policies/policy-fixed-issuance.pact")
 (load "../pact/policies/policy-guards.pact")
@@ -20,6 +21,7 @@
 (load "../pact/policies/policy-marketplace.pact")
 (load "../pact/policies/policy-non-fungible.pact")
 (load "../pact/policies/policy-royalty.pact")
+(load "../pact/policies/policy-trusted-custody.pact")
 
 ; Load un unknown policy
 (load "stubs/policy-events-A.pact")
@@ -50,8 +52,9 @@
 
 (expect "Policy -> Single String" "GUARDS" (from-policy marmalade-ng.policy-guards))
 
-(expect-that "Unkwon Policy -> Single String" (and? (starts-with* "UNKNOWN")
-                                                    (compose (take -6) (is-hex-digit)))
+(expect-that "Unkwon Policy -> Single String" (and? (starts-with* "UNKNOWN_")
+                                                    (compose (drop 8)
+                                                             (and? (compose (length) (= 16)) (is-hex-digit))))
               (from-policy marmalade-ng.policy-events-A))
 
 (expect "Policies -> List of strings" ["GUARDS", "FIXED-SALE", "DISABLE-BURN"] (policies-to-list [marmalade-ng.policy-guards,

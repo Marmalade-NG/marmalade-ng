@@ -282,9 +282,12 @@
 
 (expect "Balance of was 0.6" 0.6 (get-balance "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice"))
 
-;Try to sell with a biad timeout
-(expect-failure "Tiemout in the past" "Timeout must be in future"
+;Try to sell with a bad timeout
+(expect-failure "Tiemout in the past" "Invalid timeout"
                 (sale "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice" 0.1 (time "2019-06-01T00:00:00Z")))
+(expect-failure "Tiemout in 11 years" "Invalid timeout"
+                (sale "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice" 0.1 (time "2043-07-01T00:00:00Z")))
+
 
 (sale "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice" 0.1 (time "2023-06-01T00:00:00Z"))
 

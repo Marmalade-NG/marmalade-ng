@@ -11,7 +11,7 @@ The central part of Marmalade-NG is the ledger module:
   - Manage the security of escrow accounts.
 
 
-Marmalade-V2 contains 15 standard policies that can be declared by tokens.
+Marmalade-V2 contains 16 standard policies that can be declared by tokens.
 
 Every policy has a static dependency on the ledger:
   - For security: The policies need to refer to the ledger capabilities.
@@ -71,6 +71,15 @@ Especially these two critical cases are considered:
   - tokens creation
   - collections creation
 
+URI
+~~~
+Each token is associated with a URI pointing to a metadata object that can include
+often the description, name, traits, link to the hosted image, and several other information
+This object is stored off-chain.
+The Marmalade-NG smart-contracts are agnostic to this object format. However for a better interoperability
+between ledgers, marketplaces and other Dapp, tokens metadata is expected to follow the
+following standard: :ref:`METADATA`
+
 
 Token IDs
 ---------
@@ -91,9 +100,26 @@ Policies
 --------
 When created, the token must *subscribe* to a list of policies.
 
-These policies can be:
-  - standard policies
-  - custom policies
+Three types of policies exist:
+
+- **Standard policies**
+
+  They are provided by Marmalade NG. They must be selected at token creation.
+  They can't be changed later. Marmalade NG guarantees that a token that only
+  uses standard policies is safe.
+
+- **Custom policies**:
+
+  They are similar to the standard policies. But they are developed by
+  the token creator/minter. Like the standard policies, they can't be
+  changed or added after token creation.
+
+- **Extra policies**:
+
+  The extra policies are provided and audited by the Marmalade NG team.
+  Once globally added to Marmalade, they are automatically available to all
+  tokens. To benefit from extra policies, a token must include the
+  policy :ref:`POLICY-EXTRA-POLICIES`.
 
 A policy is a Pact helper module that will be called at each step of the life of the token. A policy must implement the token-policy interface.
 
@@ -167,8 +193,28 @@ Important: The only exception for the hook ``(enforce-sale-offer)``. The policy 
 
 The ledger ensures that at least one policy has handled the sale. This is necessary to prevent the dramatic case when no policy wants to manage the sale.
 
-Example:
+Extra-Policies
+--------------
+To use the extra policies, a token must must include the special
+standard policy :ref:`POLICY-EXTRA-POLICIES`. This policy acts as a proxy to call the registered
+policies.
 
+As a principle, all registered policies are safe.
+
+A token issuer can decide to blacklist an extra policy for his tokens. As such, this policy won't never bee called.
+
+Another possibility for a token issuer is to not include ``policy-extra-policies``, to be sure that no extra policies
+will be used with his token.
+
+**Extra policies and ranks**: The proxy policy will be executed at rank 25.
+As a result, all extra-policies will be executed:
+
+  - After the royalties policies (rank 20)
+  - Before the sales policies (rank 30)
+
+Some considerations for writting an extra policies are given here :ref:`EXTRA-POLICIES-CONSIDERATIONS`
+
+.. image:: diagrams/marmalade_ng_extra.svg
 
 
 .. _DATA-MESSAGES:

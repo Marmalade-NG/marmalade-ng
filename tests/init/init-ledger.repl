@@ -1,20 +1,23 @@
-(enforce-pact-version "4.8")
+(enforce-pact-version "4.9")
 (begin-tx)
 (use basic-guards)
 (define-namespace 'marmalade-ng GUARD_SUCCESS GUARD_SUCCESS)
 (print "====> Deploy ledger")
 
 (env-data {'admin_keyset:"marmalade-ng.admin",
+           'extra_policies_admin_keyset:"marmalade-ng.extra_admin",
+           'ks-extra:["extra_adm"],
            'ks:["adm"]})
 
 
 
 (namespace 'kip)
-(load "../../pact/kip/poly-fungible-v3.pact")
+(load "../../pact/kip/ng-poly-fungible-v1.pact")
 
 (namespace 'marmalade-ng)
 (env-sigs [{'key:"adm", 'caps:[]}])
 (define-keyset "marmalade-ng.admin" (read-keyset 'ks))
+(define-keyset "marmalade-ng.extra_admin" (read-keyset 'ks-extra))
 (load "../../pact/policies/token-policy-ng-v1.pact")
 (load "../../pact/utils/util-policies.pact")
 (load "../../pact/ledger.pact")

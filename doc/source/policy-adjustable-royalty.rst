@@ -25,7 +25,7 @@ This mechanism is very similar to the concept of fixing a minimum output amount 
 
 The policy works whatever the sale scheme.
 
-*Important note*: It's highly recommended to use :ref:`POLICY-DISABLE-TRANSFER` in conjunction with this policy.
+*Important note*: It's highly recommended to use :ref:`POLICY-DISABLE-TRANSFER` or :ref:`POLICY-TRUSTED-CUSTODY` in conjunction with this policy.
 Otherwise, the royalty could be bypassed by OTC sales.
 
 Implemented hooks
@@ -75,10 +75,10 @@ Handled by ``(enforce-sale-init)``
 .. code:: lisp
 
   (defschema royalty-init-msg-sch
-    creator_acct:string
-    creator_guard:guard
-    rate:decimal
-    currencies:[module{fungible-v2}]
+    creator_acct:string ; Creator account: recipient of the royalty
+    creator_guard:guard ; Creator account: recipient of the royalty
+    rate:decimal ; Royalty rate
+    currencies:[module{fungible-v2}] ; List of currencies allowed for royalty payment
   )
 
 
@@ -183,6 +183,21 @@ Return the details of the royalties for a token for a given creator account.
     "token-id": "t:9Dh2pSjMjXLPERZnbE-aDuXQuquuOkgxSOgS-hYYX7Q"}
   ]
 
+get-sale-rate
+~~~~~~~~~~~~~
+*sale-id* ``string`` *→* ``string``
+
+Return the royalty rate for a given sale.
+
+Usually the rate is the same as the one returned by `get-royalty-details`.
+But if the creator has changed the rate after the sale being started, the old
+rate returned by this function is still applied.
+
+.. code:: lisp
+
+  (use marmalade-ng.policy-adjustable-roayalty)
+  (get-sale-rate "Lya0Fz-Sl7IuNYp3DOPPtMGU7VFDFZG0mpYd-NneHIs")
+    > 0.1
 
 Events
 ^^^^^^

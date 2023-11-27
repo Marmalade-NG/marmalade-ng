@@ -229,3 +229,26 @@ Return all the active sales details.
     "timeout": "2023-06-01T00:00:00Z",
     "token-id": "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM"
    }]
+
+
+Events
+^^^^^^
+DUTCH-AUCTION-SALE-OFFER
+~~~~~~~~~~~~~~~~~~~~~~~~
+sale-id* ``string`` *token-id* ``string`` *start-price* ``decimal``
+
+Event sent when an auction is started
+
+
+DUTCH-AUCTION-SALE-BOUGHT
+~~~~~~~~~~~~~~~~~~~~~~~~~
+sale-id* ``string`` *token-id* ``string`` *buy-price* ``decimal``
+
+Event sent when a dutch auction sale is bought
+
+
+DUTCH-AUCTION-SALE-WITHDRAWN
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+sale-id* ``string`` *token-id* ``string``
+
+Event sent when a dutch auction sale is withdrawn

@@ -8,6 +8,8 @@ Description
 
 This policy prohibits the token from being transfered.
 
+This policy is incompatible with :ref:`POLICY-TRUSTED-CUSTODY`.
+
 Implemented hooks
 ^^^^^^^^^^^^^^^^^
 

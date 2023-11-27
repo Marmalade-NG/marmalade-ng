@@ -217,3 +217,26 @@ Return all the active sales details.
     "timeout": "2023-06-01T00:00:00Z",
     "token-id": "t:2Q74RY998p-_uKdehMLFKeLN6erO5GRTkTS3vAWdzhg"
     }]
+
+
+Events
+^^^^^^
+FIXED-SALE-OFFER
+~~~~~~~~~~~~~~~~
+sale-id* ``string`` *token-id* ``string`` *price* ``decimal``
+
+Event sent when an auction is started
+
+
+FIXED-SALE-BOUGHT
+~~~~~~~~~~~~~~~~~
+sale-id* ``string`` *token-id* ``string``
+
+Event sent when a fixed sale is bought
+
+
+FIXED-SALE-WITHDRAWN
+~~~~~~~~~~~~~~~~~~~~
+sale-id* ``string`` *token-id* ``string``
+
+Event sent when a fixed sale is withdrawn

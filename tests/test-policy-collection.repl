@@ -56,11 +56,11 @@
 
 
 (env-events true)
-(create-collection "c_Cats_ZMLLJuSq0JoHSR4f_ZgUa2H_p7Rr71CN8CjQ7ZL_hU0" "Cats" 0 "CatsLover" (read-keyset 'cats-ks))
+(create-collection "c_Cats_ZMLLJuSq0JoHSR4f_ZgUa2H_p7Rr71CN8CjQ7ZL_hU0" "Cats" UNLIMITED-SIZE "CatsLover" (read-keyset 'cats-ks))
 (ev-analyzer.store (env-events true))
 
 (expect "Event CREATE-COLLECTION has been emitted" true (ev-analyzer.is-present "CREATE-COLLECTION"))
-(expect "CREATE COLLECTION good params" ["c_Cats_ZMLLJuSq0JoHSR4f_ZgUa2H_p7Rr71CN8CjQ7ZL_hU0" "Cats" 0 "CatsLover"] (ev-analyzer.params "CREATE-COLLECTION"))
+(expect "CREATE COLLECTION good params" ["c_Cats_ZMLLJuSq0JoHSR4f_ZgUa2H_p7Rr71CN8CjQ7ZL_hU0" "Cats" UNLIMITED-SIZE "CatsLover"] (ev-analyzer.params "CREATE-COLLECTION"))
 
 
 ; Try princapals creator with the pigs collection
@@ -69,15 +69,15 @@
 (env-sigs [{'key:"pigs-owner-key", 'caps:[]}])
 ; Try with a principal account that doesn't match to the guard
 (expect-failure "Bad principal owner name" "Reserved protocol guard violation"
-                (create-collection "c_SmallPigs_OpMyaBMEuVD9flzeMZ7gHNk2xEH3HU8yDGib4w3S5gs" "SmallPigs" 0 "r:user.PigsHater" (keyset-ref-guard "user.PigsLover")))
+                (create-collection "c_SmallPigs_OpMyaBMEuVD9flzeMZ7gHNk2xEH3HU8yDGib4w3S5gs" "SmallPigs" UNLIMITED-SIZE "r:user.PigsHater" (keyset-ref-guard "user.PigsLover")))
 
 (expect-failure "Bad principal owner name" "Reserved protocol guard violation"
-                (create-collection "c_SmallPigs_OpMyaBMEuVD9flzeMZ7gHNk2xEH3HU8yDGib4w3S5gs" "SmallPigs" 0 "r:user.PigsLover" (read-keyset 'pigs-ks)))
+                (create-collection "c_SmallPigs_OpMyaBMEuVD9flzeMZ7gHNk2xEH3HU8yDGib4w3S5gs" "SmallPigs" UNLIMITED-SIZE "r:user.PigsLover" (read-keyset 'pigs-ks)))
 
 
-(create-collection "c_SmallPigs_OpMyaBMEuVD9flzeMZ7gHNk2xEH3HU8yDGib4w3S5gs" "SmallPigs" 0 "r:user.PigsLover" (keyset-ref-guard "user.PigsLover"))
+(create-collection "c_SmallPigs_OpMyaBMEuVD9flzeMZ7gHNk2xEH3HU8yDGib4w3S5gs" "SmallPigs" UNLIMITED-SIZE "r:user.PigsLover" (keyset-ref-guard "user.PigsLover"))
 
-(create-collection "c_BigsPigs_lZnDio-8EqbWxznH2r0v7q1iB_QRjfSWFrBp9Xj-Prc" "BigsPigs" 0 "r:user.PigsLover" (keyset-ref-guard "user.PigsLover"))
+(create-collection "c_BigsPigs_lZnDio-8EqbWxznH2r0v7q1iB_QRjfSWFrBp9Xj-Prc" "BigsPigs" UNLIMITED-SIZE "r:user.PigsLover" (keyset-ref-guard "user.PigsLover"))
 
 (commit-tx)
 

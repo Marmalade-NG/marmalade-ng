@@ -5,7 +5,7 @@ Create your own custom policy
 
 **Not following these recommendations could compromise the security of the tokens.**
 
-More than 15 standard policies are available and should preferably be used.
+More than 16 standard policies are available and should preferably be used.
 
 But to create specific behavior for a token, a creator may want to create his own
 policy. And maybe combine them with standards policies.
@@ -30,6 +30,8 @@ If the policy only does enforcement, and does not manage sales or fees, ``0`` is
 
 If the policy is involved in a sale, another value between 10 and 30 has to be chosen, depending on how the
 policy must be prioritized within the sale process vs *policy-marketplace*, *policy-royalty*, *policy-xxx-sale*, ...
+
+Some constants are defined in ``util-policies``: :ref:`API_UTILS_POLICIES_RANK`
 
 3 - Ledger capabilities requirements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -58,3 +60,25 @@ If the policy needs to read data from the transaction, it should follow Marmalad
 
 In this case, the policy should use the functions ``(enforce-get-msg-data )`` and ``(get-msg-data )`` from the ``util-policies`` module.
 This module contains other functions that are very useful for dealing with *standard sale* messages.
+
+
+.. _EXTRA-POLICIES-CONSIDERATIONS:
+
+Extra policies considerations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+When the policy is intended to work as an extra-policy, the following limitations apply:
+
+* ``(enforce-init)`` is not called
+
+  Since the policy may not be available at creation, the ``(enforce-init)`` is never called.
+  If the policy needs special settings, an external callable function should exist.
+  The policy can use the :ref:`POLICY-EXTRA-POLICIES-GET-GUARD` function of ``policy-extra-policies`` to protect
+  settings or special operations.
+
+* The policy should require caps from ``policy-extra-policies`` instead of ``ledger``
+
+  An extra policy isn't called by the ledger directly. As a consequence, instead of using
+  ``(require-capability (ledger.`` at the beginning of each hook, it should use
+  ``(require-capability (marmalade-ns.policy-extra-policies``, with the caps names.
+
+* The policy will always be executed at rank 25.

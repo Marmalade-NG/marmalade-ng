@@ -1,0 +1,25 @@
+# This code adds a new custodian prefix to the policy trusted-custody
+code: |-
+  (use {{namespace}}.policy-trusted-custody)
+  (add-custodian "{{token_id}}" "{{new-custodian}}")
+
+data:
+
+publicMeta:
+  chainId: "{{chain}}"
+  sender: {{gas-payer}}
+  gasLimit: 2000
+  gasPrice: 0.00000001
+  ttl: 7200
+networkId: "{{network}}"
+signers:
+  - public: {{gas-payer-key}}
+    caps:
+      - name: "coin.GAS"
+        args: []
+  - public: {{creator-key}}
+    caps:
+      - name: {{namespace}}.policy-trusted-custody.UPDATE-CUSTODIAN
+        args:
+          - {{token_id}}
+type: exec

@@ -1,7 +1,8 @@
 (env-data {"disable-marmalade":true})
 (load "kadena_repl_sandbox/kda-env/init.repl")
 
-(env-data {'admin_keyset:"marmalade-ng.admin"})
+(env-data {'admin_keyset:"marmalade-ng.admin",
+           'extra_policies_admin_keyset:"marmalade-ng.extra-admin"})
 (namespace 'kip)
 (load "../pact/kip/poly-fungible-v3.pact")
 
@@ -18,6 +19,7 @@
 (load "../pact/policies/policy-disable-sale.pact")
 (load "../pact/policies/policy-disable-transfer.pact")
 (load "../pact/policies/policy-dutch-auction-sale.pact")
+(load "../pact/policies/policy-extra-policies.pact")
 (load "../pact/policies/policy-fixed-issuance.pact")
 (load "../pact/policies/policy-fixed-sale.pact")
 (load "../pact/policies/policy-guards.pact")
@@ -25,6 +27,7 @@
 (load "../pact/policies/policy-marketplace.pact")
 (load "../pact/policies/policy-non-fungible.pact")
 (load "../pact/policies/policy-royalty.pact")
+(load "../pact/policies/policy-trusted-custody.pact")
 (load "../pact/utils/std-policies.pact")
 
 
@@ -37,10 +40,12 @@
 (typecheck 'policy-disable-burn)
 (typecheck 'policy-disable-sale)
 (typecheck 'policy-disable-transfer)
+(typecheck 'policy-extra-policies)
 (typecheck 'policy-fixed-sale)
 (typecheck 'policy-guards)
 (typecheck 'policy-instant-mint)
 (typecheck 'policy-marketplace)
 (typecheck 'policy-non-fungible)
 (typecheck 'policy-royalty)
+(typecheck 'policy-trusted-custody)
 (typecheck 'std-policies)

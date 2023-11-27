@@ -1,0 +1,31 @@
+{
+  "name": "Garfield",
+  "description": "King of cats",
+  "image": "https://en.wikipedia.org/wiki/Garfield_(character)#/media/File:Garfield_the_Cat.svg",
+  "attributes": [
+    {
+      "trait_type": "height",
+      "value": 3.5
+    },
+    {
+      "trait_type": "weight",
+      "value": 11.2
+    },
+    {
+      "trait_type": "rank",
+      "value": 1
+    }
+  ],
+  "properties": {
+    "external_url": "https://www.mozilla.org/fr/firefox/",
+    "collection": {
+      "name": "Royal cats",
+      "family": "Cats"
+    },
+    "authors": [
+      {
+        "name": "Jim Davis"
+      }
+    ]
+  }
+}

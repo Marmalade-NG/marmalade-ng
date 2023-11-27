@@ -87,10 +87,16 @@
 (env-data {'marmalade_sale: {'sale_type:"auction", 'currency:coin },
            'marmalade_auction: {'recipient:"alice", 'start_price:10.0, 'increment_ratio:1.1 }})
 
-
+(env-events true)
 (sale "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8" "alice" 0.1 (time "2023-06-01T00:00:00Z"))
 
-; CVerify that0.1 has been deducted from the balance of Alice
+(ev-analyzer.store (env-events true))
+(expect "Event AUCTION-SALE-OFFER has been emitted" true (ev-analyzer.is-present "AUCTION-SALE-OFFER"))
+(expect "Event AUCTION-SALE-OFFER -> sale_id" (hash "auction-sale-1") (ev-analyzer.param "AUCTION-SALE-OFFER" 0))
+(expect "Event AUCTION-SALE-OFFER -> token_id" "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8" (ev-analyzer.param "AUCTION-SALE-OFFER" 1))
+(expect "Event AUCTION-SALE-OFFER -> price" 10.0 (ev-analyzer.param "AUCTION-SALE-OFFER" 2))
+
+; Verify that 0.1 has been deducted from the balance of Alice
 (expect "Balance of alice is 0.6 - 0.1" 0.5 (get-balance "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8" "alice"))
 
 (expect-that "It should exist 1 active sale" (compose (length) (= 1)) (get-all-active-sales))
@@ -253,7 +259,15 @@
 
 
 (env-data {'buyer:"bob", 'buyer-guard:{'pred:"keys-all", 'keys:["bob-key"]}})
+
+(env-events true)
 (continue-pact 1 false (hash "auction-sale-1"))
+
+(ev-analyzer.store (env-events true))
+(expect "Event AUCTION-SALE-BOUGHT has been emitted" true (ev-analyzer.is-present "AUCTION-SALE-BOUGHT"))
+(expect "Event AUCTION-SALE-BOUGHT -> sale_id" (hash "auction-sale-1") (ev-analyzer.param "AUCTION-SALE-BOUGHT" 0))
+(expect "Event AUCTION-SALE-BOUGHT -> token_id" "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8" (ev-analyzer.param "AUCTION-SALE-BOUGHT" 1))
+(expect "Event AUCTION-SALE-BOUGHT -> price" 13.0 (ev-analyzer.param "AUCTION-SALE-BOUGHT" 2))
 
 ; Check that alice has been paid
 (expect "Balance should be 1013" 1013.0 (coin.get-balance "alice"))
@@ -313,7 +327,13 @@
    (continue-pact 1 false (hash "auction-sale-2")))
 
 ; But alice should be able to withdraw
+(env-events true)
 (continue-pact 0 true (hash "auction-sale-2"))
+
+(ev-analyzer.store (env-events true))
+(expect "Event AUCTION-SALE-WITHDRAWN has been emitted" true (ev-analyzer.is-present "AUCTION-SALE-WITHDRAWN"))
+(expect "Event AUCTION-SALE-WITHDRAWN -> sale_id" (hash "auction-sale-2") (ev-analyzer.param "AUCTION-SALE-WITHDRAWN" 0))
+(expect "Event AUCTION-SALE-WITHDRAWN -> token_id" "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8" (ev-analyzer.param "AUCTION-SALE-WITHDRAWN" 1))
 
 ; Verify that the NFT has been refunded to alice
 (expect "Balance of alice is 0.5" 0.5 (get-balance "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8" "alice"))

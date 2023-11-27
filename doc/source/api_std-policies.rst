@@ -2,8 +2,8 @@ Module std-policies: Reference and API
 =======================================
 
 ``std-policies`` is a module that contains **pure only** helpers to deal with
-standard policies. The modules if intended to be used by wallets, market-places, tokens creator
-to simplify development. It avoids manipulating directly modrefs, but instead allows manipulating simple strings.
+standard policies. The module is intended to be used by wallets, market-places, tokens creators
+to simplify development. It avoids manipulating modrefs directly, but instead allows manipulating simple strings.
 
 Helpers
 -------
@@ -24,7 +24,7 @@ list-to-policies
 ~~~~~~~~~~~~~~~~
 *name* ``[string]`` *→* ``[module{token-policy-ng-v1}]``
 
-Convert a list of policies names to a list of policies.
+Convert a list of policy names to a list of policies.
 
 .. code:: lisp
 
@@ -51,8 +51,8 @@ from-policy
 
 Convert a policy name to the corresponding policy modref.
 
-In case of a non standard policy, the string `UNKNOWN_xxxxxx` is returned.
-where xxxxxx is an unique 6 hexadecimals characters derived from the hash of the policy
+In case of a non-standard policy, the string `UNKNOWN_xxxxxxxxxxxxxxxx` is returned.
+where *xxxxxxxxxxxxxxxx* is a unique 16 hexadecimal characters derived from the hash of the policy
 
 
 .. code:: lisp
@@ -62,7 +62,7 @@ where xxxxxx is an unique 6 hexadecimals characters derived from the hash of the
     > "INSTANT MINT"
 
   (from-policy private-ns.my-own-policy)
-    > "UNKNOWN_AB147D"
+    > "UNKNOWN_AB147ECB247D648"
 
 
 .. _STD-POLICIES-POLICIES-TO-LIST:
@@ -71,7 +71,7 @@ policies-to-list
 ~~~~~~~~~~~~~~~~
  *policies* ``[module{token-policy-ng-v1}]`` *→* ``[string]``
 
-Convert a list of policies names to a list of policies.
+Convert a list of policies to a list of policy names.
 
 .. code:: lisp
 

@@ -31,6 +31,9 @@ to be sold on a Marketplace.
 
 As well, you may want to choose ``ROYALTY`` or ``ADJUSTABLE-ROYALTY``.
 
+Usually ``EXTRA-POLICY`` should be chosen to benefit from the new features and new sales
+mechanisms introduced by the devellopers.
+
 
 Optional: Create a collection
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
