@@ -8,7 +8,7 @@
 (load "tools/events_analyzer.pact")
 (commit-tx)
 
-(begin-tx "Create 4 tokens")
+(begin-tx "Create 5 tokens")
 (env-hash (hash "CreateTx"))
 (use marmalade-ng.ledger)
 (use free.util-strings)
@@ -18,7 +18,8 @@
 (print (+ "Tokens ID: -" (join "\n           -" (map (create-token-id (read-keyset 'create-ks)) ["http://token-1",
                                                                                       "http://token-2",
                                                                                       "http://token-3",
-                                                                                      "http://token-4"]))))
+                                                                                      "http://token-4",
+                                                                                      "http://token-5"]))))
 
 (create-token "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" 0 "http://token-1"
               [marmalade-ng.policy-fixed-sale, marmalade-ng.policy-marketplace] (read-keyset 'create-ks))
@@ -32,6 +33,10 @@
 (create-token "t:9Dh2pSjMjXLPERZnbE-aDuXQuquuOkgxSOgS-hYYX7Q" 0 "http://token-4"
               [marmalade-ng.policy-fixed-sale, marmalade-ng.policy-marketplace] (read-keyset 'create-ks))
 
+(create-token "t:U-NkkWIAlYzdAERxJNNqmTgvR2j5jznXxrQg9z3VpDc" 0 "http://token-5"
+              [marmalade-ng.policy-fixed-sale, marmalade-ng.policy-marketplace] (read-keyset 'create-ks))
+
+
 (env-sigs [])
 (env-data {'alice-ks:["alice-key"]})
 
@@ -39,16 +44,18 @@
 (mint "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I" "alice" (read-keyset 'alice-ks) 1.0)
 (mint "t:L3JH94fXZQvUZ_IGNKMXAX5HwSZc_X0H7OwbnY_lsHA" "alice" (read-keyset 'alice-ks) 1.0)
 (mint "t:9Dh2pSjMjXLPERZnbE-aDuXQuquuOkgxSOgS-hYYX7Q" "alice" (read-keyset 'alice-ks) 1.0)
+(mint "t:U-NkkWIAlYzdAERxJNNqmTgvR2j5jznXxrQg9z3VpDc" "alice" (read-keyset 'alice-ks) 1.0)
 
 (commit-tx)
 
-;-------------------------------------------
-; Preparation create a keyset for best-market
-;--------------------------------------------
+;------------------------------------------------------------------
+; Preparation create a keysets for best-market and christmas-market
+;------------------------------------------------------------------
 (begin-tx)
 (env-data {'ks:["best-market-key"]})
 (namespace 'user)
 (define-keyset "user.best-market" (read-keyset 'ks))
+(define-keyset "user.christmas-market" (read-keyset 'ks))
 (commit-tx)
 
 
@@ -178,6 +185,21 @@
   (sale "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I" "alice" 1.0 NO-TIMEOUT))
 
 
+(env-data {'marmalade_sale: {'sale_type:"fixed", 'currency:coin },
+           'marmalade_fixed_quote: {'recipient:"alice", 'price:5.0 },
+           'marmalade_marketplace: {'marketplace-name: "BestMarket",
+                                    'marketplace-account:"r.user.best-market",
+                                    'shared-rate:1.1,
+                                    'currency:coin,
+                                    'min-fee:0.0,
+                                    'fee-rate:1.2,
+                                    'max-fee:10000.0}
+          })
+(expect-failure "Shared rate > 1.0" "Rate must be between 0.0 and 1.0"
+  (sale "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I" "alice" 1.0 NO-TIMEOUT))
+
+
+
 ; Try with a non created account
 (env-data {'marmalade_sale: {'sale_type:"fixed", 'currency:coin },
            'marmalade_fixed_quote: {'recipient:"alice", 'price:5.0 },
@@ -290,8 +312,8 @@
 
 
 ; => We try to rollback sale-2
-(begin-tx "Sale 1 withdraw")
-(env-hash (hash "fixed-sale-1-buy"))
+(begin-tx "Sale 2 withdraw")
+(env-hash (hash "fixed-sale-2-withdraw"))
 (use marmalade-ng.ledger)
 (use marmalade-ng.policy-fixed-sale)
 
@@ -368,6 +390,76 @@
 (expect "Final balance should be 995 - 5 -5 -5" 980.0 (coin.get-balance "bob"))
 (expect "Check that the marketplace balance is now 1.7" 1.7 (coin.get-balance "r.user.best-market"))
 (commit-tx)
+
+
+;----------------------------
+; Sale 5 Test the shared fee
+;----------------------------
+(begin-tx "Sale 5")
+(env-hash (hash "fixed-sale-5"))
+(print (format "Sale ID 5: => {}" [(tx-hash)]))
+(use marmalade-ng.ledger)
+(use marmalade-ng.policy-fixed-sale)
+(use marmalade-ng.policy-marketplace)
+(env-sigs [ {'key:"alice-key", 'caps:[(OFFER "t:U-NkkWIAlYzdAERxJNNqmTgvR2j5jznXxrQg9z3VpDc" "alice" 1.0)]}])
+(env-data {'marmalade_sale: {'sale_type:"fixed", 'currency:coin },
+           'marmalade_fixed_quote: {'recipient:"alice", 'price:5.0 },
+           'marmalade_marketplace: {'marketplace-name: "BestMarket",
+                                    'marketplace-account:"r.user.best-market",
+                                    'shared-rate:0.1,
+                                    'currency:coin,
+                                    'min-fee:0.0,
+                                    'fee-rate:0.1,
+                                    'max-fee:10000.0}
+          })
+(sale "t:U-NkkWIAlYzdAERxJNNqmTgvR2j5jznXxrQg9z3VpDc" "alice" 1.0 NO-TIMEOUT)
+
+(print (+ "Escrow account: => " (at 'escrow-account (get-sale (tx-hash)))))
+(commit-tx)
+
+
+;; First buy without shared fee object
+(begin-tx "Sale 5 buy")
+(env-hash (hash "fixed-sale-5-buy"))
+(use marmalade-ng.ledger)
+
+(env-data {'buyer:"bob", 'buyer-guard:{'pred:"keys-all", 'keys:["bob-key"]}})
+(env-sigs [{'key:"bob-key", 'caps:[(coin.TRANSFER "bob" "c:HlpnTkPhZwmVSyOY9Kf-cupi-Uue0o2JGnLuPfC4IZY" 5.0)]}])
+
+
+(continue-pact 1 false (hash  "fixed-sale-5"))
+
+; The price was 5.0 - 10%  = 4.5 for Alice
+; Check the KDA balances
+(expect "Check that the marketplace balance is now 1.7 + 0.5 =  2.2" 2.2 (coin.get-balance "r.user.best-market"))
+
+; ===> And rollback
+(rollback-tx)
+
+
+;; First buy without shared fee object
+(begin-tx "Sale 5 buy")
+(env-hash (hash "fixed-sale-5-buy"))
+(use marmalade-ng.ledger)
+
+(env-data {'buyer:"bob", 'buyer-guard:{'pred:"keys-all", 'keys:["bob-key"]},
+           'marmalade_shared_fee: {'recipient:"r:user.christmas-market"}
+        })
+
+(env-sigs [{'key:"bob-key", 'caps:[(coin.TRANSFER "bob" "c:HlpnTkPhZwmVSyOY9Kf-cupi-Uue0o2JGnLuPfC4IZY" 5.0)]}])
+
+(coin.create-account "r:user.christmas-market" (keyset-ref-guard "user.christmas-market"))
+
+(continue-pact 1 false (hash  "fixed-sale-5"))
+
+; The price was 5.0 - 10%  = 4.5 for Alice
+; Best Market got 0.9 * 0.5 = 0.45
+; Christmas Market got 0.1 * 0.5 = 0.05
+; Check the KDA balances
+(expect "Check that the marketplace balance is now 1.7 + 0.45 =  2.2" 2.15 (coin.get-balance "r.user.best-market"))
+(expect "Check that the Christmas marketplace balance is now 0.05" 0.05 (coin.get-balance "r:user.christmas-market"))
+(commit-tx)
+
 
 
 ;---------------------------------------
