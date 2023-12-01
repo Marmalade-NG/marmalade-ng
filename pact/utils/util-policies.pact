@@ -86,8 +86,10 @@
     recipient:string ; Recipient account for the shared-fee
   )
 
+  (defconst DEFAULT-SHARED-FEE:object{shared-fee-msg} {'recipient:""})
+
   (defun read-shared-fee-msg:object{shared-fee-msg} (token:object{token-info})
-    (get-msg-data "shared_fee" token {'recipient:""}))
+    (get-msg-data "shared_fee" token DEFAULT-SHARED-FEE))
 
   ;-----------------------------------------------------------------------------
   ; Sales common utils
