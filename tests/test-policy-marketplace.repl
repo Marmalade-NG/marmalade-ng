@@ -141,6 +141,7 @@
            'marmalade_fixed_quote: {'recipient:"alice", 'price:5.0 },
            'marmalade_marketplace: {'marketplace-name: "BestMarket",
                                     'marketplace-account:"r.user.best-market",
+                                    'shared-rate:0.0,
                                     'currency:coin,
                                     'min-fee:-8.0,
                                     'fee-rate:0.1,
@@ -153,6 +154,7 @@
            'marmalade_fixed_quote: {'recipient:"alice", 'price:5.0 },
            'marmalade_marketplace: {'marketplace-name: "BestMarket",
                                     'marketplace-account:"r.user.best-market",
+                                    'shared-rate:0.0,
                                     'currency:coin,
                                     'min-fee:8.0,
                                     'fee-rate:0.1,
@@ -166,6 +168,7 @@
            'marmalade_fixed_quote: {'recipient:"alice", 'price:5.0 },
            'marmalade_marketplace: {'marketplace-name: "BestMarket",
                                     'marketplace-account:"r.user.best-market",
+                                    'shared-rate:0.0,
                                     'currency:coin,
                                     'min-fee:0.0,
                                     'fee-rate:1.2,
@@ -180,6 +183,7 @@
            'marmalade_fixed_quote: {'recipient:"alice", 'price:5.0 },
            'marmalade_marketplace: {'marketplace-name: "BestMarket",
                                     'marketplace-account:"r.user.best-market",
+                                    'shared-rate:0.0,
                                     'currency:coin,
                                     'min-fee:0.2,
                                     'fee-rate:0.1,
@@ -211,6 +215,7 @@
            'marmalade_fixed_quote: {'recipient:"alice", 'price:5.0 },
            'marmalade_marketplace: {'marketplace-name: "BestMarket",
                                     'marketplace-account:"r.user.best-market",
+                                    'shared-rate:0.0,
                                     'currency:coin,
                                     'min-fee:1.0,
                                     'fee-rate:0.1,
@@ -237,6 +242,7 @@
            'marmalade_fixed_quote: {'recipient:"alice", 'price:5.0 },
            'marmalade_marketplace: {'marketplace-name: "BestMarket",
                                     'marketplace-account:"r.user.best-market",
+                                    'shared-rate:0.0,
                                     'currency:coin,
                                     'min-fee:0.0,
                                     'fee-rate:0.1,
@@ -245,6 +251,7 @@
 
 (print (+ "Sale 4 MarketPlace Hash: => " (hash {'marketplace-name: "BestMarket",
                                                 'marketplace-account:"r.user.best-market",
+                                                'shared-rate:0.0,
                                                 'min-fee:0.0,
                                                 'currency:coin,
                                                 'fee-rate:0.1,
@@ -278,7 +285,7 @@
              (get-active-sales-by-name "BestMarket"))
 
 (expect-that "1 NFTS is currently under sale with ceil price hash"  (compose (length) (= 1))
-             (get-active-sales-by-market-hash "zE-T8f_kTazOs7IuC-dNZ4Nf3KnkDymeozRb66QlrBk" ))
+             (get-active-sales-by-market-hash "cxOEJ6ABlJGJw3lVSgBAVbGFQtFLoTE6onRisjM2Y70" ))
 (commit-tx)
 
 
