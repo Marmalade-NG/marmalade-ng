@@ -165,8 +165,7 @@
                             'max-fee:=max-fee}
             (bind (read-shared-fee-msg token) {'recipient:=shared-recipient}
 
-              (let* ((escrow (ledger.escrow))
-                     (escrow-balance (currency::get-balance escrow))
+              (let* ((escrow-balance (currency::get-balance (ledger.escrow)))
                      (total-amount (clamp min-fee max-fee  (* fee-rate escrow-balance)))
                      (shared-amount (if (!= shared-recipient "")
                                         (floor (* total-amount shared-rate) (currency::precision))
