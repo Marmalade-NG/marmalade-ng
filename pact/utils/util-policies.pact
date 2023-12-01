@@ -40,10 +40,10 @@
   ;   - use a global message for all tokens (Syntax 1)
   ;   - use a per-token message (Syntax 2)
   (defun global-key:string (domain:string)
-    (concat ["marmalade" "_" domain]))
+    (format "marmalade_{}" [domain]))
 
   (defun token-key:string (domain:string token:object{token-info})
-    (concat [(global-key domain) "_" (at 'id token)]))
+    (format "{}_{}" [(global-key domain) (at 'id token)]))
 
   (defun get-msg-data:object (domain:string token:object{token-info} default:object)
     @doc "Read an optional message from data, trying to read \
