@@ -34,6 +34,10 @@
     @event
     true)
 
+  (defcap FIXED-SALE-PAYMENT ()
+    @doc "Capability aquired during a sale payment"
+    true)
+
   ;-----------------------------------------------------------------------------
   ; Schemas and Tables
   ;-----------------------------------------------------------------------------
@@ -175,7 +179,8 @@
     (bind (read-buy-msg token buyer) {'payer:=payer}
       (with-read quotes (pact-id) {'currency:=currency:module{fungible-v2},
                                    'price:=price}
-        (currency::transfer-create payer (ledger.escrow) (ledger.escrow-guard) price)))
+        (with-capability (FIXED-SALE-PAYMENT)
+          (currency::transfer-create payer (ledger.escrow) (ledger.escrow-guard) price))))
     (emit-event (FIXED-SALE-BOUGHT (pact-id) (at 'id token)))
   )
 
