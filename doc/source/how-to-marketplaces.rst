@@ -50,6 +50,7 @@ that defines the fee parameters:
 
 - minimal/maximum/rate of the fee
 - currency of the fee
+- shared fee rate
 - payable account.
 
 Such an object is identified by a hash. The Marketplace may manage one or a set of genuine fee objects (and their corresponding hashes)
@@ -58,6 +59,13 @@ This will give the possibility to the marketplace to only list genuine sales.
 
 **Note**: The field ``marketplace-name`` should remain as informative only. Nobody should rely on this field, since it can
 be crafted by anyone. Only the full object represented by its hash is reliable.
+
+Shared Marketplace fees
+~~~~~~~~~~~~~~~~~~~~~~~
+A selling marketplace may propose to share fees with another buying marketplace.
+
+This feature is described more in details here:
+:ref:`POLICY-MARKETPLACE-SHARED-FEES`
 
 
 Fixed quote sales
@@ -107,6 +115,8 @@ Data:
    "buyer-guard": buyer-guard
   }
 
+The transaction may include a `shared_fee` object.
+
 And the following installed capacity:
 
 .. code:: lisp
@@ -154,12 +164,15 @@ The minimum price should be calculated by the dApp with the following algorithm:
 
 The bid must be done using the function :ref:`POLICY-AUCTION-SALE-PLACE-BID` of the `policy-auction-sale` module.
 
+The transaction may include a `shared_fee` object.
 
 And the following installed capacity:
 
 .. code:: lisp
 
     (currency.TRANSFER buyer escrow-account new-price)
+
+
 
 
 Ending the sale
@@ -205,3 +218,6 @@ Data:
   {"buyer": buyer,
    "buyer-guard": buyer-guard
   }
+
+The transaction must include a `shared_fee` object, if the bid has been done with such object.
+This information can be retrieved during listing.

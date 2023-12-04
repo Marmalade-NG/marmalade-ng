@@ -46,11 +46,11 @@ Examples:
 
 Shared fees
 ~~~~~~~~~~~
-To be compatible with she shared fees feature of the the ``MARKETPLACE`` policy, this policy includes some optionnal hints
+To be compatible with the shared fees feature of the ``MARKETPLACE`` policy, this policy includes some optional hints
 to facilitate the integration of shared fees.
 
  - During a bid transaction, the data section may contain a `marmalade_shared_fee` object.
- - When the bid has been done with the a `marmalade_shared_fee`, the sale ending (continue transaction), must contains exactly the same object.
+ - When the bid has been done with a `marmalade_shared_fee`, the sale ending (continue transaction), must contain exactly the same object.
 
 The marmalade_shared_fee object can be retrieved using ``get-sale`` :ref:`POLICY-AUCTION-SALE-GET-SALE`
 

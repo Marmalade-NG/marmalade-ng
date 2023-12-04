@@ -27,6 +27,8 @@ whether this sale can be listed or not.
 
 This policy works whatever the sale scheme.
 
+.. _POLICY-MARKETPLACE-SHARED-FEES:
+
 Shared fees
 ~~~~~~~~~~~
 The marketplace that created the sale has the possibility of sharing its fees with the buying marketplace.
@@ -91,8 +93,8 @@ Handled by ``(enforce-sale-offer)``
 Both objects must be present in the ``(sale)`` transaction. And both objects must
 have the same currency.
 
-shared-fee
-~~~~~~~~~~
+marmalade_shared_fee
+~~~~~~~~~~~~~~~~~~~~
 Handled by ``(enforce-sale-settle)``
 
 Optional object. If not present, the whole fee amount is paid to the initial market place.
