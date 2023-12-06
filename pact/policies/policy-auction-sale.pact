@@ -278,7 +278,7 @@
     ; 1 - Fake a token-info object : no need to fetch a true one from the ledger, since we are only
     ;     interested by the 'id
     ; 2 - Read the shared-fee message object (if present)
-    ; 3 - Check that the recipient account exists in the currency => No surpise for settling the sale
+    ; 3 - Check that the recipient account exists in the currency => No surprise for settling the sale
     (let* ((token-info-obj {'id:token-id, 'supply:0.0, 'precision:0, 'uri:""})
            (msg (read-shared-fee-msg token-info-obj)))
       (if (!= msg DEFAULT-SHARED-FEE)
