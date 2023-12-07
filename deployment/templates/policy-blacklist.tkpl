@@ -1,6 +1,4 @@
 codeFile: .pact/policy-blacklist.pact
-data:
-  admin_keyset: "{{admin-keyset}}"
 publicMeta:
   chainId: "{{chain}}"
   sender: {{gas-payer}}
@@ -9,8 +7,6 @@ publicMeta:
   ttl: 7200
 networkId: "{{network}}"
 signers:
-  - public: {{namespace-key}}
-    caps: []
   - public: {{gas-payer-key}}
     caps:
       - name: "coin.GAS"

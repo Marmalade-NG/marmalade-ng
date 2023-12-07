@@ -1,12 +1,18 @@
-codeFile: .pact/policy-disable-transfer.pact
+codeFile: .pact/governance.pact
+data:
+  admin_keyset: "{{admin-keyset}}"
 publicMeta:
   chainId: "{{chain}}"
   sender: {{gas-payer}}
-  gasLimit: 80000
+  gasLimit: 100000
   gasPrice: 0.00000001
   ttl: 7200
 networkId: "{{network}}"
 signers:
+######## ONLY FOR INIT ##########
+  - public: {{namespace-key}}
+    caps: []
+#################################
   - public: {{gas-payer-key}}
     caps:
       - name: "coin.GAS"

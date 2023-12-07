@@ -11,6 +11,7 @@ INIT=-D__INIT__
 
 TRANSACTION_FILES = interface-poly-fungible \
                     interface-token-policy \
+										governance \
                     core-ledger \
                     core-util-policies \
                     policy-adjustable-royalty \

@@ -45,6 +45,16 @@ before proceeding to the next step you can verify that everything is ok and has 
 for TRX in tx_interface-*.json; do kda poll $TRX |jq;done
 ```
 
+## Deploy governance module
+```sh
+kda send tx_governance.json
+```
+before proceeding to the next step you can verify that everything is ok and has been deployed.
+
+```sh
+kda poll governance.json
+```
+
 ## Deploy Marmalade core
 ```sh
 kda send tx_core-*.json
