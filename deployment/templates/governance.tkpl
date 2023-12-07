@@ -1,6 +1,7 @@
 codeFile: .pact/governance.pact
 data:
   admin_keyset: "{{admin-keyset}}"
+  lock-namespace: {{lock-namespace}}
 publicMeta:
   chainId: "{{chain}}"
   sender: {{gas-payer}}

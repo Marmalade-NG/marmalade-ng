@@ -7,11 +7,12 @@
 (namespace 'marmalade-ng)
 (env-data {'admin_keyset:"marmalade-ng.admin",
            'ks-extra:["extra_adm"],
-           'ks:["adm"]})
+           'ks:["adm"],
+           'lock-namespace:false})
 (define-keyset "marmalade-ng.admin" (read-keyset 'ks))
 (define-keyset "marmalade-ng.extra_admin" (read-keyset 'ks-extra))
 (load "../../pact/governance.pact")
-(define-namespace 'marmalade-ng (create-user-guard (governance.namespace-guard))
+(define-namespace 'marmalade-ng (create-user-guard (governance.namespace-user-guard))
                                 basic-guards.GUARD_FAILURE)
 
 (print "====> Deploy ledger")
