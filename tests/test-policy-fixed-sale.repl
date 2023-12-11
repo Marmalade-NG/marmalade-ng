@@ -4,6 +4,11 @@
 (load "init/init-policy-fixed-sale.repl")
 
 (begin-tx)
+(load "stubs/test-payer-manager.pact")
+(create-table test-table)
+(commit-tx)
+
+(begin-tx)
 (load "tools/events_analyzer.pact")
 (commit-tx)
 
@@ -258,11 +263,21 @@
 
 (env-chain-data {"block-time": (time "2023-01-02T00:00:00Z")})
 (env-data {'buyer:"bob", 'buyer-guard:{'pred:"keys-all", 'keys:["bob-key"]},
-           'marmalade_fixed_buy:{'payer:"carol"}
+           'marmalade_managed_payer:{'manager:test-payer-manager,
+                                     'payer:"carol"}
             })
 
 (env-sigs [{'key:"carol-key", 'caps:[(coin.TRANSFER "carol" "c:hl7nOg4e09GP5zMyZ8KtWQTmIV7ftlKnQoPqvtu632g" 5.0)]}])
+
+
+(expect-failure "Payer not enabled" "Payer refuses to pay"
+                 (continue-pact 1 false (hash  "fixed-sale-3")))
+
+
+; Now enable the payer manager and retry
+(test-payer-manager.enable "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" true)
 (continue-pact 1 false (hash  "fixed-sale-3"))
+
 (expect "Balance of alice is 0.3" 0.1 (get-balance "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice"))
 (expect "Balance of bob is 0.3" 0.5 (get-balance "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "bob"))
 

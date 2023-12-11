@@ -5,6 +5,8 @@
 
 (begin-tx)
 (namespace 'marmalade-ng)
+(load "../pact/payer-manager/payer-manager-v1.pact")
+(load "../pact/payer-manager/null-payer-manager.pact")
 (load "../pact/policies/policy-adjustable-royalty.pact")
 (load "../pact/policies/policy-auction-sale.pact")
 (load "../pact/policies/policy-blacklist.pact")

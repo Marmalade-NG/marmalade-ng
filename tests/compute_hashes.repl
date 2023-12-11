@@ -24,7 +24,11 @@
 (load "../pact/policies/policy-dutch-auction-sale.pact")
 (load "../pact/policies/policy-extra-policies.pact")
 (load "../pact/policies/policy-fixed-issuance.pact")
+
+(load "../pact/payer-manager/payer-manager-v1.pact")
+(load "../pact/payer-manager/null-payer-manager.pact")
 (load "../pact/policies/policy-fixed-sale.pact")
+
 (load "../pact/policies/policy-guards.pact")
 (load "../pact/policies/policy-instant-mint.pact")
 (load "../pact/policies/policy-marketplace.pact")
