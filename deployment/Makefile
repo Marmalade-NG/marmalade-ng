@@ -11,6 +11,7 @@ INIT=-D__INIT__
 
 TRANSACTION_FILES = interface-poly-fungible \
                     interface-token-policy \
+										governance \
                     core-ledger \
                     core-util-policies \
                     policy-adjustable-royalty \
@@ -34,10 +35,10 @@ TRANSACTION_FILES = interface-poly-fungible \
 
 
 
-.PRECIOUS: %.yaml .pact/%.pact
+.PRECIOUS: tx_%.yaml .pact/%.pact
 
 
-all: $(addsuffix .json, ${TRANSACTION_FILES})
+all: $(addprefix tx_, $(addsuffix .json, ${TRANSACTION_FILES}))
 
 .pact:
 	mkdir -p .pact
@@ -48,8 +49,8 @@ all: $(addsuffix .json, ${TRANSACTION_FILES})
 .pact/%.pact: templates/%.m4 | .pact
 	m4 -I../pact -D__NAMESPACE__=${NAMESPACE} -D__KIP_NAMESPACE__=${KIP_NAMESPACE} ${INIT} $< > $@
 
-%.yaml: templates/%.tkpl .pact/%.pact
-	kda gen -t $< -o $*.yaml -d ${DATA_FILE}
+tx_%.yaml: templates/%.tkpl .pact/%.pact
+	kda gen -t $< -o $@ -d ${DATA_FILE}
 
 clean:
 		rm -rf .pact

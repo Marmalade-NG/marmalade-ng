@@ -221,8 +221,15 @@ Some considerations for writting an extra policies are given here :ref:`EXTRA-PO
 
 Passing data to policies
 ------------------------
-Since the poly-fungible API does not allow passing specific information to the policies, parameters must
+Since the poly-fungible API does not allow passing specific information directly to the policies, parameters must
 be passed using the data section of the transaction.
+
+Data messages are read by the policies for which they are intended.
+
+**Example:**
+
+.. image:: diagrams/data_messages.svg
+
 
 Marmalade-NG uses a standardized way to encode the data.
 

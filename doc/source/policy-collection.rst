@@ -34,9 +34,15 @@ be trusted by third parties.
 
 Ranks
 ~~~~~
-Each token when created inside a collection is given automatically a rank.
+Each token when created inside a collection is given automatically a rank. The rank is
+incremented at each creation.
 
 Ranks start with #1 and are immutable.
+
+Collection ranks represents the position of the NFT inside the collection. They are equivalent
+to the **tokenId** of an ERC-721 contract.
+
+The tuple (collection / rank) is an unambiguous way to identify a token.
 
 
 Collection sizes and maximum tokens

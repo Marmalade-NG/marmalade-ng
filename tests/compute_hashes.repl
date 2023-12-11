@@ -3,7 +3,8 @@
 
 (begin-tx)
 (env-data {'admin_keyset:"marmalade-ng.admin",
-           'extra_policies_admin_keyset:"marmalade-ng.extra-admin"})
+           'extra_policies_admin_keyset:"marmalade-ng.extra-admin",
+           'lock-namespace:false})
 (namespace 'kip)
 (load "../pact/kip/ng-poly-fungible-v1.pact")
 
@@ -11,6 +12,7 @@
 (define-namespace 'marmalade-ng GUARD_SUCCESS GUARD_SUCCESS)
 (namespace "marmalade-ng")
 (load "../pact/policies/token-policy-ng-v1.pact")
+(load "../pact/governance.pact")
 (load "../pact/utils/util-policies.pact")
 (load "../pact/ledger.pact")
 
