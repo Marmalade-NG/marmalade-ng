@@ -3,9 +3,8 @@
   ;-----------------------------------------------------------------------------
   ; Governance
   ;-----------------------------------------------------------------------------
-  (defconst ADMIN-KEYSET:string (read-string "admin_keyset"))
   (defcap GOVERNANCE ()
-    (enforce-keyset ADMIN-KEYSET))
+    (governance.enforce-governance))
 
   ;Enforce payer implementation
   (defun enforce-payer:bool (account:string)
