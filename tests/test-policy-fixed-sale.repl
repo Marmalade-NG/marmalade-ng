@@ -226,3 +226,45 @@
 (expect "Balance of alice is 0.3" 0.3 (get-balance "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice"))
 (expect "Balance of bob is 0.3" 0.3 (get-balance "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "bob"))
 (commit-tx)
+
+
+;------------------------ Try with an alternate payer ----------------------
+(begin-tx "Sales 3")
+(env-hash (hash "fixed-sale-3"))
+(print (format "Sale ID 3: => {}" [(tx-hash)]))
+; Alice will sell 0.2 to carol
+(use marmalade-ng.ledger)
+(use marmalade-ng.policy-fixed-sale)
+
+(env-sigs [ {'key:"alice-key", 'caps:[(OFFER "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice" 0.2)]}
+           ])
+
+(env-chain-data {"block-time": (time "2023-01-01T00:00:00Z")})
+
+(env-data {'marmalade_sale: {'sale_type:"fixed", 'currency:coin },
+           'marmalade_fixed_quote: {'recipient:"alice", 'price:5.0 }})
+
+(sale "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice" 0.2 NO-TIMEOUT)
+
+(print (+ "Escrow account: => " (at 'escrow-account (get-sale (tx-hash)))))
+
+(expect "Balance of alice is 0.1" 0.1 (get-balance "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice"))
+(commit-tx)
+
+
+(begin-tx "Sale 3 => Carol will buy for bob")
+(use marmalade-ng.ledger)
+(use marmalade-ng.policy-fixed-sale)
+
+(env-chain-data {"block-time": (time "2023-01-02T00:00:00Z")})
+(env-data {'buyer:"bob", 'buyer-guard:{'pred:"keys-all", 'keys:["bob-key"]},
+           'marmalade_fixed_buy:{'payer:"carol"}
+            })
+
+(env-sigs [{'key:"carol-key", 'caps:[(coin.TRANSFER "carol" "c:hl7nOg4e09GP5zMyZ8KtWQTmIV7ftlKnQoPqvtu632g" 5.0)]}])
+(continue-pact 1 false (hash  "fixed-sale-3"))
+(expect "Balance of alice is 0.3" 0.1 (get-balance "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "alice"))
+(expect "Balance of bob is 0.3" 0.5 (get-balance "t:r-4jQUrZWpYfEqq_iGvBn1ofgCLPoh2ZfG5kfAVX2KM" "bob"))
+
+(expect "Final balance of Carol should be 995" 995.0 (coin.get-balance "carol"))
+(commit-tx)

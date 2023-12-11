@@ -33,6 +33,10 @@
     @event
     true)
 
+  (defcap FIXED-SALE-PAYMENT ()
+    @doc "Capability aquired during a sale payment"
+    true)
+
   ;-----------------------------------------------------------------------------
   ; Schemas and Tables
   ;-----------------------------------------------------------------------------
@@ -62,6 +66,14 @@
 
   (defun read-fixed-quote-msg:object{fixed-quote-msg-sch} (token:object{token-info})
     (enforce-get-msg-data "fixed_quote" token))
+
+  (defschema fixed-buy-msg-sch
+    payer:string ; Alternate payer
+  )
+
+  (defun read-buy-msg:object{fixed-buy-msg-sch} (token:object{token-info} default-payer:string)
+    (get-msg-data "fixed_buy" token {'payer:default-payer})
+  )
 
   ;-----------------------------------------------------------------------------
   ; Util functions
@@ -163,10 +175,11 @@
     (require-capability (ledger.POLICY-ENFORCE-BUY token (pact-id) policy-fixed-sale))
     (enforce-sale-not-ended)
     ; First step to handle the buying part => Transfer the amount to the escrow account
-    (with-read quotes (pact-id) {'currency:=currency:module{fungible-v2},
-                                 'price:=price}
-      (currency::transfer-create buyer (ledger.escrow) (ledger.escrow-guard) price))
-    ; Emit the corresponding event
+    (bind (read-buy-msg token buyer) {'payer:=payer}
+      (with-read quotes (pact-id) {'currency:=currency:module{fungible-v2},
+                                   'price:=price}
+        (with-capability (FIXED-SALE-PAYMENT)
+          (currency::transfer-create payer (ledger.escrow) (ledger.escrow-guard) price))))
     (emit-event (FIXED-SALE-BOUGHT (pact-id) (at 'id token)))
   )
 
