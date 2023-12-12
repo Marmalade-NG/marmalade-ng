@@ -264,6 +264,7 @@
 (env-chain-data {"block-time": (time "2023-01-02T00:00:00Z")})
 (env-data {'buyer:"bob", 'buyer-guard:{'pred:"keys-all", 'keys:["bob-key"]},
            'marmalade_managed_payer:{'manager:test-payer-manager,
+                                     'spec:{},
                                      'payer:"carol"}
             })
 

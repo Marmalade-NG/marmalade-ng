@@ -3,9 +3,8 @@
   ;-----------------------------------------------------------------------------
   ; Governance
   ;-----------------------------------------------------------------------------
-  (defconst ADMIN-KEYSET:string (read-string "admin_keyset"))
   (defcap GOVERNANCE ()
-    (enforce-keyset ADMIN-KEYSET))
+    true)
 
   (defschema test-sch
     enabled:bool
@@ -19,7 +18,7 @@
   )
 
   ;Enforce payer implementation
-  (defun enforce-payer:bool (account:string)
+  (defun enforce-payer:bool (spec:object)
     (bind (marmalade-ng.policy-fixed-sale.get-sale (pact-id))
           {'token-id:=token-id}
       (with-read test-table token-id {'enabled:=enabled}

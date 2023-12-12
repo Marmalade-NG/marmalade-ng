@@ -33,9 +33,9 @@
     @event
     true)
 
-  (defcap FIXED-SALE-PAYMENT (manager:module{payer-manager-v1} payer:string)
+  (defcap FIXED-SALE-PAYMENT (manager:module{payer-manager-v1} spec:object)
     @doc "Capability aquired during a sale payment"
-    (enforce-one "Payer refuses to pay" [(manager::enforce-payer payer)])
+    (enforce-one "Payer refuses to pay" [(manager::enforce-payer spec)])
   )
 
   ;-----------------------------------------------------------------------------
@@ -70,11 +70,13 @@
 
   (defschema fixed-buy-msg-sch
     manager:module{payer-manager-v1}
+    spec:object
     payer:string ; Alternate payer
   )
 
   (defun read-payer-msg:object{fixed-buy-msg-sch} (token:object{token-info} default-payer:string)
     (get-msg-data "managed_payer" token {'manager:null-payer-manager,
+                                         'spec:{},
                                          'payer:default-payer})
   )
 
@@ -179,10 +181,11 @@
     (enforce-sale-not-ended)
     ; First step to handle the buying part => Transfer the amount to the escrow account
     (bind (read-payer-msg token buyer) {'manager:=manager,
+                                        'spec:=payer-spec,
                                         'payer:=payer}
       (with-read quotes (pact-id) {'currency:=currency:module{fungible-v2},
                                    'price:=price}
-        (with-capability (FIXED-SALE-PAYMENT manager payer)
+        (with-capability (FIXED-SALE-PAYMENT manager payer-spec)
           (currency::transfer-create payer (ledger.escrow) (ledger.escrow-guard) price))))
     (emit-event (FIXED-SALE-BOUGHT (pact-id) (at 'id token)))
   )

@@ -7,6 +7,6 @@
     (governance.enforce-governance))
 
   ;Enforce payer implementation
-  (defun enforce-payer:bool (account:string)
+  (defun enforce-payer:bool (spec:object)
     true)
 )
