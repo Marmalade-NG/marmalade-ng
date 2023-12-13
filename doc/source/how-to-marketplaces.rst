@@ -135,7 +135,7 @@ The timeout parameter must be a finite timeout.
 
 Listing
 ^^^^^^^
-The listing procedures are similar to :ref:`FIXED-QUOTE-LISTING`, but the ``policy-auction-same`` policy module has to be used
+The listing procedures are similar to :ref:`FIXED-QUOTE-LISTING`, but the ``policy-auction-sale`` policy module has to be used
 instead of the ``fixed-auction-sale``:
 
 - :ref:`POLICY-AUCTION-SALE-GET-ALL-ACTIVE-SALES` and :ref:`POLICY-AUCTION-SALE-GET-SALE`

@@ -1,6 +1,4 @@
 codeFile: .pact/policy-auction-sale.pact
-data:
-  admin_keyset: "{{admin-keyset}}"
 publicMeta:
   chainId: "{{chain}}"
   sender: {{gas-payer}}

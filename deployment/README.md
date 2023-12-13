@@ -37,40 +37,50 @@ make
 
 ## Deploy interfaces
 ```sh
-kda send interface-*.json
+kda send tx_interface-*.json
 ```
 before proceeding to the next step you can verify that everything is ok and has been deployed.
 
 ```sh
-for TRX in interface-*.json; do kda poll $TRX |jq;done
+for TRX in tx_interface-*.json; do kda poll $TRX |jq;done
+```
+
+## Deploy governance module
+```sh
+kda send tx_governance.json
+```
+before proceeding to the next step you can verify that everything is ok and has been deployed.
+
+```sh
+kda poll governance.json
 ```
 
 ## Deploy Marmalade core
 ```sh
-kda send core-*.json
+kda send tx_core-*.json
 ```
 before proceeding to the next step you can verify that everything is ok and has been deployed.
 
 ```sh
-for TRX in core-*.json; do kda poll $TRX |jq;done
+for TRX in tx_core-*.json; do kda poll $TRX |jq;done
 ```
 
 ## Deploy policies
 ```sh
-kda send policy-*.json
+kda send tx_policy-*.json
 ```
 before proceeding to the next step you can verify that everything is ok and has been deployed.
 
 ```sh
-for TRX in policy-*.json; do kda poll $TRX |jq;done
+for TRX in tx_policy-*.json; do kda poll $TRX |jq;done
 ```
 
 ## Deploy std-policies module
 ```sh
-kda send std-policies.json
+kda send tx_std-policies.json
 ```
 You can verify that the module has been well deployed.
 
 ```sh
-kda poll std-policies.json
+kda poll tx_std-policies.json
 ```
