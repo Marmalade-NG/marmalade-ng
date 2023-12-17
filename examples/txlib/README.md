@@ -64,6 +64,10 @@
 - Start a fixed quote sale
 - Needed signatures : ``gas-payer-key``, ``seller-XX.key``
 
+**fixed-sale/fixed-sale-with-marketplace.tkpl:**
+- Start a fixed quote sale with Marketplace and shared fees
+- Needed signatures : ``gas-payer-key``, ``seller-XX.key``
+
 **fixed-sale/buy.tkpl:**
 - Complete the fixed quote sale and buy the token
 - Needed signatures : ``gas-payer-key``, ``buyer-XX.key``
