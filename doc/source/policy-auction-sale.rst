@@ -44,8 +44,15 @@ Examples:
   - The tiemout was previously set to: ``2023-01-03T06:00:00``, a bid arrives at ``2023-01-03T05:45:00`` => The tiemout is not changed.
   - The tiemout was previously set to: ``2023-01-03T06:00:00``, a bid arrives at ``2023-01-03T05:56:00`` => The tiemout is extended to ``2023-01-03T06:06:00``.
 
+Shared fees
+~~~~~~~~~~~
+To be compatible with the shared fees feature of the ``MARKETPLACE`` policy, this policy includes some optional hints
+to facilitate the integration of shared fees.
 
+ - During a bid transaction, the data section may contain a `marmalade_shared_fee` object.
+ - When the bid has been done with a `marmalade_shared_fee`, the sale ending (continue transaction), must contain exactly the same object.
 
+The marmalade_shared_fee object can be retrieved using ``get-sale`` :ref:`POLICY-AUCTION-SALE-GET-SALE`
 
 
 Implemented hooks
@@ -91,6 +98,19 @@ Handled by ``(enforce-sale-offer)``
   )
 
 Mandatory
+
+marmalade_shared_fee
+~~~~~~~~~~~~~~~~~~~~
+Handled by ``(enforce-sale-buy)`` and ``(place-bid)``
+
+Optional object
+
+.. code:: lisp
+
+  (defschema shared-fee-msg
+    recipient:string ; Recipient account for the shared-fee
+  )
+
 
 
 External functions
@@ -150,7 +170,7 @@ Return the sale details of a given sale-id.
    "increment-ratio": 1.1,
    "recipient": "alice",
    "sale-id": "",
-   "seller: "alice",
+   "seller": "alice",
    "start-price": 10.0,
    "timeout": "2023-06-01T00:00:00Z",
    "token-id": "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8"
@@ -180,7 +200,8 @@ Return the sale details of a given sale-id.
        "increment-ratio": 1.1,
        "recipient": "alice",
        "sale-id": "",
-       "seller: "alice",
+       "seller": "alice",
+       "shared-fee": {"recipient":""},
        "start-price": 10.0,
        "timeout": "2023-06-01T00:00:00Z",
        "token-id": "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8"
@@ -214,7 +235,8 @@ Return all the active sales details initiated by a given account.
      "increment-ratio": 1.1,
      "recipient": "alice",
      "sale-id": "",
-     "seller: "alice",
+     "seller": "alice",
+     "shared-fee": {"recipient":""},
      "start-price": 10.0,
      "timeout": "2023-06-01T00:00:00Z",
      "token-id": "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8"
@@ -229,7 +251,8 @@ Return all the active sales details initiated by a given account.
     "increment-ratio": 1.1,
     "recipient": "alice",
     "sale-id": "DmxMgittQd4Duf0WQdeySZkx_I4yvQ3phecLpWMzmw8",
-    "seller: "alice",
+    "seller": "alice",
+    "shared-fee": {"recipient":""},
     "start-price": 10.0,
     "timeout": "2023-06-01T00:00:00Z",
     "token-id": "t:sMd0A3s6ZoiHd0RCzZ3XqVcTmOcoNvi73hl1gWXUMSA"}
@@ -264,7 +287,8 @@ Return all the active sales details.
      "increment-ratio": 1.1,
      "recipient": "alice",
      "sale-id": "",
-     "seller: "alice",
+     "seller": "alice",
+     "shared-fee": {"recipient":""},
      "start-price": 10.0,
      "timeout": "2023-06-01T00:00:00Z",
      "token-id": "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8"
@@ -279,7 +303,8 @@ Return all the active sales details.
     "increment-ratio": 1.1,
     "recipient": "alice",
     "sale-id": "DmxMgittQd4Duf0WQdeySZkx_I4yvQ3phecLpWMzmw8",
-    "seller: "alice",
+    "seller": "alice",
+    "shared-fee": {"recipient":""},
     "start-price": 10.0,
     "timeout": "2023-06-01T00:00:00Z",
     "token-id": "t:sMd0A3s6ZoiHd0RCzZ3XqVcTmOcoNvi73hl1gWXUMSA"}
@@ -312,7 +337,9 @@ Return all ended sales:
      "escrow-account": "c:09-juxzBu412pfsgBlM6Au7fOnwvSsX78Er66vnC6sI",
      "increment-ratio": 1.1,
      "recipient": "alice",
-     "sale-id": "",
+     "sale-id": "DmxMgittQd4Duf0WQdeySZkx_I4yvQ3phecLpWMzmw8",
+     "seller": "alice",
+     "shared-fee": {"recipient":""},
      "start-price": 10.0,
      "timeout": "2023-06-01T00:00:00Z",
      "token-id": "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8"

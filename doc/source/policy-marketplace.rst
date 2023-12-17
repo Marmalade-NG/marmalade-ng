@@ -27,6 +27,27 @@ whether this sale can be listed or not.
 
 This policy works whatever the sale scheme.
 
+.. _POLICY-MARKETPLACE-SHARED-FEES:
+
+Shared fees
+~~~~~~~~~~~
+The marketplace that created the sale has the possibility of sharing its fees with the buying marketplace.
+
+The following conditions must be met:
+  - The ``shared-rate`` field in the fee object must be set (between 0.0 and 1.0)
+  - During the continue transaction the buying marketplace must include the ``shared_fee`` object in the transaction data.
+
+Then, the fees are split in the following way:
+   - Buying Marketplace: Buying_Fee = shared-rate * Fee
+   - Selling Marketplace : Selling_Fee = (1.0 - shared-rate) * Fee
+   - If there is no ``shared-fee`` object in the continue transaction, the Buying marketplace receives the totality of the fee.
+
+A Marketplace that doesn't want to share fees must simply include shared-rate = 0.0 in the fee object.
+
+**Note:** A smart user might buy directly the NFT without using a Marketplace Frontend. In this case, the user
+will be able to appropriate the shared part of the marketplace fee.
+
+
 Implemented hooks
 ^^^^^^^^^^^^^^^^^
 
@@ -66,11 +87,23 @@ Handled by ``(enforce-sale-offer)``
     min-fee:decimal ; Minimum absolute fee
     fee-rate:decimal ; Fee rate
     max-fee:decimal ; Maximum absolute fee
+    shared-rate:decimal; Share fee with the buying marketplace
   )
 
 Both objects must be present in the ``(sale)`` transaction. And both objects must
 have the same currency.
 
+marmalade_shared_fee
+~~~~~~~~~~~~~~~~~~~~
+Handled by ``(enforce-sale-settle)``
+
+Optional object. If not present, the whole fee amount is paid to the initial market place.
+
+.. code:: lisp
+
+  (defschema shared-fee-msg
+    recipient:string ; Recipient account for the shared-fee
+  )
 
 
 External functions
@@ -98,7 +131,8 @@ Return the detail of the marketplace fee record for the given sale
                        "marketplace-account": "r.user.best-market",
                        "marketplace-name": "BestMarket",
                        "max-fee": 10000.0,
-                       "min-fee": 0.2},
+                       "min-fee": 0.2,
+                       "shared-rate":0.0},
    "marketplace-hash": "clALAwFdf6Xd17bVFGK1Jxo6b92TkNdZ2YHD4I3ZtKw",
    "sale-id": "MdXO502ljyF-O6YJV-ODmTuhqFF2Zn6Wa0ONQZu1P8o",
    "token-id": "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I"}
@@ -128,7 +162,8 @@ A marketplace should not rely blindly on these information. The marketplace must
                        "marketplace-account": "r.user.best-market",
                        "marketplace-name": "BestMarket",
                        "max-fee": 0.2,
-                       "min-fee": 0.0},
+                       "min-fee": 0.0,
+                       "shared-rate":0.0},
     "marketplace-hash": "zE-T8f_kTazOs7IuC-dNZ4Nf3KnkDymeozRb66QlrBk",
     "sale-id": "rmIkCdd9907zaaVDRhnkIiig1mZclYnkLbsGzgXuCLk",
     "token-id": "t:9Dh2pSjMjXLPERZnbE-aDuXQuquuOkgxSOgS-hYYX7Q"},
@@ -139,7 +174,8 @@ A marketplace should not rely blindly on these information. The marketplace must
                          "marketplace-account": "r.user.best-market",
                          "marketplace-name": "BestMarket",
                          "max-fee": 10000.0,
-                         "min-fee": 0.2},
+                         "min-fee": 0.2,
+                         "shared-rate":0.0},
      "marketplace-hash": "clALAwFdf6Xd17bVFGK1Jxo6b92TkNdZ2YHD4I3ZtKw",
      "sale-id": "MdXO502ljyF-O6YJV-ODmTuhqFF2Zn6Wa0ONQZu1P8o",
      "token-id": "t:QvuWzPPKhSlueC9hryQKJ-ItFPGtdOhDDhrD4q8lc-I"}
@@ -168,7 +204,8 @@ Return the details of the market place fee record for a given market hash.
                        "marketplace-account": "r.user.best-market",
                        "marketplace-name": "BestMarket",
                        "max-fee": 0.2,
-                       "min-fee": 0.0},
+                       "min-fee": 0.0,
+                       "shared-rate":0.0},
     "marketplace-hash": "zE-T8f_kTazOs7IuC-dNZ4Nf3KnkDymeozRb66QlrBk",
     "sale-id": "rmIkCdd9907zaaVDRhnkIiig1mZclYnkLbsGzgXuCLk",
     "token-id": "t:9Dh2pSjMjXLPERZnbE-aDuXQuquuOkgxSOgS-hYYX7Q"}

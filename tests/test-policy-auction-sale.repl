@@ -214,7 +214,7 @@
 (commit-tx)
 
 
-;try an extension tomeout
+; try an extension timeout
 ; Carol will bid just 29 minutes before the end
 (begin-tx "Carol wants to bid just before the end")
 (env-chain-data {"block-time": (time "2023-05-31T23:51:00Z")})
@@ -338,5 +338,76 @@
 ; Verify that the NFT has been refunded to alice
 (expect "Balance of alice is 0.5" 0.5 (get-balance "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8" "alice"))
 
+
+(commit-tx)
+
+
+;===== AUCTION SALE with shared fees
+;
+; Let's create a shared fee account
+(begin-tx)
+(env-data {'ks:["shared-key"]})
+(coin.create-account "shared" (read-keyset 'ks))
+(commit-tx)
+
+; Alice put into sale
+; try another auction but with no bidder
+(begin-tx "Sales 3")
+(env-hash (hash "auction-sale-3"))
+(env-chain-data {"block-time": (time "2023-07-01T00:00:00Z")})
+(print (format "Sale ID 3: => {}" [(tx-hash)]))
+
+; Alice will sell 0.2
+(use marmalade-ng.ledger)
+(use marmalade-ng.policy-auction-sale)
+
+; Verify the initial balance of alice
+(expect "Balance of alice is 0.5" 0.5 (get-balance "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8" "alice"))
+
+
+(env-sigs [ {'key:"alice-key", 'caps:[(OFFER "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8" "alice" 0.2)]}
+           ])
+
+(env-data {'marmalade_sale: {'sale_type:"auction", 'currency:coin },
+           'marmalade_auction: {'recipient:"alice", 'start_price:10.0, 'increment_ratio:1.1 }})
+
+
+(sale "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8" "alice" 0.2 (time "2023-08-01T00:00:00Z"))
+
+(print (+ "Escrow account: => " (at 'escrow-account (get-sale (tx-hash)))))
+
+(commit-tx)
+
+
+
+(begin-tx "Bob wants to bid on sale 3")
+(env-chain-data {"block-time": (time "2023-07-31T00:00:00Z")})
+(use marmalade-ng.policy-auction-sale)
+
+(env-data {'bob-ks:["bob-key"],
+           'marmalade_shared_fee:{'recipient:"shared"}})
+
+
+(env-sigs [ {'key:"bob-key", 'caps:[(coin.TRANSFER "bob" "c:oc1R7weJasH-ub6PgJSDROgvX-9osRhU1Mmvm9u9Gbs" 10.0)]}
+           ])
+
+(place-bid "YdYqbazQQCnGWkM_5qcOwXQn3XdwyfYISupEUOdN-MY" "bob" (read-keyset 'bob-ks) 10.0)
+
+(commit-tx)
+
+
+(begin-tx "Close the defpact")
+(env-chain-data {"block-time": (time "2023-08-02T00:00:00Z")})
+(use marmalade-ng.policy-auction-sale)
+
+; First we don't include shared fee => should not work
+(env-data {'buyer:"bob", 'buyer-guard:{'pred:"keys-all", 'keys:["bob-key"]}})
+(expect-failure "Without shared fee" "Shared fee doesn't match"
+                (continue-pact 1 false (hash "auction-sale-3")))
+
+; Now include it
+(env-data {'buyer:"bob", 'buyer-guard:{'pred:"keys-all", 'keys:["bob-key"]},
+           'marmalade_shared_fee:{'recipient:"shared"}})
+(continue-pact 1 false (hash "auction-sale-3"))
 
 (commit-tx)

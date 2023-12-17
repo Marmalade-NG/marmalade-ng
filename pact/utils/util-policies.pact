@@ -79,6 +79,18 @@
     (enforce-get-msg-data "sale" token))
 
   ;-----------------------------------------------------------------------------
+  ; Shared fee messages
+  ;-----------------------------------------------------------------------------
+  (defschema shared-fee-msg
+    recipient:string ; Recipient account for the shared-fee
+  )
+
+  (defconst DEFAULT-SHARED-FEE:object{shared-fee-msg} {'recipient:""})
+
+  (defun read-shared-fee-msg:object{shared-fee-msg} (token:object{token-info})
+    (get-msg-data "shared_fee" token DEFAULT-SHARED-FEE))
+
+  ;-----------------------------------------------------------------------------
   ; Sales common utils
   ;-----------------------------------------------------------------------------
   (defun check-fungible-account:bool (currency:module{fungible-v2} acct:string)

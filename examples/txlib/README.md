@@ -64,8 +64,16 @@
 - Start a fixed quote sale
 - Needed signatures : ``gas-payer-key``, ``seller-XX.key``
 
+**fixed-sale/fixed-sale-with-marketplace.tkpl:**
+- Start a fixed quote sale with Marketplace and shared fees
+- Needed signatures : ``gas-payer-key``, ``seller-XX.key``
+
 **fixed-sale/buy.tkpl:**
 - Complete the fixed quote sale and buy the token
+- Needed signatures : ``gas-payer-key``, ``buyer-XX.key``
+
+**fixed-sale/buy-shared-fee.tkpl:**
+- Complete the fixed quote sale and buy the token with shared fees
 - Needed signatures : ``gas-payer-key``, ``buyer-XX.key``
 
 **auction-sale/auction-sale.tkpl:**
@@ -76,8 +84,16 @@
 - Bid an auction
 - Needed signatures : ``gas-payer-key``, ``buyer-XX.key``
 
+**auction-sale/bid-shared-fee.tkpl:**
+- Bid an auction with shared fees
+- Needed signatures : ``gas-payer-key``, ``buyer-XX.key``
+
 **auction-sale/complete.tkpl:**
 - Complete and settle an auction sale (after the timeout)
+- Needed signatures : ``gas-payer-key``
+
+**auction-sale/complete-shared-fee.tkpl:**
+- Complete and settle an auction sale with shared fee.
 - Needed signatures : ``gas-payer-key``
 
 **transfer/transfer-ng.tkpl:**
