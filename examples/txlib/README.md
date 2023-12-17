@@ -84,8 +84,16 @@
 - Bid an auction
 - Needed signatures : ``gas-payer-key``, ``buyer-XX.key``
 
+**auction-sale/bid-shared-fee.tkpl:**
+- Bid an auction with shared fees
+- Needed signatures : ``gas-payer-key``, ``buyer-XX.key``
+
 **auction-sale/complete.tkpl:**
 - Complete and settle an auction sale (after the timeout)
+- Needed signatures : ``gas-payer-key``
+
+**auction-sale/complete-shared-fee.tkpl:**
+- Complete and settle an auction sale with shared fee.
 - Needed signatures : ``gas-payer-key``
 
 **transfer/transfer-ng.tkpl:**
