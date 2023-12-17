@@ -72,6 +72,10 @@
 - Complete the fixed quote sale and buy the token
 - Needed signatures : ``gas-payer-key``, ``buyer-XX.key``
 
+**fixed-sale/buy-shared-fee.tkpl:**
+- Complete the fixed quote sale and buy the token with shared fees
+- Needed signatures : ``gas-payer-key``, ``buyer-XX.key``
+
 **auction-sale/auction-sale.tkpl:**
 - Start an auction sale
 - Needed signatures : ``gas-payer-key``, ``seller-XX.key``
