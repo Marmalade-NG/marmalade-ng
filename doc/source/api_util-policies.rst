@@ -34,10 +34,10 @@ get-msg-data
 ^^^^^^^^^^^^
 *domain* ``string``  *token* ``object{token-info}`` *default* ``object``  *→* ``object``
 
-Read an optional message from data, trying to read
-- per-token message
-- then fallback to a global message
-- and if nothing is available return the default as a fallback
+Read an optional message from data, trying to read:
+  - per-token message
+  - then fallback to a global message
+  - and if nothing is available return the default as a fallback
 
 
 enforce-get-msg-data
