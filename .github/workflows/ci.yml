@@ -18,8 +18,8 @@ jobs:
 
       - name: Install Pact
         run: |
-          wget -nv https://github.com/kadena-io/pact/releases/download/v4.9.0/pact-4.9.0-linux-20.04.zip
-          unzip pact-4.9.0-linux-20.04.zip  pact -d .bin
+          wget -nv https://github.com/kadena-io/pact/releases/download/v4.10.0/pact-4.10.0-linux-20.04.zip
+          unzip pact-4.10.0-linux-20.04.zip  pact -d .bin
           chmod +x .bin/pact
 
       - name: Units Tests

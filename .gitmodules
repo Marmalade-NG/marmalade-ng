@@ -1,4 +1,4 @@
 [submodule "tests/kadena_repl_sandbox"]
 	path = tests/kadena_repl_sandbox
 	url = https://github.com/CryptoPascal31/kadena_repl_sandbox.git
-  branch = v0.8pre
+  branch = main
