@@ -1,11 +1,19 @@
-NAMESPACE = "n_442d3e11cfe0d39859878e5b1520cd8b8c36e5db"
-KIP_NAMESPACE = "n_5caec7ffe20c6e09fd632fb1ee04468848966332"
+#testnet
 
-DATA_FILE = testnet_data.yaml
+#NAMESPACE = "n_442d3e11cfe0d39859878e5b1520cd8b8c36e5db"
+#KIP_NAMESPACE = "n_5caec7ffe20c6e09fd632fb1ee04468848966332"
+#DATA_FILE = testnet_data.yaml
 
 KEY_FILES = keys/a35.yaml \
             keys/e2e.yaml \
             keys/e97.yaml
+
+#mainnet
+NAMESPACE = "n_4e470a97222514a8662dd1219000a0431451b0ee"
+KIP_NAMESPACE = "n_4e47017ea6449649e13d79906dd1697fb1fe1d7a"
+DATA_FILE = mainnet_data.yaml
+
+KEY_FILES =
 
 INIT=-D__INIT__
 
@@ -39,6 +47,7 @@ TRANSACTION_FILES = interface-poly-fungible \
 
 
 all: $(addprefix tx_, $(addsuffix .json, ${TRANSACTION_FILES}))
+yaml: $(addprefix tx_, $(addsuffix .yaml, ${TRANSACTION_FILES}))
 
 .pact:
 	mkdir -p .pact

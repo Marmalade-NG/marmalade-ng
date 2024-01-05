@@ -1,0 +1,15 @@
+chain: 8
+network: mainnet01
+admin-keyset: n_4e470a97222514a8662dd1219000a0431451b0ee.admin-multi-sig
+extra-policies-admin-keyset: n_4e470a97222514a8662dd1219000a0431451b0ee.admin-multi-sig
+gas-payer: util-lib-deployer-new
+
+# interface (KIP) namespace is defined by {pred:"keys-any" keys:"[namespace-key, alt-namespace-key]}
+# while modules namespace is defined by {pred:"keys-all" keys:"[namespace-key]}
+namespace-key: 4e70958bc74b248cfe373e41aaa7bd0ad72b9bf002dc7d6fa27ce2de215ccdd4
+alt-namespace-key: 4e70958bc74b248cfe373e41aaa7bd0ad72b9bf002dc7d6fa27ce2de215ccdd4
+admin-key: 4e70958bc74b248cfe373e41aaa7bd0ad72b9bf002dc7d6fa27ce2de215ccdd4
+gas-payer-key: ce0bc52493dd69b2325b56565b099865f7e6cb007523d27b5f166d21b1aaabe5
+
+# Should the governance lock the namespace
+lock-namespace: false
