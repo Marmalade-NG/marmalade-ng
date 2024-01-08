@@ -52,7 +52,7 @@ kda send tx_governance.json
 before proceeding to the next step you can verify that everything is ok and has been deployed.
 
 ```sh
-kda poll governance.json
+kda poll tx_governance.json | jq
 ```
 
 ## Deploy Marmalade core
