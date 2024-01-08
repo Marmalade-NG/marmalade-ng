@@ -4,6 +4,30 @@
 
 The project aims to create a fork / rewrite of Marmalade-V2.
 
+## Deployment
+
+### Mainnet
+
+Marmalade NG is currently deployed on chain on Kadena Mainnet:
+  - chains : **1** and **8**
+  - Main namespace : **n_4e470a97222514a8662dd1219000a0431451b0ee**
+  - Poly-Fungible Namespace: **n_4e47017ea6449649e13d79906dd1697fb1fe1d7a**
+  - Extra Policies Namespace: **n_4e470ef3de0596d74595c92510f7e4de20e6bd0a**
+
+
+### Testnet
+
+Marmalade NG is currently deployed on chain on Testnet:
+  - chain : **1**
+  - namespace : **n_442d3e11cfe0d39859878e5b1520cd8b8c36e5db**
+
+### Explorer
+
+An explorer is deployed here:
+
+https://explorer.marmalade-ng.xyz
+
+
 ## Project goals
 
 ### Business code "In policy only"
@@ -49,16 +73,12 @@ https://github.com/CryptoPascal31/kadena_repl_sandbox/blob/marmalade-ng/example-
 The example should work out-of-the-box with the `pact` [1] executable.
 
 
-### On chain (Testnet)
 
-Marmalade NG is currently deployed on chain on Testnet:
-  - chain : **1**
-  - namespace : **n_442d3e11cfe0d39859878e5b1520cd8b8c36e5db**
 
 This repository contains many examples of *almost ready-to-be-used* transactions with the `kda`[2] tool. And most explanations are given in the corresponding Readme.
 [./examples/txlib](./examples/txlib)
 
-The PoC explorer: https://explorer.marmalade-ng.xyz can be used to check the results.
+
 
 * [1] https://github.com/kadena-io/pact/releases
 * [2] https://github.com/kadena-io/kda-tool/releases
