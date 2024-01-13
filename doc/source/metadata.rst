@@ -4,7 +4,17 @@ Marmalade NG Metadata
 =====================
 The URI of a token (as retrieved by :ref:`LEDGER-GET-URI`) must point to a JSON off-chain Metadata Object.
 
-Ideally the Object is stored on ipfs. (``ipfs://CID``).
+It is highly recommended to only store metadata (and NFTs related content like images) in reliable, immutable and long term storage.
+As such URI starting with ``https://`` or ``http://`` must be avoided. And Marketplaces should tag these NFTs as unsafe.
+
+The 2 available options for NFT storage are either:
+
+* IPFS (``ipfs://CID``), with a sufficient number of pinning servers (Filecoin may help)
+
+* KDAFS (``kdafs://network:chain/namespace.module/CID``) (as per Draft KIP 25: https://github.com/kadena-io/KIPs/blob/75099f2e112c87ad4669f1a643cbd7bf49cfce66/kip-0025.md)
+
+
+Note that the reference implementation of Marmalade NG: (https://explorer.marmalade-ng.xyz) supports in native ipfs and kdafs.
 
 Specification
 ~~~~~~~~~~~~~
@@ -32,6 +42,7 @@ A token metadata has the following format:
     - | A URI pointing to a resource with mime type ``image/*`` representing the asset
       | to which this NFT represents. Consider making any images at a width between
       | 320 and 1080 pixels and aspect ratio between 1.91:1 and 4:5 inclusive.
+      | The string may be a an embedded image in dataURI format as per RFC 2397.
 
   * - | attributes
       | *(Optionnal)*
