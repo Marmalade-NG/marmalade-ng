@@ -76,6 +76,10 @@
 - Complete the fixed quote sale and buy the token with shared fees
 - Needed signatures : ``gas-payer-key``, ``buyer-XX.key``
 
+**dutch-auction-sale/dutch-auction-sale.tkpl:**
+- Start a dutch auction-sale
+- Needed signatures : ``gas-payer-key``, ``seller-XX.key``
+
 **auction-sale/auction-sale.tkpl:**
 - Start an auction sale
 - Needed signatures : ``gas-payer-key``, ``seller-XX.key``
