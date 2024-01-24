@@ -20,8 +20,9 @@ The price is calculated using the following formula:
 After all the allowed time has been elapsed, and the floor price has been reached, the price stay
 constant until the sale timeout is reached.
 
-Note: The NO-TIMEOUT is supported.
+Note: ``NO-TIMEOUT`` is supported.
 
+.. image:: diagrams/dutch_auction.svg
 
 Implemented hooks
 ^^^^^^^^^^^^^^^^^

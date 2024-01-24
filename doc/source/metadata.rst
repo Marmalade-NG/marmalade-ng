@@ -14,6 +14,8 @@ The 2 available options for NFT storage are either:
 * KDAFS (``kdafs://network:chain/namespace.module/CID``) (as per Draft KIP 25: https://github.com/kadena-io/KIPs/blob/75099f2e112c87ad4669f1a643cbd7bf49cfce66/kip-0025.md)
 
 
+**In case of IPFS, the URI must not include an `https` gateway.**: Only the raw CID prefixed by ``ipfs://`` must be present.
+
 Note that the reference implementation of Marmalade NG: (https://explorer.marmalade-ng.xyz) supports in native ipfs and kdafs.
 
 Specification
