@@ -246,7 +246,7 @@ when several tokens are handled in the same transaction but with different param
 
 The second syntax acts as a fallback and allows defining a common set of parameters for all tokens.
 
-Example: Imagine a transaction that creates two tokens but with different royalty rates:
+**Example:** Imagine a transaction that creates two tokens but with different royalty rates:
 
 .. code-block:: lisp
   :caption: Pact code
@@ -279,6 +279,8 @@ Example: Imagine a transaction that creates two tokens but with different royalt
            "rate": 0.2 }
     }
 
+**Note:** Data messages must be manually encoded using Pact Values rules:
+`Pact API <https://api.chainweb.com/openapi/pact.html#tag/model-pact-value>`_
 
 .. _CONCEPTS-SALE:
 
