@@ -147,7 +147,8 @@ We need to include the objects ``marmalade_collection`` and ``marmalade_royalty`
     "marmalade_royalty": {"creator_acct":"k:9ded186eb20c495ca1f08d59722237024282da264db1ed8d5aaf4ca4d351edd0",
                           "creator_guard":{"pred":"keys-all",
                                            "keys":["9ded186eb20c495ca1f08d59722237024282da264db1ed8d5aaf4ca4d351edd0"]},
-                          "rate": 0.05 }
+                          "rate": 0.05,
+                          "currencies": [coin, kdlaunch.kdswap-token] }
     }
 
 - Sign with ``creation-key`` (cap ``(ledger.ENFORCE-RESERVED)``)
