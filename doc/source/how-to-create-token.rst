@@ -8,9 +8,9 @@ Choose a set of policies
 ~~~~~~~~~~~~~~~~~~~~~~~~
 There is no rule of thumb...
 
-However some guidelines:
+However, some guidelines:
 
-Choose at least one policy that manaages the minting process:
+Choose at least one policy that manages the minting process:
    - ``INSTANT-MINT`` or ``GUARDS``
    - ``FIXED-ISSUANCE``
    - ``NON-FUNGIBLE``
@@ -32,7 +32,7 @@ to be sold on a Marketplace.
 As well, you may want to choose ``ROYALTY`` or ``ADJUSTABLE-ROYALTY``.
 
 Usually ``EXTRA-POLICY`` should be chosen to benefit from the new features and new sales
-mechanisms introduced by the devellopers.
+mechanisms introduced by the developers.
 
 
 Optional: Create a collection
