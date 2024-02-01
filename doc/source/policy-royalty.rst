@@ -69,7 +69,7 @@ Handled by ``(enforce-sale-init)``
 
 This object is mandatory during creation.
 ``rate`` is between 0.0 and 1.0 (eg. For 5%, rate=0.05).
-``currency`` must be the list of allowed currencies for payment.
+``currencies`` must be the list of allowed currencies for payment.
 
 
 External functions
