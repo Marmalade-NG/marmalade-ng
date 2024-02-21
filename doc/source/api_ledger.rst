@@ -309,7 +309,7 @@ The managed capability ``(TRANSFER id sender receiver amount)`` must be installe
 
 sale (defpact)
 ~~~~~~~~~~~~~~
-*id* ``string`` *sellet* ``string`` *amount* ``decimal`` *timeout* ``time`` *→* ``bool``
+*id* ``string`` *seller* ``string`` *amount* ``decimal`` *timeout* ``time`` *→* ``bool``
 
 Put into sale an amount of token, with a given *timeout*.
 
