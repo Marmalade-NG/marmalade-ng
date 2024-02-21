@@ -176,36 +176,36 @@ Return the sale details of a given sale-id.
    "token-id": "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8"
   }
 
-  get-sales-for-token
-  ~~~~~~~~~~~~~~~~~~~
-  *token-id* ``string`` *→* ``[object{auction-sch}]``
+get-sales-for-token
+~~~~~~~~~~~~~~~~~~~
+*token-id* ``string`` *→* ``[object{auction-sch}]``
 
-  Return all the active sales details for a given token.
+Return all the active sales details for a given token.
 
-  **Important**: Local only function. Do not use in transactions
+**Important**: Local only function. Do not use in transactions
 
-  .. code:: lisp
+.. code:: lisp
 
-    (use marmalade-ng.policy-auction-sale)
-    (get-sales-for-token "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8")
+  (use marmalade-ng.policy-auction-sale)
+  (get-sales-for-token "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8")
 
-  .. code-block::
+.. code-block::
 
-    [{"amount": 0.1,
-       "currency": coin,
-       "current-buyer": "",
-       "current-price": 0.0,
-       "enabled": true,
-       "escrow-account": "c:09-juxzBu412pfsgBlM6Au7fOnwvSsX78Er66vnC6sI",
-       "increment-ratio": 1.1,
-       "recipient": "alice",
-       "sale-id": "",
-       "seller": "alice",
-       "shared-fee": {"recipient":""},
-       "start-price": 10.0,
-       "timeout": "2023-06-01T00:00:00Z",
-       "token-id": "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8"
-      }]
+  [{"amount": 0.1,
+     "currency": coin,
+     "current-buyer": "",
+     "current-price": 0.0,
+     "enabled": true,
+     "escrow-account": "c:09-juxzBu412pfsgBlM6Au7fOnwvSsX78Er66vnC6sI",
+     "increment-ratio": 1.1,
+     "recipient": "alice",
+     "sale-id": "",
+     "seller": "alice",
+     "shared-fee": {"recipient":""},
+     "start-price": 10.0,
+     "timeout": "2023-06-01T00:00:00Z",
+     "token-id": "t:LWZdYIxjht_J_PCA4RrThTdjD9VDCvkWabnh8tKNST8"
+    }]
 
 
 .. _POLICY-AUCTION-SALE-GET-SALES-FROM-ACCOUNT:
