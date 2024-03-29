@@ -7,8 +7,8 @@ Description
 ^^^^^^^^^^^
 
 This policy manages a fixed quote sale:
-  - The seller of the token puts its token on sale and propose a price.
-  - The first person that is willing to pay the requested price buy the token.
+  - The seller of the token puts its token on sale and proposes a price.
+  - The first person that is willing to pay the requested price buys the token.
 
 This policy work in several steps:
 
@@ -32,6 +32,15 @@ Although, this policy supports the ``NO-TIMEOUT`` parameter.
 
 When used, there is no time-limit to buy. But the seller can withdraw at any time, by signing with its Marmalade account guard
 (can be scoped with ``(FORCE-WITHDRAW sale-id)``).
+
+Seller and Recipient
+^^^^^^^^^^^^^^^^^^^^
+This policy manages two differents concepts:
+
+* seller: The account that was previously owning the Token. This information comes from the ledger itself.
+* recipient: The account that will receive the payment. The information is set-up through the `fixed_quote` structure.
+
+These two pieces of information may be the same, but it's not mandatory. Indeed, theoretically, correlation is not required between fungible accounts and Marmalade's accounts.
 
 
 Implemented hooks
