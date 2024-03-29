@@ -47,14 +47,14 @@ A token metadata has the following format:
       | The string may be a an embedded image in dataURI format as per RFC 2397.
 
   * - | attributes
-      | *(Optionnal)*
+      | *(Optional)*
     - array of objects
     - | An array of objects, each representing a characteristic or trait of the
       | NFT, with a *trait_type* field specifying the trait's name and a *value*
       | field specifying the trait's value.
 
   * - | properties
-      | *(Optionnal, see below)*
+      | *(Optional, see below)*
     - object
     - Arbitrary properties. Values may be strings, numbers, object or arrays.
 
@@ -68,18 +68,18 @@ A token metadata has the following format:
     - Description
 
   * - | authors
-      | *(Optionnal)*
+      | *(Optional)*
     - array of objects
     - | An array of authors who created or contributed to the asset. Each author
       | is an object with a *name* field specifying the author's name.
 
   * - | external_url
-      | *(Optionnal)*
+      | *(Optional)*
     - string
     - URL to an external application or website where users can also view the asset.
 
   * - | animation_url
-      | *(Optionnal)*
+      | *(Optional)*
     - string
     - | URL to a multimedia attachment of the asset. The supported file formats are
       | MP4 and MOV for video, MP3, FLAC and WAV for audio, GLB for AR/3D assets,
@@ -87,7 +87,7 @@ A token metadata has the following format:
       | provide information on the file type.
 
   * - | collection
-      | *(Optionnal)*
+      | *(Optional)*
     - object
     - | An object with a *name* field specifying the name of the collection, and a
       | *family* field specifying the larger category or group to which the collection belongs.
