@@ -4,6 +4,7 @@
   (use util-policies)
   (use ledger [NO-TIMEOUT account-guard])
   (use free.util-time [is-past is-future])
+  (use free.util-strings [to-string])
 
   ;-----------------------------------------------------------------------------
   ; Governance
@@ -18,7 +19,7 @@
     @doc "Capability to scope a signature when withdrawing an infinite timeout sale"
     true)
 
-  (defcap FIXED-SALE-OFFER (sale-id:string token-id:string price:decimal)
+  (defcap FIXED-SALE-OFFER (sale-id:string token-id:string price:decimal currency:string)
     @doc "Event sent when a fixed sale is started"
     @event
     true)
@@ -140,7 +141,7 @@
                                         'timeout: timeout,
                                         'enabled: true})
               ; Emit event always returns true
-              (emit-event (FIXED-SALE-OFFER (pact-id) token-id price))))
+              (emit-event (FIXED-SALE-OFFER (pact-id) token-id price (to-string currency)))))
           false))
   )
 
