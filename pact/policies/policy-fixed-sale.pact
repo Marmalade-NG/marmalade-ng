@@ -24,7 +24,7 @@
     @event
     true)
 
-  (defcap FIXED-SALE-BOUGHT (sale-id:string token-id:string)
+  (defcap FIXED-SALE-BOUGHT (sale-id:string token-id:string price:decimal currency:string)
     @doc "Event sent when a fixed sale is bought"
     @event
     true)
@@ -166,9 +166,9 @@
     ; First step to handle the buying part => Transfer the amount to the escrow account
     (with-read quotes (pact-id) {'currency:=currency:module{fungible-v2},
                                  'price:=price}
-      (currency::transfer-create buyer (ledger.escrow) (ledger.escrow-guard) price))
-    ; Emit the corresponding event
-    (emit-event (FIXED-SALE-BOUGHT (pact-id) (at 'id token)))
+      (currency::transfer-create buyer (ledger.escrow) (ledger.escrow-guard) price)
+      ; Emit the corresponding event
+      (emit-event (FIXED-SALE-BOUGHT (pact-id) (at 'id token) price (to-string currency))))
   )
 
   (defun enforce-sale-buy:bool (token:object{token-info} buyer:string)

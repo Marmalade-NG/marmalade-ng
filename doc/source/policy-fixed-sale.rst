@@ -239,7 +239,7 @@ Event sent when an auction is started
 
 FIXED-SALE-BOUGHT
 ~~~~~~~~~~~~~~~~~
-sale-id* ``string`` *token-id* ``string``
+sale-id* ``string`` *token-id* ``string`` *price* ``decimal`` *currency* ``string``
 
 Event sent when a fixed sale is bought
 
